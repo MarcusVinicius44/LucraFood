@@ -1,0 +1,37 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Projeto
+
+LucraFood: o dono de um restaurante pequeno fotografa o cardápio, a IA extrai os pratos, e o sistema calcula custo, margem (balcão x delivery) e um semáforo verde/amarelo/vermelho por prato. Produto e código em português (nomes de modelos, funções, rotas e mensagens de erro).
+
+## Comandos
+
+Rodar da raiz com o venv ativo (`python -m venv .venv`, `.venv\Scripts\activate` no Windows, `pip install -r requirements.txt`, `.env` copiado de `.env.example` com `GROQ_API_KEY`). Os comandos Django rodam dentro de `backend/`.
+
+```bash
+cd backend
+python manage.py migrate
+python manage.py runserver
+python manage.py test cardapio                                   # todos os testes (IA mockada, sem rede)
+python manage.py test cardapio.tests.CalculosTest.test_custo_prato   # um teste
+python manage.py extrair_cardapio caminho/da/foto.jpg            # chama a API real com uma foto
+```
+
+Não há linter configurado. O frontend (React + TypeScript, Vite em `localhost:5173`) ainda não existe; o CORS já está liberado para essa origem em `config/settings.py`.
+
+## Arquitetura
+
+Backend Django 5.2 + DRF, um único app `backend/cardapio/`, SQLite local.
+
+- **`calculos.py`: toda a matemática** (custo do prato, margem, preço sugerido, `diagnosticar` que gera o semáforo). O semáforo usa a margem do delivery: verde ≥ `margem_desejada_pct` (padrão 30), vermelho < `margem_minima_pct` (padrão 10), amarelo no meio; limiar `None` cai no padrão, e mínima > desejada é `ValueError`. Python puro com `Decimal`, sem Django nem IA. Regra central do projeto: **o LLM nunca faz conta**, só extrai dados e conversa. Qualquer cálculo financeiro novo vai aqui, com teste em `tests.py`. Percentuais entram como 0–100 (23 = 23%).
+- **`ia/`: camada de IA.** `cliente.py` usa a biblioteca `openai` apontada para o Groq (API compatível); trocar provedor/modelo é mudar `GROQ_BASE_URL` / `LUCRAFOOD_MODELO_VISAO` no `.env`. `extracao.py` faz foto → `CardapioExtraido` (Pydantic): resposta JSON validada, com **uma** nova tentativa devolvendo o erro de validação ao modelo, e `ValueError` se falhar de novo (a view converte em 502). Também remove blocos `<think>` e cercas ``` antes de parsear. Preço ilegível vira `null`, nunca chute.
+- **Fluxo em duas etapas, nada grava sem confirmação humana:** `POST /api/cardapio/extrair/` (multipart `imagem`, JPG/PNG/WEBP até 4 MB, não salva) → dono confere/corrige → `POST /api/cardapio/confirmar/` (JSON `{restaurante, pratos[]}`) grava `Prato`s. `GET/PATCH /api/restaurantes/<id>/` consulta e ajusta taxas e limiares do semáforo; `margem_minima_pct > margem_desejada_pct` devolve 400 (validação duplicada no serializer e em `Restaurante.clean`, com a mesma mensagem `MSG_MINIMA_MAIOR`). As rotas ficam em `cardapio/urls.py`, sob `/api/`.
+- **`models.py`:** `Restaurante` guarda taxa de delivery, impostos, margem desejada e margem mínima (percentuais por restaurante, nada fixo no código); `Ingrediente` guarda preço e tamanho da embalagem (custo unitário = preço / quantidade, propriedade `custo_por_unidade`); `Prato` → `ItemFichaTecnica` → `Ingrediente`. A ficha técnica ainda não tem endpoint nem agente (próximo item do roadmap, previsto com tool calling).
+- **Testes** (`cardapio/tests.py`) usam um cliente de IA falso injetado em `extrair_cardapio(cliente=...)`; mantenha esse padrão para não chamar a API real.
+- **`evals/`:** fotos reais de cardápio + gabarito JSON (mesmo nome) para medir a taxa de acerto da extração. Ainda sem script.
+
+## Docs de planejamento
+
+`BRIEFING.md` (visão, escopo, regras de negócio, roadmap) e `AGENTES_E_SKILLS.md` (agentes/skills de desenvolvimento e agentes do produto) estão alinhados com a stack real. Em caso de conflito, vale o código e o `README.md`.

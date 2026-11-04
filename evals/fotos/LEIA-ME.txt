@@ -1,0 +1,1 @@
+Coloque aqui as fotos de cardápio (com permissão do restaurante) e o gabarito em JSON com o mesmo nome. O script de avaliação vem na etapa 5.
