@@ -1,0 +1,19 @@
+Conjunto de avaliação da extração de cardápio.
+
+Estrutura: cada foto tem um gabarito com o mesmo nome.
+    cardapio_01.png   (ou .jpg / .jpeg / .webp)
+    cardapio_01.json
+
+O gabarito usa o mesmo formato que a extração devolve:
+    {"pratos": [{"nome": "X-Tudo", "descricao": null, "categoria": "Lanches", "preco": 24.90}]}
+
+- "preco": número em reais, ou null quando o cardápio não mostra preço.
+- Cardápio com tamanhos/porções: um item por tamanho, com o tamanho no nome
+  (mesma regra do prompt de extração), ex.: "Pizza Calabresa (G)".
+- Só "nome" e "preco" entram na pontuação. descricao e categoria são informativas.
+- Foto sem gabarito é ignorada pelo comando (com aviso).
+- Use fotos com permissão do restaurante.
+
+Rodar (da pasta backend/, com o .env preenchido):
+    python manage.py avaliar_extracao                  # todas as fotos (chama a API real)
+    python manage.py avaliar_extracao --foto cardapio_01

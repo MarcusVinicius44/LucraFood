@@ -142,3 +142,41 @@ class MargemMinimaValidacaoTest(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.r.refresh_from_db()
         self.assertEqual(self.r.margem_minima_pct, Decimal("20"))
+
+
+class AvaliacaoTest(TestCase):
+    def _p(self, nome, preco):
+        return SimpleNamespace(nome=nome, preco=None if preco is None else Decimal(str(preco)))
+
+    def test_conta_encontrados_faltando_inventados_e_precos_errados(self):
+        from .avaliacao import comparar
+
+        gabarito = [self._p("X-Tudo", 24.9), self._p("Suco de Laranja", 8), self._p("Coxinha", 7)]
+        extraido = [self._p("X Tudo", 24.9), self._p("Suco de laranja", 9), self._p("Pastel", 6)]
+        r = comparar(gabarito, extraido)
+        self.assertEqual((r.gabarito, r.extraidos, r.encontrados), (3, 3, 2))
+        self.assertEqual(r.faltando, ["Coxinha"])
+        self.assertEqual(r.inventados, ["Pastel"])
+        self.assertEqual(r.precos_errados, [("Suco de Laranja", Decimal("8"), Decimal("9"))])
+
+    def test_nome_tolera_acento_caixa_e_sufixo(self):
+        from .avaliacao import comparar
+
+        r = comparar([self._p("Bacalhau na Brasa (Prato Individual)", 130)], [self._p("BACALHAU NA BRASA", 130)])
+        self.assertEqual(r.encontrados, 1)
+        self.assertEqual(r.precos_errados, [])
+
+    def test_tamanhos_diferentes_nao_se_misturam(self):
+        from .avaliacao import comparar
+
+        gab = [self._p("Espiritual (1 pessoa)", 80), self._p("Espiritual (2 pessoas)", 135)]
+        ext = [self._p("Espiritual (2 pessoas)", 135), self._p("Espiritual (1 pessoa)", 80)]
+        r = comparar(gab, ext)
+        self.assertEqual(r.encontrados, 2)
+        self.assertEqual(r.precos_errados, [])
+
+    def test_preco_null_so_confere_com_null(self):
+        from .avaliacao import comparar
+
+        r = comparar([self._p("Suco", None), self._p("Água", None)], [self._p("Suco", None), self._p("Água", 3)])
+        self.assertEqual([x[0] for x in r.precos_errados], ["Água"])

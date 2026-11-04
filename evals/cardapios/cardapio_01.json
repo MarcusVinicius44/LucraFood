@@ -1,0 +1,10 @@
+{
+  "pratos": [
+    {"nome": "Bacalhau na Brasa (Prato Individual)", "descricao": "Alcaparras, alho, azeite, bacalhau (200g), batata soute, brocolis, cebolas, tomates cereja e salsa picada.", "categoria": null, "preco": 130.00},
+    {"nome": "Bacalhau à Moda da Casa (Prato Individual)", "descricao": "Alho, azeite, arroz branco, azeitonas azapa, bacalhau (200g), batatas ao murro, brocolis, cebola e salsa picada.", "categoria": null, "preco": 130.00},
+    {"nome": "Bacalhau à Moda de Braga (Prato Individual)", "descricao": "Alho, azeite, azeitonas, bacalhau (200g), batatas, cebolas, pimentoes amarelo e vermelho puxado a vinho branco.", "categoria": null, "preco": 125.00},
+    {"nome": "Bacalhau com Natas (2 pessoas)", "descricao": "Alho, azeite, bacalhau desfiado, batata, cebolas, natas e queijo parmesao.", "categoria": null, "preco": 140.00},
+    {"nome": "Bacalhau Espiritual (1 pessoa)", "descricao": "Alho, azeite, cebola, cenoura, bacalhau desfiado, molho bechamel e especiarias.", "categoria": null, "preco": 80.00},
+    {"nome": "Bacalhau Espiritual (2 pessoas)", "descricao": "Alho, azeite, cebola, cenoura, bacalhau desfiado, molho bechamel e especiarias.", "categoria": null, "preco": 135.00}
+  ]
+}
