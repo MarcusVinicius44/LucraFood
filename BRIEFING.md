@@ -100,7 +100,7 @@ Princípios: a IA **sugere, o dono confirma**; nunca gravar valores financeiros 
 - Privacidade/LGPD para fotos e dados financeiros do negócio.
 
 ## 13. Roadmap proposto
-**Status atual:** já existem a extração de cardápio por foto (com validação e retry), o motor de cálculo de custo/margem/preço sugerido (com testes) e os endpoints `extrair` e `confirmar`. Faltam o agente de ficha técnica, o painel React, o conjunto de avaliação (`evals/`) e o teste com restaurantes reais.
+**Status atual:** já existem a extração de cardápio por foto (com validação e retry), o motor de cálculo de custo/margem/preço sugerido (com testes) e os endpoints `extrair` e `confirmar`. Já existe o comando de avaliação da extração (`avaliar_extracao`, com 1 foto de gabarito). Faltam o agente de ficha técnica, o painel React, mais gabaritos em `evals/cardapios/` e o teste com restaurantes reais.
 
 1. **Fase 0 — Descoberta (1 sem):** entrevistar 5–10 donos, validar as dores e testar fotos reais de cardápio com o modelo.
 2. **Fase 1 — Protótipo do núcleo (2–3 sem):** foto → pratos → ingredientes → ficha técnica → cálculo de margem (sem polimento).
@@ -117,6 +117,6 @@ Princípios: a IA **sugere, o dono confirma**; nunca gravar valores financeiros 
 
 ## 15. Próximos passos imediatos
 1. Validar este briefing e fechar as perguntas em aberto prioritárias.
-2. Juntar 5–10 fotos reais de cardápios em `evals/fotos/` (com gabarito JSON) e criar o script de avaliação da extração.
+2. Montar o gabarito JSON das demais fotos em `evals/cardapios/` (hoje só `cardapio_01` tem) e rodar `avaliar_extracao` para ter a taxa de acerto de referência.
 3. Implementar o agente de ficha técnica com tool calling e os endpoints correspondentes.
 4. Desenhar o fluxo de telas do MVP (foto → revisão → ficha técnica → painel) e iniciar o front React.

@@ -16,7 +16,7 @@ Pequenos restaurantes costumam precificar no "achismo". Quando entram em aplicat
 - **Saída estruturada e validada.** A resposta do modelo passa por Pydantic. Se falhar, o erro volta para o modelo e há uma nova tentativa; se falhar de novo, o usuário recebe um erro claro em vez de dados inventados.
 - **Sem chute de preço.** Preço ilegível vira `null` e o dono confere antes de salvar. Nada é gravado sem confirmação humana.
 - **Provedor trocável.** Usa a biblioteca `openai` com a API compatível do Groq. Mudar de modelo ou provedor é uma variável de ambiente.
-- **Avaliação medida, não "parece que funciona".** A pasta `evals/` vai reunir fotos reais com gabarito para medir a taxa de acerto. *(em construção)*
+- **Avaliação medida, não "parece que funciona".** `evals/cardapios/` reúne fotos reais com gabarito, e `python manage.py avaliar_extracao` mede encontrados, faltando, inventados e preços errados. *(1 foto avaliada por enquanto)*
 
 ## Stack
 
