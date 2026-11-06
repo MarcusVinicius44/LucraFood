@@ -15,6 +15,7 @@ from cardapio.avaliacao import Resultado, comparar
 from cardapio.ia.extracao import (
     CardapioExtraido,
     FalhaDeCota,
+    FotoIlegivel,
     ProvedorIndisponivel,
     Uso,
     extrair_cardapio_com_uso,
@@ -76,6 +77,8 @@ class Command(BaseCommand):
             except Exception as erro:  # qualquer falha é registrada e a avaliação segue
                 if isinstance(erro, FalhaDeCota):
                     rotulo, lista = "FALHA DE COTA", falhas_cota
+                elif isinstance(erro, FotoIlegivel):
+                    rotulo, lista = "FOTO ILEGÍVEL", falhas
                 elif isinstance(erro, ProvedorIndisponivel):
                     rotulo, lista = "PROVEDOR INDISPONÍVEL", falhas_503
                 else:

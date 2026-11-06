@@ -5,7 +5,7 @@ from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
 
-from cardapio.ia.extracao import extrair_cardapio
+from cardapio.ia.extracao import FotoIlegivel, extrair_cardapio
 
 
 class Command(BaseCommand):
@@ -21,7 +21,10 @@ class Command(BaseCommand):
         mime = mimetypes.guess_type(caminho.name)[0] or "image/jpeg"
 
         inicio = time.perf_counter()
-        cardapio = extrair_cardapio(caminho.read_bytes(), mime)
+        try:
+            cardapio = extrair_cardapio(caminho.read_bytes(), mime)
+        except FotoIlegivel as erro:
+            raise CommandError(f"{erro} -> tire outra foto (boa luz, celular parado, cardápio inteiro).")
         segundos = time.perf_counter() - inicio
 
         for p in cardapio.pratos:

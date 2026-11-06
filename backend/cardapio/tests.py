@@ -18,6 +18,7 @@ from .ia.faixas import juntar, recortar
 from .ia.limitador import LimitadorSaida
 from .ia.extracao import (
     FalhaDeCota,
+    FotoIlegivel,
     ProvedorIndisponivel,
     SaidaCortada,
     Uso,
@@ -158,6 +159,44 @@ class Retry429Test(TestCase):
         cliente.chat.completions.create.return_value = r
         _, uso = extrair_cardapio_com_uso(b"fake", cliente=cliente)
         self.assertEqual((uso.entrada, uso.saida), (1500, 200))
+
+
+class FotoIlegivelTest(TestCase):
+    def _cliente(self, *textos):
+        cliente = MagicMock()
+        cliente.chat.completions.create.side_effect = [_resposta(t) for t in textos]
+        return cliente
+
+    def test_modelo_avisa_foto_ilegivel(self):
+        cliente = self._cliente('{"foto_ilegivel": "foto desfocada", "pratos": []}')
+        with self.assertRaises(FotoIlegivel) as ctx:
+            extrair_cardapio(b"fake", cliente=cliente)
+        self.assertEqual(ctx.exception.motivo, "foto desfocada")
+
+    def test_lista_vazia_sem_motivo_tambem_e_ilegivel(self):
+        with self.assertRaises(FotoIlegivel) as ctx:
+            extrair_cardapio(b"fake", cliente=self._cliente('{"pratos": []}'))
+        self.assertEqual(ctx.exception.motivo, "nenhum prato encontrado")
+
+    def test_trecho_ruim_com_pratos_lidos_segue(self):
+        # Uma faixa ilegível e outra com pratos: não recusa, o dono confere o que veio.
+        cliente = self._cliente(
+            '{"foto_ilegivel": "reflexo", "pratos": []}',
+            '{"pratos": [{"nome": "Suco", "preco": 8}]}',
+        )
+        cardapio = extrair_cardapio(_png(), cliente=cliente, faixas=2)
+        self.assertEqual([p.nome for p in cardapio.pratos], ["Suco"])
+
+    def test_view_devolve_422_pedindo_outra_foto(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        with patch("cardapio.views.extrair_cardapio", side_effect=FotoIlegivel("foto tremida")):
+            foto = SimpleUploadedFile("c.jpg", b"fake", content_type="image/jpeg")
+            resposta = self.client.post("/api/cardapio/extrair/", {"imagem": foto})
+        self.assertEqual(resposta.status_code, 422)
+        self.assertEqual(resposta.json()["codigo"], "foto_ilegivel")
+        self.assertEqual(resposta.json()["motivo"], "foto tremida")
+        self.assertIn("Tire outra foto", resposta.json()["erro"])
 
 
 def _5xx(codigo=503, retry_after=None):

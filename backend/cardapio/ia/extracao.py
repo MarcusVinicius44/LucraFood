@@ -25,10 +25,14 @@ from .limitador import LimitadorSaida
 
 PROMPT_SISTEMA = """Você extrai cardápios de restaurantes brasileiros a partir de fotos.
 Responda SOMENTE com um objeto JSON no formato:
-{"colunas_preco": [str]|null,
+{"foto_ilegivel": str|null,
+ "colunas_preco": [str]|null,
  "pratos": [{"nome": str, "descricao": str|null, "categoria": str|null, "preco": number|null, "precos": [number|null]|null}]}
 
 Regras:
+- Se a foto NÃO permite ler o cardápio (desfocada, tremida, escura, com reflexo forte, cortada
+  demais ou não é um cardápio), NÃO adivinhe: responda {"foto_ilegivel": "<motivo curto>", "pratos": []}.
+  Se só um trecho estiver ruim, extraia o que der para ler e deixe "foto_ilegivel" null.
 - Um item por prato/produto vendido. Ignore telefones, endereços, horários e slogans.
 - "preco" em reais como número (ex.: 24.9). Prato com UM preço: use "preco" e deixe "precos" null.
 - Prato com VÁRIOS preços (colunas de tamanho P/M/G, 30/40/50 cm, unitário/combo, ou linhas como
@@ -77,6 +81,8 @@ class PratoExtraido(BaseModel):
 class CardapioExtraido(BaseModel):
     pratos: list[PratoExtraido]
     colunas_preco: Optional[list[str]] = None
+    # Preenchido pelo modelo quando a foto não dá para ler (motivo curto, ex.: "foto desfocada").
+    foto_ilegivel: Optional[str] = None
 
 
 def _imagem_para_data_url(conteudo: bytes, mime: str = "image/jpeg") -> str:
@@ -106,6 +112,18 @@ class FalhaDeCota(Exception):
 
 class ProvedorIndisponivel(Exception):
     """O provedor respondeu 503 (sobrecarregado) em todas as tentativas. Não é erro de extração."""
+
+
+class FotoIlegivel(Exception):
+    """A foto não deu para ler (desfoque, tremido, escuro...): o dono precisa tirar outra.
+
+    Não é ValueError de propósito: não é falha da IA, é a foto. `motivo` vem do modelo
+    (ou "nenhum prato encontrado" quando ele devolve a lista vazia sem explicar).
+    """
+
+    def __init__(self, motivo: str):
+        self.motivo = motivo
+        super().__init__(f"Foto ilegível: {motivo}")
 
 
 class SaidaCortada(ValueError):
@@ -243,14 +261,20 @@ def extrair_cardapio_com_uso(
     pedacos = recortar(imagem, n=faixas) if faixas > 1 else [imagem]
     mime_pedaco = "image/jpeg" if faixas > 1 else mime
     uso = uso if uso is not None else Uso()
-    listas, colunas = [], None
+    listas, colunas, motivos = [], None, []
     for k, pedaco in enumerate(pedacos):
         anteriores = [p for lista in listas for p in lista]
         contexto = _texto_contexto(k, len(pedacos), anteriores, colunas) if k else ""
         bruto = _extrair_imagem(pedaco, mime_pedaco, cliente, esperar, contexto, limitador, max_tokens, uso)
+        if bruto.foto_ilegivel:
+            motivos.append(bruto.foto_ilegivel)
         plano, colunas = _expandir(bruto, colunas)
         listas.append(plano.pratos)
-    return CardapioExtraido(pratos=juntar(listas), colunas_preco=colunas), uso
+    pratos = juntar(listas)
+    # Só recusa a foto se nada foi lido. Trecho ruim com o resto legível segue para o dono conferir.
+    if not pratos:
+        raise FotoIlegivel(motivos[0] if motivos else "nenhum prato encontrado")
+    return CardapioExtraido(pratos=pratos, colunas_preco=colunas), uso
 
 
 def _extrair_imagem(imagem, mime, cliente, esperar, contexto, limitador, max_tokens, uso):
