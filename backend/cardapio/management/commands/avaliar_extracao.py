@@ -1,4 +1,4 @@
-"""Mede a qualidade da extração em fotos reais (CHAMA A API: consome cota do Groq).
+"""Mede a qualidade da extração em fotos reais (CHAMA A API: consome a cota do provedor).
 
     python manage.py avaliar_extracao                    # todas as fotos de evals/cardapios/
     python manage.py avaliar_extracao --foto cardapio_01
@@ -12,7 +12,13 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from cardapio.avaliacao import Resultado, comparar
-from cardapio.ia.extracao import CardapioExtraido, FalhaDeCota, extrair_cardapio_com_uso
+from cardapio.ia.extracao import (
+    CardapioExtraido,
+    FalhaDeCota,
+    ProvedorIndisponivel,
+    Uso,
+    extrair_cardapio_com_uso,
+)
 from cardapio.ia.cliente import config
 from cardapio.ia.limitador import LimitadorSaida
 
@@ -50,7 +56,9 @@ class Command(BaseCommand):
         limitador = (
             LimitadorSaida(limite=cfg.limite_saida_min, ao_esperar=self._aviso_limite) if cfg.limite_saida_min else None
         )
-        total, avaliadas, falhas, falhas_cota, tabela = Resultado(), 0, [], [], []
+        total, avaliadas, tabela = Resultado(), 0, []
+        falhas, falhas_cota, falhas_503 = [], [], []
+        chamadas = 0  # todas as requisições, inclusive de fotos que falharam (gastam a cota diária)
         for caminho in fotos:
             gabarito_path = caminho.with_suffix(".json")
             if not gabarito_path.exists():
@@ -59,27 +67,35 @@ class Command(BaseCommand):
             gabarito = CardapioExtraido.model_validate(json.loads(gabarito_path.read_text(encoding="utf-8")))
 
             self.stdout.write(f"\n== {caminho.name}")
-            inicio = time.perf_counter()
+            inicio, uso = time.perf_counter(), Uso()
             try:
                 mime = mimetypes.guess_type(caminho.name)[0] or "image/jpeg"
-                extraido, uso = extrair_cardapio_com_uso(
-                    caminho.read_bytes(), mime, esperar=self._esperar, faixas=faixas, limitador=limitador
+                extraido, _ = extrair_cardapio_com_uso(
+                    caminho.read_bytes(), mime, esperar=self._esperar, faixas=faixas, limitador=limitador, uso=uso
                 )
-            except FalhaDeCota as erro:
-                self.stdout.write(self.style.ERROR(f"   FALHA DE COTA: {erro}"))
-                falhas_cota.append(caminho.name)
-                continue
-            except Exception as erro:  # falha de API/validação conta como falha, não derruba a avaliação
-                self.stdout.write(self.style.ERROR(f"   FALHOU: {erro}"))
-                falhas.append(caminho.name)
+            except Exception as erro:  # qualquer falha é registrada e a avaliação segue
+                if isinstance(erro, FalhaDeCota):
+                    rotulo, lista = "FALHA DE COTA", falhas_cota
+                elif isinstance(erro, ProvedorIndisponivel):
+                    rotulo, lista = "PROVEDOR INDISPONÍVEL", falhas_503
+                else:
+                    rotulo, lista = "FALHOU", falhas
+                self.stdout.write(self.style.ERROR(f"   {rotulo}: {erro}"))
+                self.stdout.write(f"   chamadas gastas: {uso.chamadas}")
+                lista.append(caminho.name)
+                chamadas += uso.chamadas
                 continue
             segundos = time.perf_counter() - inicio
+            chamadas += uso.chamadas
 
             r = comparar(gabarito.pratos, extraido.pratos)
             avaliadas += 1
             total.somar(r)
             self._mostrar(r)
-            self.stdout.write(f"   tokens: {uso.entrada} entrada + {uso.saida} saída | tempo total: {segundos:.0f}s")
+            self.stdout.write(
+                f"   tokens: {uso.entrada} entrada + {uso.saida} saída | chamadas: {uso.chamadas} | "
+                f"tempo total: {segundos:.0f}s"
+            )
             tabela.append((caminho.name, r, uso, segundos))
             if cfg.limite_tokens_min and uso.maior_chamada > cfg.limite_tokens_min:
                 self.stdout.write(self.style.WARNING(
@@ -91,17 +107,22 @@ class Command(BaseCommand):
         self.stdout.write("\n" + "=" * 50)
         self.stdout.write(
             f"TOTAL: {avaliadas} foto(s) avaliada(s), {len(falhas)} falha(s) na extração, "
-            f"{len(falhas_cota)} falha(s) de cota"
+            f"{len(falhas_cota)} falha(s) de cota, {len(falhas_503)} com provedor indisponível"
         )
+        self.stdout.write(f"Chamadas à API (contam na cota diária, inclusive as que falharam): {chamadas}")
         if falhas:
             self.stdout.write(self.style.ERROR(f"Falharam (extração): {', '.join(falhas)}"))
         if falhas_cota:
             self.stdout.write(self.style.ERROR(f"Falharam (cota): {', '.join(falhas_cota)}"))
+        if falhas_503:
+            self.stdout.write(self.style.ERROR(f"Falharam (503, provedor indisponível): {', '.join(falhas_503)}"))
         if avaliadas:
             self._mostrar(total, detalhes=False)
 
     def _esperar(self, segundos: float):
-        self.stdout.write(self.style.WARNING(f"   429 do provedor (limite de taxa): esperando {segundos:.0f}s para tentar de novo..."))
+        self.stdout.write(self.style.WARNING(
+            f"   provedor recusou (429 limite de taxa ou 503 sobrecarga): esperando {segundos:.0f}s para tentar de novo..."
+        ))
         time.sleep(segundos)
 
     def _aviso_limite(self, segundos: float):
@@ -110,15 +131,18 @@ class Command(BaseCommand):
     def _tabela(self, linhas):
         if not linhas:
             return
-        self.stdout.write("\n" + f"{'foto':<18}{'gab':>5}{'ext':>5}{'achou':>6}{'falta':>6}{'inv':>5}{'$err':>5}{'tok.ent':>9}{'tok.sai':>9}{'tempo':>7}")
-        ent = sai = tempo = 0
+        self.stdout.write(
+            "\n" + f"{'foto':<18}{'gab':>5}{'ext':>5}{'achou':>6}{'falta':>6}{'inv':>5}{'$err':>5}"
+            f"{'tok.ent':>9}{'tok.sai':>9}{'cham':>6}{'tempo':>7}"
+        )
+        ent = sai = cham = tempo = 0
         for nome, r, uso, seg in linhas:
-            ent, sai, tempo = ent + uso.entrada, sai + uso.saida, tempo + seg
+            ent, sai, cham, tempo = ent + uso.entrada, sai + uso.saida, cham + uso.chamadas, tempo + seg
             self.stdout.write(
                 f"{nome:<18}{r.gabarito:>5}{r.extraidos:>5}{r.encontrados:>6}{len(r.faltando):>6}"
-                f"{len(r.inventados):>5}{len(r.precos_errados):>5}{uso.entrada:>9}{uso.saida:>9}{seg:>6.0f}s"
+                f"{len(r.inventados):>5}{len(r.precos_errados):>5}{uso.entrada:>9}{uso.saida:>9}{uso.chamadas:>6}{seg:>6.0f}s"
             )
-        self.stdout.write(f"{'TOTAL tokens':<18}{'':>32}{ent:>9}{sai:>9}{tempo:>6.0f}s")
+        self.stdout.write(f"{'TOTAL (avaliadas)':<18}{'':>32}{ent:>9}{sai:>9}{cham:>6}{tempo:>6.0f}s")
 
     def _mostrar(self, r: Resultado, detalhes: bool = True):
         self.stdout.write(

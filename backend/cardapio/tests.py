@@ -11,12 +11,19 @@ import io
 
 import httpx2 as httpx
 from PIL import Image
-from openai import RateLimitError
+from openai import InternalServerError, RateLimitError
 
 from .ia.cliente import config
 from .ia.faixas import juntar, recortar
 from .ia.limitador import LimitadorSaida
-from .ia.extracao import FalhaDeCota, SaidaCortada, extrair_cardapio, extrair_cardapio_com_uso
+from .ia.extracao import (
+    FalhaDeCota,
+    ProvedorIndisponivel,
+    SaidaCortada,
+    Uso,
+    extrair_cardapio,
+    extrair_cardapio_com_uso,
+)
 from .models import Restaurante
 
 
@@ -151,6 +158,54 @@ class Retry429Test(TestCase):
         cliente.chat.completions.create.return_value = r
         _, uso = extrair_cardapio_com_uso(b"fake", cliente=cliente)
         self.assertEqual((uso.entrada, uso.saida), (1500, 200))
+
+
+def _5xx(codigo=503, retry_after=None):
+    headers = {"retry-after": retry_after} if retry_after else {}
+    resp = httpx.Response(codigo, headers=headers, request=httpx.Request("POST", "http://x"))
+    return InternalServerError("sobrecarga", response=resp, body=None)
+
+
+class Retry503Test(TestCase):
+    OK = Retry429Test.OK
+
+    def test_espera_crescente_e_tenta_de_novo(self):
+        cliente, esperas = MagicMock(), []
+        cliente.chat.completions.create.side_effect = [_5xx(), _5xx(), _resposta(self.OK)]
+        cardapio, uso = extrair_cardapio_com_uso(b"fake", cliente=cliente, esperar=esperas.append)
+        self.assertEqual(cardapio.pratos[0].nome, "Coxinha")
+        self.assertEqual(esperas, [10, 30])
+        self.assertEqual(uso.chamadas, 3)  # as que falharam também contam
+
+    def test_respeita_retry_after_se_vier(self):
+        cliente, esperas = MagicMock(), []
+        cliente.chat.completions.create.side_effect = [_5xx(retry_after="5"), _resposta(self.OK)]
+        extrair_cardapio_com_uso(b"fake", cliente=cliente, esperar=esperas.append)
+        self.assertEqual(esperas, [5.0])
+
+    def test_indisponivel_apos_3_tentativas_e_conta_chamadas(self):
+        cliente, esperas, uso = MagicMock(), [], Uso()
+        cliente.chat.completions.create.side_effect = _5xx()
+        with self.assertRaises(ProvedorIndisponivel):
+            extrair_cardapio_com_uso(b"fake", cliente=cliente, esperar=esperas.append, uso=uso)
+        self.assertEqual(cliente.chat.completions.create.call_count, 3)
+        self.assertEqual(uso.chamadas, 3)  # o Uso passado de fora guarda a contagem mesmo com erro
+
+    def test_outros_5xx_nao_repetem(self):
+        cliente, esperas = MagicMock(), []
+        cliente.chat.completions.create.side_effect = _5xx(500)
+        with self.assertRaises(InternalServerError):
+            extrair_cardapio_com_uso(b"fake", cliente=cliente, esperar=esperas.append)
+        self.assertEqual((cliente.chat.completions.create.call_count, esperas), (1, []))
+
+    def test_view_devolve_503_e_429(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        for erro, codigo in ((ProvedorIndisponivel("x"), 503), (FalhaDeCota("x"), 429)):
+            with patch("cardapio.views.extrair_cardapio", side_effect=erro):
+                foto = SimpleUploadedFile("c.jpg", b"fake", content_type="image/jpeg")
+                resposta = self.client.post("/api/cardapio/extrair/", {"imagem": foto})
+            self.assertEqual(resposta.status_code, codigo)
 
 
 def _png(largura=100, altura=300):

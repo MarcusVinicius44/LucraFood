@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
 
-from .ia.extracao import extrair_cardapio
+from .ia.extracao import FalhaDeCota, ProvedorIndisponivel, extrair_cardapio
 from .models import MSG_MINIMA_MAIOR, Prato, Restaurante
 
 TIPOS_ACEITOS = {"image/jpeg", "image/png", "image/webp"}
@@ -25,6 +25,16 @@ def extrair(request):
         return Response({"erro": "Imagem acima de 4 MB."}, status=400)
     try:
         cardapio = extrair_cardapio(arquivo.read(), arquivo.content_type)
+    except FalhaDeCota:
+        return Response(
+            {"erro": "Limite de uso da IA atingido. Tente de novo em alguns minutos."},
+            status=status.HTTP_429_TOO_MANY_REQUESTS,
+        )
+    except ProvedorIndisponivel:
+        return Response(
+            {"erro": "O serviço de IA está sobrecarregado. Tente de novo em alguns minutos."},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
     except ValueError as erro:
         return Response({"erro": str(erro)}, status=status.HTTP_502_BAD_GATEWAY)
     return Response(cardapio.model_dump(mode="json"))

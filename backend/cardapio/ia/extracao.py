@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Optional
 
-from openai import RateLimitError
+from openai import InternalServerError, RateLimitError
 from pydantic import BaseModel, Field, ValidationError, field_validator
 
 from .cliente import config, get_cliente
@@ -87,7 +87,9 @@ def _extrair_json(texto: str) -> str:
 
 
 TENTATIVAS_COTA = 3
-ESPERA_PADRAO_429 = 60  # segundos, quando o Groq não manda o cabeçalho retry-after
+ESPERA_PADRAO_429 = 60  # segundos, quando o provedor não manda o cabeçalho retry-after
+TENTATIVAS_503 = 3
+ESPERAS_503 = (10, 30)  # espera crescente antes da 2ª e da 3ª tentativa, sem retry-after
 
 
 class FalhaDeCota(Exception):
@@ -95,6 +97,10 @@ class FalhaDeCota(Exception):
 
     Separada de ValueError de propósito: não é erro de extração, é limite do provedor.
     """
+
+
+class ProvedorIndisponivel(Exception):
+    """O provedor respondeu 503 (sobrecarregado) em todas as tentativas. Não é erro de extração."""
 
 
 class SaidaCortada(ValueError):
@@ -108,30 +114,58 @@ class Uso:
     entrada: int = 0
     saida: int = 0
     maior_chamada: int = 0  # entrada + saída da chamada mais pesada (o limite por minuto vale por chamada)
+    chamadas: int = 0  # requisições enviadas, inclusive as que voltaram 429/503 (contam na cota diária)
 
 
-def _espera_429(erro: RateLimitError) -> float:
+def _retry_after(erro) -> Optional[float]:
     try:
         return max(float(erro.response.headers["retry-after"]), 0)
     except (KeyError, TypeError, ValueError, AttributeError):
-        return ESPERA_PADRAO_429
+        return None
 
 
-def _chamar(cliente, esperar, limitador=None, **kwargs):
-    """Chama a API; em 429 espera o retry-after e tenta de novo (até TENTATIVAS_COTA).
+def _espera_429(erro: RateLimitError) -> float:
+    espera = _retry_after(erro)
+    return ESPERA_PADRAO_429 if espera is None else espera
 
+
+def _espera_503(erro: InternalServerError, falhas: int) -> float:
+    espera = _retry_after(erro)
+    return ESPERAS_503[min(falhas, len(ESPERAS_503)) - 1] if espera is None else espera
+
+
+def _chamar(cliente, esperar, limitador=None, uso=None, **kwargs):
+    """Chama a API e tenta de novo quando o problema é passageiro do provedor.
+
+    - 429 (limite de taxa): espera o retry-after (ou 60s); até TENTATIVAS_COTA, senão FalhaDeCota.
+    - 503 (sobrecarga): espera crescente (ESPERAS_503); até TENTATIVAS_503, senão ProvedorIndisponivel.
+    Outros erros sobem direto. Com `uso`, conta cada requisição enviada em `uso.chamadas`.
     Com `limitador`, antes de cada chamada espera caber no orçamento de tokens de saída
     por minuto e, depois, registra os tokens realmente gastos.
     """
-    for tentativa in range(1, TENTATIVAS_COTA + 1):
+    falhas_429 = falhas_503 = 0
+    while True:
         if limitador:
             limitador.aguardar(kwargs["max_tokens"])
+        if uso is not None:
+            uso.chamadas += 1
         try:
             resposta = cliente.chat.completions.create(**kwargs)
         except RateLimitError as erro:
-            if tentativa == TENTATIVAS_COTA:
+            falhas_429 += 1
+            if falhas_429 == TENTATIVAS_COTA:
                 raise FalhaDeCota(f"Cota excedida após {TENTATIVAS_COTA} tentativas: {erro}") from erro
             esperar(_espera_429(erro))
+            continue
+        except InternalServerError as erro:
+            if erro.status_code != 503:
+                raise
+            falhas_503 += 1
+            if falhas_503 == TENTATIVAS_503:
+                raise ProvedorIndisponivel(
+                    f"Provedor indisponível (503) após {TENTATIVAS_503} tentativas: {erro}"
+                ) from erro
+            esperar(_espera_503(erro, falhas_503))
             continue
         if limitador:
             usage = getattr(resposta, "usage", None)
@@ -191,32 +225,32 @@ def extrair_cardapio_com_uso(
     faixas: int = 1,
     limitador: Optional[LimitadorSaida] = None,
     max_tokens: Optional[int] = None,
+    uso: Optional[Uso] = None,
 ) -> tuple[CardapioExtraido, Uso]:
     """Com faixas > 1, lê a foto em pedaços (uma chamada por faixa) e junta os pratos.
 
     Cada faixa recebe o contexto das anteriores (categoria em andamento e rótulos das colunas
     de preço). `limitador` (opcional) espaça as chamadas para respeitar tokens de saída/minuto.
     `max_tokens` = teto de saída por chamada; padrão do provedor (cliente.config()).
+    `uso` (opcional): passe um Uso() para ler tokens e chamadas mesmo se a extração falhar.
     """
     max_tokens = max_tokens or config().max_tokens
     pedacos = recortar(imagem, n=faixas) if faixas > 1 else [imagem]
     mime_pedaco = "image/jpeg" if faixas > 1 else mime
-    uso, listas, colunas = Uso(), [], None
+    uso = uso if uso is not None else Uso()
+    listas, colunas = [], None
     for k, pedaco in enumerate(pedacos):
         anteriores = [p for lista in listas for p in lista]
         contexto = _texto_contexto(k, len(pedacos), anteriores, colunas) if k else ""
-        bruto, uso_faixa = _extrair_imagem(pedaco, mime_pedaco, cliente, esperar, contexto, limitador, max_tokens)
+        bruto = _extrair_imagem(pedaco, mime_pedaco, cliente, esperar, contexto, limitador, max_tokens, uso)
         plano, colunas = _expandir(bruto, colunas)
-        uso.entrada += uso_faixa.entrada
-        uso.saida += uso_faixa.saida
-        uso.maior_chamada = max(uso.maior_chamada, uso_faixa.maior_chamada)
         listas.append(plano.pratos)
     return CardapioExtraido(pratos=juntar(listas), colunas_preco=colunas), uso
 
 
-def _extrair_imagem(imagem, mime, cliente, esperar, contexto, limitador, max_tokens):
+def _extrair_imagem(imagem, mime, cliente, esperar, contexto, limitador, max_tokens, uso):
+    """Uma chamada (mais uma de correção, se o JSON vier inválido). Soma tokens e chamadas em `uso`."""
     cliente = cliente or get_cliente()
-    uso = Uso()
     texto_usuario = "Extraia todos os pratos deste cardápio."
     if contexto:
         texto_usuario += " " + contexto
@@ -237,6 +271,7 @@ def _extrair_imagem(imagem, mime, cliente, esperar, contexto, limitador, max_tok
             cliente,
             esperar,
             limitador,
+            uso,
             model=config().modelo,
             messages=mensagens,
             response_format={"type": "json_object"},
@@ -252,7 +287,7 @@ def _extrair_imagem(imagem, mime, cliente, esperar, contexto, limitador, max_tok
             raise SaidaCortada(f"A resposta foi cortada no teto de {max_tokens} tokens de saída (JSON incompleto).")
         texto = resposta.choices[0].message.content or ""
         try:
-            return CardapioExtraido.model_validate(json.loads(_extrair_json(texto))), uso
+            return CardapioExtraido.model_validate(json.loads(_extrair_json(texto)))
         except (json.JSONDecodeError, ValidationError) as erro:
             ultimo_erro = erro
             mensagens += [
