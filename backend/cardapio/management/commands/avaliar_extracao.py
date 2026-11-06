@@ -13,10 +13,10 @@ from django.core.management.base import BaseCommand, CommandError
 
 from cardapio.avaliacao import Resultado, comparar
 from cardapio.ia.extracao import CardapioExtraido, FalhaDeCota, extrair_cardapio_com_uso
+from cardapio.ia.cliente import config
 from cardapio.ia.limitador import LimitadorSaida
 
 EXTENSOES = {".jpg", ".jpeg", ".png", ".webp"}
-LIMITE_TOKENS_MIN = 8000  # limite por minuto do plano: uma foto acima disso nunca passa, esperar não resolve
 
 
 def _preco(p) -> str:
@@ -42,7 +42,14 @@ class Command(BaseCommand):
             if not fotos:
                 raise CommandError(f"Foto '{foto}' não encontrada em {pasta}")
 
-        limitador = LimitadorSaida(ao_esperar=self._aviso_limite)
+        cfg = config()
+        self.stdout.write(
+            f"Provedor: {cfg.provedor} | modelo: {cfg.modelo} | max_tokens: {cfg.max_tokens} | "
+            f"limite de saída/min: {cfg.limite_saida_min or 'nenhum'} | faixas: {faixas}"
+        )
+        limitador = (
+            LimitadorSaida(limite=cfg.limite_saida_min, ao_esperar=self._aviso_limite) if cfg.limite_saida_min else None
+        )
         total, avaliadas, falhas, falhas_cota, tabela = Resultado(), 0, [], [], []
         for caminho in fotos:
             gabarito_path = caminho.with_suffix(".json")
@@ -74,9 +81,9 @@ class Command(BaseCommand):
             self._mostrar(r)
             self.stdout.write(f"   tokens: {uso.entrada} entrada + {uso.saida} saída | tempo total: {segundos:.0f}s")
             tabela.append((caminho.name, r, uso, segundos))
-            if uso.maior_chamada > LIMITE_TOKENS_MIN:
+            if cfg.limite_tokens_min and uso.maior_chamada > cfg.limite_tokens_min:
                 self.stdout.write(self.style.WARNING(
-                    f"   AVISO: uma chamada sozinha usou {uso.maior_chamada} tokens > {LIMITE_TOKENS_MIN}/min; "
+                    f"   AVISO: uma chamada sozinha usou {uso.maior_chamada} tokens > {cfg.limite_tokens_min}/min; "
                     "esperar não resolve (reduza a imagem ou use mais faixas)."
                 ))
 
@@ -94,7 +101,7 @@ class Command(BaseCommand):
             self._mostrar(total, detalhes=False)
 
     def _esperar(self, segundos: float):
-        self.stdout.write(self.style.WARNING(f"   429 do Groq: esperando {segundos:.0f}s para tentar de novo..."))
+        self.stdout.write(self.style.WARNING(f"   429 do provedor (limite de taxa): esperando {segundos:.0f}s para tentar de novo..."))
         time.sleep(segundos)
 
     def _aviso_limite(self, segundos: float):

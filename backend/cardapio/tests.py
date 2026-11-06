@@ -1,6 +1,7 @@
 from decimal import Decimal
 from types import SimpleNamespace
-from unittest.mock import MagicMock
+import os
+from unittest.mock import MagicMock, patch
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -12,6 +13,7 @@ import httpx2 as httpx
 from PIL import Image
 from openai import RateLimitError
 
+from .ia.cliente import config
 from .ia.faixas import juntar, recortar
 from .ia.limitador import LimitadorSaida
 from .ia.extracao import FalhaDeCota, SaidaCortada, extrair_cardapio, extrair_cardapio_com_uso
@@ -255,6 +257,7 @@ class FaixasTest(TestCase):
         self.assertEqual(prato.preco, Decimal("8.50"))
         self.assertIsNone(prato.precos)
 
+    @patch.dict(os.environ, {"LUCRAFOOD_PROVEDOR": "groq", "LUCRAFOOD_MAX_TOKENS": ""})
     def test_envia_max_tokens_na_chamada(self):
         cliente = MagicMock()
         cliente.chat.completions.create.return_value = _resposta('{"pratos": [{"nome": "Suco", "preco": 8}]}')
@@ -319,6 +322,49 @@ class LimitadorTest(TestCase):
         extrair_cardapio_com_uso(_png(), cliente=cliente, faixas=2, limitador=lim)
         self.assertEqual(len(esperas), 1)  # só antes da segunda faixa
         self.assertGreater(relogio.t, 59)
+
+
+# Ambiente limpo: sem nenhuma variável de provedor herdada do .env de quem roda os testes.
+_VARS_PROVEDOR = [
+    "LUCRAFOOD_PROVEDOR", "LUCRAFOOD_MODELO_VISAO", "LUCRAFOOD_MAX_TOKENS", "LUCRAFOOD_LIMITE_SAIDA_MIN",
+    "LUCRAFOOD_LIMITE_TOKENS_MIN", "GROQ_MODELO_VISAO", "GROQ_BASE_URL", "GEMINI_MODELO_VISAO", "GEMINI_BASE_URL",
+]
+
+
+def _ambiente(**valores):
+    limpo = {k: v for k, v in os.environ.items() if k not in _VARS_PROVEDOR}
+    return patch.dict(os.environ, {**limpo, **valores}, clear=True)
+
+
+class ConfigProvedorTest(TestCase):
+    def test_padrao_e_groq_com_limites_do_plano_gratuito(self):
+        with _ambiente():
+            cfg = config()
+        self.assertEqual((cfg.provedor, cfg.var_chave, cfg.max_tokens), ("groq", "GROQ_API_KEY", 900))
+        self.assertEqual((cfg.limite_saida_min, cfg.limite_tokens_min), (1000, 8000))
+
+    def test_gemini_sem_limitador_de_saida_e_teto_maior(self):
+        with _ambiente(LUCRAFOOD_PROVEDOR="gemini"):
+            cfg = config()
+        self.assertEqual(cfg.var_chave, "GEMINI_API_KEY")
+        self.assertIn("generativelanguage.googleapis.com", cfg.base_url)
+        self.assertEqual((cfg.limite_saida_min, cfg.limite_tokens_min), (0, 0))
+        self.assertGreater(cfg.max_tokens, 900)
+
+    def test_modelo_antigo_do_groq_nao_vaza_para_o_gemini(self):
+        with _ambiente(LUCRAFOOD_PROVEDOR="gemini", LUCRAFOOD_MODELO_VISAO="qwen/qwen3.8-27b"):
+            self.assertTrue(config().modelo.startswith("gemini"))
+        with _ambiente(LUCRAFOOD_MODELO_VISAO="qwen/outro"):
+            self.assertEqual(config().modelo, "qwen/outro")
+
+    def test_modelo_e_limites_sobrescritos_pelo_ambiente(self):
+        with _ambiente(LUCRAFOOD_PROVEDOR="gemini", GEMINI_MODELO_VISAO="gemini-3.8-flash", LUCRAFOOD_MAX_TOKENS="4000"):
+            cfg = config()
+        self.assertEqual((cfg.modelo, cfg.max_tokens), ("gemini-3.8-flash", 4000))
+
+    def test_provedor_invalido(self):
+        with _ambiente(LUCRAFOOD_PROVEDOR="outro"), self.assertRaises(RuntimeError):
+            config()
 
 
 class MargemMinimaValidacaoTest(TestCase):

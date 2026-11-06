@@ -19,7 +19,7 @@ from typing import Optional
 from openai import RateLimitError
 from pydantic import BaseModel, Field, ValidationError, field_validator
 
-from .cliente import MODELO_VISAO, get_cliente
+from .cliente import config, get_cliente
 from .faixas import juntar, recortar
 from .limitador import LimitadorSaida
 
@@ -88,9 +88,6 @@ def _extrair_json(texto: str) -> str:
 
 TENTATIVAS_COTA = 3
 ESPERA_PADRAO_429 = 60  # segundos, quando o Groq não manda o cabeçalho retry-after
-# Teto de tokens de SAÍDA declarado em cada chamada. O Groq recusa (429) pedidos cujo teto
-# passa do limite por minuto da conta (1000), então fica abaixo disso.
-MAX_TOKENS_SAIDA = 900
 
 
 class FalhaDeCota(Exception):
@@ -193,13 +190,15 @@ def extrair_cardapio_com_uso(
     esperar=time.sleep,
     faixas: int = 1,
     limitador: Optional[LimitadorSaida] = None,
-    max_tokens: int = MAX_TOKENS_SAIDA,
+    max_tokens: Optional[int] = None,
 ) -> tuple[CardapioExtraido, Uso]:
     """Com faixas > 1, lê a foto em pedaços (uma chamada por faixa) e junta os pratos.
 
     Cada faixa recebe o contexto das anteriores (categoria em andamento e rótulos das colunas
     de preço). `limitador` (opcional) espaça as chamadas para respeitar tokens de saída/minuto.
+    `max_tokens` = teto de saída por chamada; padrão do provedor (cliente.config()).
     """
+    max_tokens = max_tokens or config().max_tokens
     pedacos = recortar(imagem, n=faixas) if faixas > 1 else [imagem]
     mime_pedaco = "image/jpeg" if faixas > 1 else mime
     uso, listas, colunas = Uso(), [], None
@@ -215,7 +214,7 @@ def extrair_cardapio_com_uso(
     return CardapioExtraido(pratos=juntar(listas), colunas_preco=colunas), uso
 
 
-def _extrair_imagem(imagem, mime, cliente, esperar, contexto="", limitador=None, max_tokens=MAX_TOKENS_SAIDA):
+def _extrair_imagem(imagem, mime, cliente, esperar, contexto, limitador, max_tokens):
     cliente = cliente or get_cliente()
     uso = Uso()
     texto_usuario = "Extraia todos os pratos deste cardápio."
@@ -238,7 +237,7 @@ def _extrair_imagem(imagem, mime, cliente, esperar, contexto="", limitador=None,
             cliente,
             esperar,
             limitador,
-            model=MODELO_VISAO,
+            model=config().modelo,
             messages=mensagens,
             response_format={"type": "json_object"},
             temperature=0,
