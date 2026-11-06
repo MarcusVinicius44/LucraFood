@@ -17,4 +17,5 @@ def get_cliente() -> OpenAI:
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
         raise RuntimeError("Defina GROQ_API_KEY no arquivo .env (veja .env.example).")
-    return OpenAI(api_key=api_key, base_url=BASE_URL)
+    # max_retries=0: o retry de 429 é nosso (extracao._chamar), para respeitar retry-after e contar tentativas.
+    return OpenAI(api_key=api_key, base_url=BASE_URL, max_retries=0)

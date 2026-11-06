@@ -6,7 +6,10 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from . import calculos
-from .ia.extracao import extrair_cardapio
+import httpx2 as httpx
+from openai import RateLimitError
+
+from .ia.extracao import FalhaDeCota, extrair_cardapio, extrair_cardapio_com_uso
 from .models import Restaurante
 
 
@@ -102,6 +105,45 @@ class ExtracaoTest(TestCase):
         cliente.chat.completions.create.return_value = _resposta("não sei")
         with self.assertRaises(ValueError):
             extrair_cardapio(b"fake", cliente=cliente)
+
+
+def _429(retry_after=None):
+    headers = {"retry-after": retry_after} if retry_after else {}
+    resp = httpx.Response(429, headers=headers, request=httpx.Request("POST", "http://x"))
+    return RateLimitError("limite", response=resp, body=None)
+
+
+class Retry429Test(TestCase):
+    OK = '{"pratos": [{"nome": "Coxinha", "preco": 7}]}'
+
+    def test_espera_retry_after_e_tenta_de_novo(self):
+        cliente, esperas = MagicMock(), []
+        cliente.chat.completions.create.side_effect = [_429("12"), _resposta(self.OK)]
+        cardapio, _ = extrair_cardapio_com_uso(b"fake", cliente=cliente, esperar=esperas.append)
+        self.assertEqual(cardapio.pratos[0].nome, "Coxinha")
+        self.assertEqual(esperas, [12.0])
+
+    def test_sem_cabecalho_espera_60s(self):
+        cliente, esperas = MagicMock(), []
+        cliente.chat.completions.create.side_effect = [_429(), _resposta(self.OK)]
+        extrair_cardapio_com_uso(b"fake", cliente=cliente, esperar=esperas.append)
+        self.assertEqual(esperas, [60])
+
+    def test_falha_de_cota_apos_3_tentativas(self):
+        cliente, esperas = MagicMock(), []
+        cliente.chat.completions.create.side_effect = _429("1")
+        with self.assertRaises(FalhaDeCota):
+            extrair_cardapio_com_uso(b"fake", cliente=cliente, esperar=esperas.append)
+        self.assertEqual(cliente.chat.completions.create.call_count, 3)
+        self.assertEqual(len(esperas), 2)
+
+    def test_soma_tokens(self):
+        cliente = MagicMock()
+        r = _resposta(self.OK)
+        r.usage = SimpleNamespace(prompt_tokens=1500, completion_tokens=200)
+        cliente.chat.completions.create.return_value = r
+        _, uso = extrair_cardapio_com_uso(b"fake", cliente=cliente)
+        self.assertEqual((uso.entrada, uso.saida), (1500, 200))
 
 
 class MargemMinimaValidacaoTest(TestCase):

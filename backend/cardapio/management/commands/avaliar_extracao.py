@@ -12,9 +12,10 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from cardapio.avaliacao import Resultado, comparar
-from cardapio.ia.extracao import CardapioExtraido, extrair_cardapio
+from cardapio.ia.extracao import CardapioExtraido, FalhaDeCota, extrair_cardapio_com_uso
 
 EXTENSOES = {".jpg", ".jpeg", ".png", ".webp"}
+LIMITE_TOKENS_MIN = 8000  # limite por minuto do plano: uma foto acima disso nunca passa, esperar não resolve
 
 
 def _preco(p) -> str:
@@ -39,7 +40,7 @@ class Command(BaseCommand):
             if not fotos:
                 raise CommandError(f"Foto '{foto}' não encontrada em {pasta}")
 
-        total, avaliadas, falhas = Resultado(), 0, []
+        total, avaliadas, falhas, falhas_cota, tabela = Resultado(), 0, [], [], []
         for caminho in fotos:
             gabarito_path = caminho.with_suffix(".json")
             if not gabarito_path.exists():
@@ -51,7 +52,13 @@ class Command(BaseCommand):
             inicio = time.perf_counter()
             try:
                 mime = mimetypes.guess_type(caminho.name)[0] or "image/jpeg"
-                extraido = extrair_cardapio(caminho.read_bytes(), mime)
+                extraido, uso = extrair_cardapio_com_uso(
+                    caminho.read_bytes(), mime, esperar=self._esperar
+                )
+            except FalhaDeCota as erro:
+                self.stdout.write(self.style.ERROR(f"   FALHA DE COTA: {erro}"))
+                falhas_cota.append(caminho.name)
+                continue
             except Exception as erro:  # falha de API/validação conta como falha, não derruba a avaliação
                 self.stdout.write(self.style.ERROR(f"   FALHOU: {erro}"))
                 falhas.append(caminho.name)
@@ -62,14 +69,43 @@ class Command(BaseCommand):
             avaliadas += 1
             total.somar(r)
             self._mostrar(r)
-            self.stdout.write(f"   ({segundos:.1f}s)")
+            self.stdout.write(f"   tokens: {uso.entrada} entrada + {uso.saida} saída ({segundos:.1f}s)")
+            tabela.append((caminho.name, r, uso))
+            if uso.entrada + uso.saida > LIMITE_TOKENS_MIN:
+                self.stdout.write(self.style.WARNING(
+                    f"   AVISO: {uso.entrada + uso.saida} tokens > {LIMITE_TOKENS_MIN}/min. "
+                    "Esta foto sozinha estoura o limite por minuto; esperar não resolve (reduza a imagem)."
+                ))
 
+        self._tabela(tabela)
         self.stdout.write("\n" + "=" * 50)
-        self.stdout.write(f"TOTAL: {avaliadas} foto(s) avaliada(s), {len(falhas)} falha(s) na extração")
+        self.stdout.write(
+            f"TOTAL: {avaliadas} foto(s) avaliada(s), {len(falhas)} falha(s) na extração, "
+            f"{len(falhas_cota)} falha(s) de cota"
+        )
         if falhas:
-            self.stdout.write(self.style.ERROR(f"Falharam: {', '.join(falhas)}"))
+            self.stdout.write(self.style.ERROR(f"Falharam (extração): {', '.join(falhas)}"))
+        if falhas_cota:
+            self.stdout.write(self.style.ERROR(f"Falharam (cota): {', '.join(falhas_cota)}"))
         if avaliadas:
             self._mostrar(total, detalhes=False)
+
+    def _esperar(self, segundos: float):
+        self.stdout.write(self.style.WARNING(f"   429 do Groq: esperando {segundos:.0f}s para tentar de novo..."))
+        time.sleep(segundos)
+
+    def _tabela(self, linhas):
+        if not linhas:
+            return
+        self.stdout.write("\n" + f"{'foto':<18}{'gab':>5}{'ext':>5}{'achou':>6}{'falta':>6}{'inv':>5}{'$err':>5}{'tok.ent':>9}{'tok.sai':>9}")
+        ent = sai = 0
+        for nome, r, uso in linhas:
+            ent, sai = ent + uso.entrada, sai + uso.saida
+            self.stdout.write(
+                f"{nome:<18}{r.gabarito:>5}{r.extraidos:>5}{r.encontrados:>6}{len(r.faltando):>6}"
+                f"{len(r.inventados):>5}{len(r.precos_errados):>5}{uso.entrada:>9}{uso.saida:>9}"
+            )
+        self.stdout.write(f"{'TOTAL tokens':<18}{'':>32}{ent:>9}{sai:>9}")
 
     def _mostrar(self, r: Resultado, detalhes: bool = True):
         self.stdout.write(

@@ -9,9 +9,12 @@ Decisões de projeto (boas para contar na entrevista):
 import base64
 import json
 import re
+import time
+from dataclasses import dataclass
 from decimal import Decimal
 from typing import Optional
 
+from openai import RateLimitError
 from pydantic import BaseModel, Field, ValidationError, field_validator
 
 from .cliente import MODELO_VISAO, get_cliente
@@ -63,8 +66,52 @@ def _extrair_json(texto: str) -> str:
     return texto[inicio : fim + 1] if inicio != -1 and fim != -1 else texto
 
 
+TENTATIVAS_COTA = 3
+ESPERA_PADRAO_429 = 60  # segundos, quando o Groq não manda o cabeçalho retry-after
+
+
+class FalhaDeCota(Exception):
+    """Cota/limite de taxa (429) esgotado mesmo após esperar e tentar de novo.
+
+    Separada de ValueError de propósito: não é erro de extração, é limite do provedor.
+    """
+
+
+@dataclass
+class Uso:
+    """Tokens consumidos (soma de todas as chamadas feitas para uma foto)."""
+
+    entrada: int = 0
+    saida: int = 0
+
+
+def _espera_429(erro: RateLimitError) -> float:
+    try:
+        return max(float(erro.response.headers["retry-after"]), 0)
+    except (KeyError, TypeError, ValueError, AttributeError):
+        return ESPERA_PADRAO_429
+
+
+def _chamar(cliente, esperar, **kwargs):
+    """Chama a API; em 429 espera o retry-after e tenta de novo (até TENTATIVAS_COTA)."""
+    for tentativa in range(1, TENTATIVAS_COTA + 1):
+        try:
+            return cliente.chat.completions.create(**kwargs)
+        except RateLimitError as erro:
+            if tentativa == TENTATIVAS_COTA:
+                raise FalhaDeCota(f"Cota excedida após {TENTATIVAS_COTA} tentativas: {erro}") from erro
+            esperar(_espera_429(erro))
+
+
 def extrair_cardapio(imagem: bytes, mime: str = "image/jpeg", cliente=None) -> CardapioExtraido:
+    return extrair_cardapio_com_uso(imagem, mime, cliente)[0]
+
+
+def extrair_cardapio_com_uso(
+    imagem: bytes, mime: str = "image/jpeg", cliente=None, esperar=time.sleep
+) -> tuple[CardapioExtraido, Uso]:
     cliente = cliente or get_cliente()
+    uso = Uso()
     mensagens = [
         {"role": "system", "content": PROMPT_SISTEMA},
         {
@@ -78,15 +125,20 @@ def extrair_cardapio(imagem: bytes, mime: str = "image/jpeg", cliente=None) -> C
 
     ultimo_erro = None
     for _tentativa in range(2):
-        resposta = cliente.chat.completions.create(
+        resposta = _chamar(
+            cliente,
+            esperar,
             model=MODELO_VISAO,
             messages=mensagens,
             response_format={"type": "json_object"},
             temperature=0,
         )
+        if getattr(resposta, "usage", None):
+            uso.entrada += resposta.usage.prompt_tokens or 0
+            uso.saida += resposta.usage.completion_tokens or 0
         texto = resposta.choices[0].message.content or ""
         try:
-            return CardapioExtraido.model_validate(json.loads(_extrair_json(texto)))
+            return CardapioExtraido.model_validate(json.loads(_extrair_json(texto))), uso
         except (json.JSONDecodeError, ValidationError) as erro:
             ultimo_erro = erro
             mensagens += [
