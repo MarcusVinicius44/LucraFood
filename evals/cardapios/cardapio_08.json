@@ -1,0 +1,106 @@
+{
+  "pratos": [
+    {
+      "nome": "Galinha Inteira",
+      "descricao": null,
+      "categoria": "Almoços",
+      "preco": 220.0
+    },
+    {
+      "nome": "Meia Galinha",
+      "descricao": null,
+      "categoria": "Almoços",
+      "preco": 120.0
+    },
+    {
+      "nome": "Almoço (1 pessoa)",
+      "descricao": null,
+      "categoria": "Almoços",
+      "preco": 100.0
+    },
+    {
+      "nome": "Almoço (2 a 3 pessoas)",
+      "descricao": null,
+      "categoria": "Almoços",
+      "preco": 150.0
+    },
+    {
+      "nome": "Almoço (4 a 5 pessoas)",
+      "descricao": null,
+      "categoria": "Almoços",
+      "preco": 200.0
+    },
+    {
+      "nome": "P.F.",
+      "descricao": null,
+      "categoria": "Almoços",
+      "preco": 40.0
+    },
+    {
+      "nome": "Quentinha pequena",
+      "descricao": null,
+      "categoria": "Almoços",
+      "preco": 26.0
+    },
+    {
+      "nome": "Quentinha grande",
+      "descricao": null,
+      "categoria": "Almoços",
+      "preco": 32.0
+    },
+    {
+      "nome": "Porção Pequena",
+      "descricao": null,
+      "categoria": "Guarnições",
+      "preco": 8.0
+    },
+    {
+      "nome": "Porção Média",
+      "descricao": null,
+      "categoria": "Guarnições",
+      "preco": 10.0
+    },
+    {
+      "nome": "Porção Grande",
+      "descricao": null,
+      "categoria": "Guarnições",
+      "preco": 14.0
+    },
+    {
+      "nome": "Mousse de Mangaba",
+      "descricao": null,
+      "categoria": "Sobremesa",
+      "preco": 13.0
+    },
+    {
+      "nome": "Mousse de Maracujá",
+      "descricao": null,
+      "categoria": "Sobremesa",
+      "preco": 11.0
+    },
+    {
+      "nome": "Doce de Leite",
+      "descricao": null,
+      "categoria": "Sobremesa",
+      "preco": 11.0
+    },
+    {
+      "nome": "Pudim",
+      "descricao": null,
+      "categoria": "Sobremesa",
+      "preco": 13.0
+    },
+    {
+      "nome": "Doce de Banana",
+      "descricao": null,
+      "categoria": "Sobremesa",
+      "preco": 11.0
+    },
+    {
+      "nome": "Picolé Paletas Brasil",
+      "descricao": null,
+      "categoria": "Sobremesa",
+      "preco": null
+    }
+  ]
+}

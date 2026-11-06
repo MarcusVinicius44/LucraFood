@@ -1,0 +1,40 @@
+{
+  "pratos": [
+    {
+      "nome": "Assado de Tira",
+      "descricao": null,
+      "categoria": "La Cheff (Parrilla) Super Premium",
+      "preco": 179.0
+    },
+    {
+      "nome": "Picanha de Tira",
+      "descricao": null,
+      "categoria": "La Cheff (Parrilla) Super Premium",
+      "preco": 179.0
+    },
+    {
+      "nome": "Fralda Vacio",
+      "descricao": null,
+      "categoria": "La Cheff (Parrilla) Super Premium",
+      "preco": 169.0
+    },
+    {
+      "nome": "Bife de Chorizo",
+      "descricao": null,
+      "categoria": "La Cheff (Parrilla) Super Premium",
+      "preco": 165.0
+    },
+    {
+      "nome": "Bife Ancho",
+      "descricao": null,
+      "categoria": "La Cheff (Parrilla) Super Premium",
+      "preco": 165.0
+    },
+    {
+      "nome": "Stake Taipa",
+      "descricao": null,
+      "categoria": "La Cheff (Parrilla) Super Premium",
+      "preco": 149.0
+    }
+  ]
+}

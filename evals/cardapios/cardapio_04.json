@@ -1,0 +1,70 @@
+{
+  "pratos": [
+    {
+      "nome": "Camarão da Barra",
+      "descricao": null,
+      "categoria": "Grelhados egoístas",
+      "preco": 87.4
+    },
+    {
+      "nome": "Pescada Aracajuana",
+      "descricao": null,
+      "categoria": "Grelhados egoístas",
+      "preco": 84.5
+    },
+    {
+      "nome": "Pescada Aracajuana c/ Camarão",
+      "descricao": null,
+      "categoria": "Grelhados egoístas",
+      "preco": 96.0
+    },
+    {
+      "nome": "Pescada Aracajuana c/ Frutos do Mar",
+      "descricao": null,
+      "categoria": "Grelhados egoístas",
+      "preco": 99.0
+    },
+    {
+      "nome": "Caueira Grelhado",
+      "descricao": null,
+      "categoria": "Grelhados egoístas",
+      "preco": 130.0
+    },
+    {
+      "nome": "Caueira Grelhada c/ Camarões",
+      "descricao": null,
+      "categoria": "Grelhados egoístas",
+      "preco": 138.0
+    },
+    {
+      "nome": "Filé de Salmão",
+      "descricao": null,
+      "categoria": "Grelhados egoístas",
+      "preco": 92.0
+    },
+    {
+      "nome": "Carne de Sol",
+      "descricao": null,
+      "categoria": "Grelhados egoístas",
+      "preco": 81.0
+    },
+    {
+      "nome": "Carne de Sol de Filé Mignon",
+      "descricao": null,
+      "categoria": "Grelhados egoístas",
+      "preco": 94.5
+    },
+    {
+      "nome": "Carne de Sol de Carneiro",
+      "descricao": null,
+      "categoria": "Grelhados egoístas",
+      "preco": 80.0
+    },
+    {
+      "nome": "Frango Grelhado",
+      "descricao": null,
+      "categoria": "Grelhados egoístas",
+      "preco": 63.8
+    }
+  ]
+}

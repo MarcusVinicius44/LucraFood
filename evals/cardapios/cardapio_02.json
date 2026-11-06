@@ -1,0 +1,322 @@
+{
+  "pratos": [
+    {
+      "nome": "X-Caseiro",
+      "descricao": null,
+      "categoria": null,
+      "preco": 19.0
+    },
+    {
+      "nome": "Eggs Caseiro",
+      "descricao": null,
+      "categoria": null,
+      "preco": 20.0
+    },
+    {
+      "nome": "Caseiro com Bacon",
+      "descricao": null,
+      "categoria": null,
+      "preco": 30.0
+    },
+    {
+      "nome": "Caseiro com Eggs Bacon",
+      "descricao": null,
+      "categoria": null,
+      "preco": 31.0
+    },
+    {
+      "nome": "Caseiro com Filé de Frango",
+      "descricao": null,
+      "categoria": null,
+      "preco": 31.0
+    },
+    {
+      "nome": "Caseiro Eggs com Filé de Frango",
+      "descricao": null,
+      "categoria": null,
+      "preco": 31.0
+    },
+    {
+      "nome": "Caseiro com Calabresa",
+      "descricao": null,
+      "categoria": null,
+      "preco": 30.0
+    },
+    {
+      "nome": "Caseiro com Eggs Calabresa",
+      "descricao": null,
+      "categoria": null,
+      "preco": 31.0
+    },
+    {
+      "nome": "Caseiro com Frango",
+      "descricao": null,
+      "categoria": null,
+      "preco": 30.0
+    },
+    {
+      "nome": "Caseiro com Eggs Frango",
+      "descricao": null,
+      "categoria": null,
+      "preco": 31.0
+    },
+    {
+      "nome": "Caseiro com Frango Especial",
+      "descricao": null,
+      "categoria": null,
+      "preco": 35.0
+    },
+    {
+      "nome": "Caseiro com Coração",
+      "descricao": null,
+      "categoria": null,
+      "preco": 30.0
+    },
+    {
+      "nome": "Caseiro com Eggs Coração",
+      "descricao": null,
+      "categoria": null,
+      "preco": 31.0
+    },
+    {
+      "nome": "Caseiro com Calabresa Defumada",
+      "descricao": null,
+      "categoria": null,
+      "preco": 30.0
+    },
+    {
+      "nome": "Caseiro com Eggs Calabresa Defumada",
+      "descricao": null,
+      "categoria": null,
+      "preco": 31.0
+    },
+    {
+      "nome": "Caseiro Especial",
+      "descricao": null,
+      "categoria": null,
+      "preco": 40.0
+    },
+    {
+      "nome": "Frango Especial com Hamburger",
+      "descricao": null,
+      "categoria": null,
+      "preco": 28.0
+    },
+    {
+      "nome": "Alasanhado",
+      "descricao": null,
+      "categoria": null,
+      "preco": 21.0
+    },
+    {
+      "nome": "X-Filé",
+      "descricao": null,
+      "categoria": null,
+      "preco": 25.0
+    },
+    {
+      "nome": "Eggs-Filé",
+      "descricao": null,
+      "categoria": null,
+      "preco": 26.0
+    },
+    {
+      "nome": "X-Filé com Hamburger",
+      "descricao": null,
+      "categoria": null,
+      "preco": 28.0
+    },
+    {
+      "nome": "Eggs-Filé com Hamburger",
+      "descricao": null,
+      "categoria": null,
+      "preco": 29.0
+    },
+    {
+      "nome": "Filé Especial",
+      "descricao": null,
+      "categoria": null,
+      "preco": 30.0
+    },
+    {
+      "nome": "Galego Burguer",
+      "descricao": null,
+      "categoria": null,
+      "preco": 31.0
+    },
+    {
+      "nome": "Super Galego",
+      "descricao": null,
+      "categoria": null,
+      "preco": 45.0
+    },
+    {
+      "nome": "Galego Especial",
+      "descricao": null,
+      "categoria": null,
+      "preco": 31.0
+    },
+    {
+      "nome": "Americano",
+      "descricao": null,
+      "categoria": "Hamburgers",
+      "preco": 10.0
+    },
+    {
+      "nome": "Misto Quente",
+      "descricao": null,
+      "categoria": "Hamburgers",
+      "preco": 10.0
+    },
+    {
+      "nome": "Queijo Quente",
+      "descricao": null,
+      "categoria": "Hamburgers",
+      "preco": 10.0
+    },
+    {
+      "nome": "Hamburger",
+      "descricao": null,
+      "categoria": "Hamburgers",
+      "preco": 10.0
+    },
+    {
+      "nome": "Eggs-Burger",
+      "descricao": null,
+      "categoria": "Hamburgers",
+      "preco": 14.0
+    },
+    {
+      "nome": "X-Burger",
+      "descricao": null,
+      "categoria": "Hamburgers",
+      "preco": 12.0
+    },
+    {
+      "nome": "X-Bacon",
+      "descricao": null,
+      "categoria": "Hamburgers",
+      "preco": 20.0
+    },
+    {
+      "nome": "Eggs-Bacon",
+      "descricao": null,
+      "categoria": "Hamburgers",
+      "preco": 21.0
+    },
+    {
+      "nome": "X-Filé de Frango",
+      "descricao": null,
+      "categoria": "Hamburgers",
+      "preco": 18.0
+    },
+    {
+      "nome": "Eggs-Filé de Frango",
+      "descricao": null,
+      "categoria": "Hamburgers",
+      "preco": 19.0
+    },
+    {
+      "nome": "X-Picanha",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 25.0
+    },
+    {
+      "nome": "Eggs-Picanha",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 26.0
+    },
+    {
+      "nome": "X-Picanha com Hamburger",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 28.0
+    },
+    {
+      "nome": "X-Picanha com Bacon",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 30.0
+    },
+    {
+      "nome": "X-Picanha com Toscana",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 28.0
+    },
+    {
+      "nome": "X-Picanha com Calabresa Defumada",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 30.0
+    },
+    {
+      "nome": "X-Picanha com Frango Desfiado",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 30.0
+    },
+    {
+      "nome": "X-Picanha com Filé de Frango",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 30.0
+    },
+    {
+      "nome": "X-Picanha Salsicha",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 28.0
+    },
+    {
+      "nome": "X-Picanha com Coração",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 31.0
+    },
+    {
+      "nome": "Eggs-Picanha com Hamburger",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 29.0
+    },
+    {
+      "nome": "Eggs-Picanha com Bacon",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 31.0
+    },
+    {
+      "nome": "Eggs-Picanha com Toscana",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 31.0
+    },
+    {
+      "nome": "Eggs-Picanha com Calabresa Defumada",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 31.0
+    },
+    {
+      "nome": "Eggs-Picanha com Frango Desfiado",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 31.0
+    },
+    {
+      "nome": "Eggs-Picanha com Filé de Frango",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 31.0
+    },
+    {
+      "nome": "Eggs-Picanha com Salsicha",
+      "descricao": null,
+      "categoria": "Hamburguer de Picanha",
+      "preco": 25.0
+    }
+  ]
+}

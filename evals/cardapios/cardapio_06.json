@@ -1,0 +1,388 @@
+{
+  "pratos": [
+    {
+      "nome": "Abobrinha (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "Abobrinha (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "Abobrinha (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "Abobrinha (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    },
+    {
+      "nome": "A Moda da Casa (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "A Moda da Casa (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "A Moda da Casa (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "A Moda da Casa (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    },
+    {
+      "nome": "A Moda 2 (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "A Moda 2 (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "A Moda 2 (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "A Moda 2 (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    },
+    {
+      "nome": "Alho e Óleo (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "Alho e Óleo (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "Alho e Óleo (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "Alho e Óleo (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    },
+    {
+      "nome": "Atum (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "Atum (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "Atum (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "Atum (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    },
+    {
+      "nome": "Alemã (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "Alemã (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "Alemã (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "Alemã (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    },
+    {
+      "nome": "Bacon (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "Bacon (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "Bacon (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "Bacon (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    },
+    {
+      "nome": "Bolonhesa (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "Bolonhesa (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "Bolonhesa (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "Bolonhesa (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    },
+    {
+      "nome": "Catupiry (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "Catupiry (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "Catupiry (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "Catupiry (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    },
+    {
+      "nome": "Escarola (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "Escarola (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "Escarola (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "Escarola (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    },
+    {
+      "nome": "Francesa (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "Francesa (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "Francesa (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "Francesa (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    },
+    {
+      "nome": "Frango com Catupiry (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "Frango com Catupiry (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "Frango com Catupiry (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "Frango com Catupiry (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    },
+    {
+      "nome": "Frango Caipira (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "Frango Caipira (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "Frango Caipira (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "Frango Caipira (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    },
+    {
+      "nome": "Marguerita (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "Marguerita (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "Marguerita (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "Marguerita (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    },
+    {
+      "nome": "Portuguesa (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "Portuguesa (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "Portuguesa (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "Portuguesa (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    },
+    {
+      "nome": "Strogonoff de Frango (tamanho 1)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 37.0
+    },
+    {
+      "nome": "Strogonoff de Frango (tamanho 2)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 41.0
+    },
+    {
+      "nome": "Strogonoff de Frango (tamanho 3)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 51.0
+    },
+    {
+      "nome": "Strogonoff de Frango (tamanho 4)",
+      "descricao": null,
+      "categoria": "Pizzas Tradicionais",
+      "preco": 61.0
+    }
+  ]
+}

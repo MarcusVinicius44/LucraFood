@@ -1,0 +1,238 @@
+{
+  "pratos": [
+    {
+      "nome": "Sertão (unitário)",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 27.0
+    },
+    {
+      "nome": "Sertão (combo (+ fritas e bebida))",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 37.0
+    },
+    {
+      "nome": "Xique-Xique (unitário)",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 27.0
+    },
+    {
+      "nome": "Xique-Xique (combo (+ fritas e bebida))",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 37.0
+    },
+    {
+      "nome": "Ducabrunco (unitário)",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 27.0
+    },
+    {
+      "nome": "Ducabrunco (combo (+ fritas e bebida))",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 37.0
+    },
+    {
+      "nome": "Lampião (unitário)",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 27.0
+    },
+    {
+      "nome": "Lampião (combo (+ fritas e bebida))",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 37.0
+    },
+    {
+      "nome": "Suculento (unitário)",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 32.0
+    },
+    {
+      "nome": "Suculento (combo (+ fritas e bebida))",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 42.0
+    },
+    {
+      "nome": "Desgramado (unitário)",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 38.0
+    },
+    {
+      "nome": "Desgramado (combo (+ fritas e bebida))",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 48.0
+    },
+    {
+      "nome": "Marminino (unitário)",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 27.0
+    },
+    {
+      "nome": "Marminino (combo (+ fritas e bebida))",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 37.0
+    },
+    {
+      "nome": "Mandacaru (unitário)",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 27.0
+    },
+    {
+      "nome": "Mandacaru (combo (+ fritas e bebida))",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 37.0
+    },
+    {
+      "nome": "Maria Bonita (unitário)",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 27.0
+    },
+    {
+      "nome": "Maria Bonita (combo (+ fritas e bebida))",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 37.0
+    },
+    {
+      "nome": "Vegetariano (unitário)",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 25.0
+    },
+    {
+      "nome": "Vegetariano (combo (+ fritas e bebida))",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 35.0
+    },
+    {
+      "nome": "Kids (unitário)",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 19.0
+    },
+    {
+      "nome": "Kids (combo (+ fritas e bebida))",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 29.0
+    },
+    {
+      "nome": "Asa Branca (unitário)",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 27.0
+    },
+    {
+      "nome": "Asa Branca (combo (+ fritas e bebida))",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 37.0
+    },
+    {
+      "nome": "Corisco (unitário)",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 32.0
+    },
+    {
+      "nome": "Corisco (combo (+ fritas e bebida))",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 42.0
+    },
+    {
+      "nome": "Eu Sozinho (unitário)",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 32.0
+    },
+    {
+      "nome": "Eu Sozinho (combo (+ fritas e bebida))",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 42.0
+    },
+    {
+      "nome": "Combo Ocê e Eu",
+      "descricao": null,
+      "categoria": "Burger",
+      "preco": 75.0
+    },
+    {
+      "nome": "Queijo",
+      "descricao": null,
+      "categoria": "Adicionais",
+      "preco": 6.0
+    },
+    {
+      "nome": "Carne",
+      "descricao": null,
+      "categoria": "Adicionais",
+      "preco": 8.0
+    },
+    {
+      "nome": "Ovo",
+      "descricao": null,
+      "categoria": "Adicionais",
+      "preco": 4.0
+    },
+    {
+      "nome": "Picles",
+      "descricao": null,
+      "categoria": "Adicionais",
+      "preco": 3.0
+    },
+    {
+      "nome": "Ketchup",
+      "descricao": null,
+      "categoria": "Adicionais",
+      "preco": 3.0
+    },
+    {
+      "nome": "Molho extra",
+      "descricao": null,
+      "categoria": "Adicionais",
+      "preco": 3.0
+    },
+    {
+      "nome": "Bacon",
+      "descricao": null,
+      "categoria": "Adicionais",
+      "preco": 5.0
+    },
+    {
+      "nome": "Salada",
+      "descricao": null,
+      "categoria": "Adicionais",
+      "preco": 3.0
+    },
+    {
+      "nome": "Cebola caramelizada",
+      "descricao": null,
+      "categoria": "Adicionais",
+      "preco": 4.0
+    },
+    {
+      "nome": "Banana da terra",
+      "descricao": null,
+      "categoria": "Adicionais",
+      "preco": 3.0
+    }
+  ]
+}

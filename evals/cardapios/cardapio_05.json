@@ -1,0 +1,346 @@
+{
+  "pratos": [
+    {
+      "nome": "Camarão crocante",
+      "descricao": null,
+      "categoria": "Petiscos & Entradas",
+      "preco": 88.0
+    },
+    {
+      "nome": "Pescada petisqueira",
+      "descricao": null,
+      "categoria": "Petiscos & Entradas",
+      "preco": 69.0
+    },
+    {
+      "nome": "Atum asiático",
+      "descricao": null,
+      "categoria": "Petiscos & Entradas",
+      "preco": 65.0
+    },
+    {
+      "nome": "Ceviche",
+      "descricao": null,
+      "categoria": "Petiscos & Entradas",
+      "preco": 69.0
+    },
+    {
+      "nome": "Tartare de salmão",
+      "descricao": null,
+      "categoria": "Petiscos & Entradas",
+      "preco": 58.0
+    },
+    {
+      "nome": "Carpaccio de angus",
+      "descricao": null,
+      "categoria": "Petiscos & Entradas",
+      "preco": 45.0
+    },
+    {
+      "nome": "Brie empanado",
+      "descricao": null,
+      "categoria": "Petiscos & Entradas",
+      "preco": 49.0
+    },
+    {
+      "nome": "Harumaki de charque (6 unid.)",
+      "descricao": null,
+      "categoria": "Petiscos & Entradas",
+      "preco": 39.0
+    },
+    {
+      "nome": "Bolinho de bacalhau (6 unid.)",
+      "descricao": null,
+      "categoria": "Petiscos & Entradas",
+      "preco": 50.0
+    },
+    {
+      "nome": "Isca de peixe (250g)",
+      "descricao": null,
+      "categoria": "Petiscos & Entradas",
+      "preco": 76.0
+    },
+    {
+      "nome": "Isca de frango (250g)",
+      "descricao": null,
+      "categoria": "Petiscos & Entradas",
+      "preco": 56.0
+    },
+    {
+      "nome": "Batata frita",
+      "descricao": null,
+      "categoria": "Petiscos & Entradas",
+      "preco": 28.0
+    },
+    {
+      "nome": "Filézinho gorgonzola (250g)",
+      "descricao": null,
+      "categoria": "Petiscos & Entradas",
+      "preco": 78.0
+    },
+    {
+      "nome": "Tirinhas de picanha com fritas",
+      "descricao": null,
+      "categoria": "Petiscos & Entradas",
+      "preco": 89.0
+    },
+    {
+      "nome": "Camarão Alho & Óleo (250g)",
+      "descricao": null,
+      "categoria": "Petiscos & Entradas",
+      "preco": 86.0
+    },
+    {
+      "nome": "Casquinha de aratu",
+      "descricao": null,
+      "categoria": "Crustáceos",
+      "preco": 28.0
+    },
+    {
+      "nome": "Patinhas de caranguejo",
+      "descricao": null,
+      "categoria": "Crustáceos",
+      "preco": 78.0
+    },
+    {
+      "nome": "Ostras gratinadas (6 unid.)",
+      "descricao": null,
+      "categoria": "Crustáceos",
+      "preco": 65.0
+    },
+    {
+      "nome": "Ostras frescas (6 unid.)",
+      "descricao": null,
+      "categoria": "Crustáceos",
+      "preco": 56.0
+    },
+    {
+      "nome": "Caranguejo",
+      "descricao": null,
+      "categoria": "Crustáceos",
+      "preco": 10.0
+    },
+    {
+      "nome": "Lambretas (12 unid.)",
+      "descricao": null,
+      "categoria": "Crustáceos",
+      "preco": 30.0
+    },
+    {
+      "nome": "Pastel de Queijo",
+      "descricao": null,
+      "categoria": "Pastéis",
+      "preco": 16.0
+    },
+    {
+      "nome": "Pastel de Aratu",
+      "descricao": null,
+      "categoria": "Pastéis",
+      "preco": 25.0
+    },
+    {
+      "nome": "Pastel de Camarão",
+      "descricao": null,
+      "categoria": "Pastéis",
+      "preco": 26.0
+    },
+    {
+      "nome": "Pastel de Carne",
+      "descricao": null,
+      "categoria": "Pastéis",
+      "preco": 20.0
+    },
+    {
+      "nome": "Pastel de Frango",
+      "descricao": null,
+      "categoria": "Pastéis",
+      "preco": 18.0
+    },
+    {
+      "nome": "Mix de pastéis (6 unid.)",
+      "descricao": null,
+      "categoria": "Pastéis",
+      "preco": 38.0
+    },
+    {
+      "nome": "Mini pastéis empanados (8 unid.)",
+      "descricao": null,
+      "categoria": "Pastéis",
+      "preco": 48.0
+    },
+    {
+      "nome": "Caldinho de Sururu",
+      "descricao": null,
+      "categoria": "Caldinhos",
+      "preco": 23.0
+    },
+    {
+      "nome": "Caldinho de Frutos do mar",
+      "descricao": null,
+      "categoria": "Caldinhos",
+      "preco": 29.0
+    },
+    {
+      "nome": "Caldinho de Feijão",
+      "descricao": null,
+      "categoria": "Caldinhos",
+      "preco": 21.0
+    },
+    {
+      "nome": "Caldinho de Camarão",
+      "descricao": null,
+      "categoria": "Caldinhos",
+      "preco": 29.0
+    },
+    {
+      "nome": "Salada sollo",
+      "descricao": null,
+      "categoria": "Saladas",
+      "preco": 65.0
+    },
+    {
+      "nome": "Salada caprese",
+      "descricao": null,
+      "categoria": "Saladas",
+      "preco": 39.0
+    },
+    {
+      "nome": "Vinagrete de polvo",
+      "descricao": null,
+      "categoria": "Saladas",
+      "preco": 74.0
+    },
+    {
+      "nome": "Linguini al mare",
+      "descricao": null,
+      "categoria": "Individuais",
+      "preco": 98.0
+    },
+    {
+      "nome": "Camarão havaí",
+      "descricao": null,
+      "categoria": "Individuais",
+      "preco": 109.0
+    },
+    {
+      "nome": "Salmão al mare",
+      "descricao": null,
+      "categoria": "Individuais",
+      "preco": 98.0
+    },
+    {
+      "nome": "Frango Alfredo Especial",
+      "descricao": null,
+      "categoria": "Individuais",
+      "preco": 68.0
+    },
+    {
+      "nome": "Filé aruanã",
+      "descricao": null,
+      "categoria": "Individuais",
+      "preco": 98.0
+    },
+    {
+      "nome": "Carne do sol na manteiga de garrafa",
+      "descricao": null,
+      "categoria": "Individuais",
+      "preco": 78.0
+    },
+    {
+      "nome": "Moquequinha vegana",
+      "descricao": null,
+      "categoria": "Individuais",
+      "preco": 50.0
+    },
+    {
+      "nome": "Frango guri",
+      "descricao": null,
+      "categoria": "Para a criançada",
+      "preco": 43.0
+    },
+    {
+      "nome": "Filé malandrinho",
+      "descricao": null,
+      "categoria": "Para a criançada",
+      "preco": 49.0
+    },
+    {
+      "nome": "Pescada grelhada",
+      "descricao": null,
+      "categoria": "Para compartilhar",
+      "preco": 189.0
+    },
+    {
+      "nome": "Moqueca de peixe",
+      "descricao": null,
+      "categoria": "Para compartilhar",
+      "preco": 169.0
+    },
+    {
+      "nome": "Moqueca de camarão",
+      "descricao": null,
+      "categoria": "Para compartilhar",
+      "preco": 189.0
+    },
+    {
+      "nome": "Moqueca mista",
+      "descricao": null,
+      "categoria": "Para compartilhar",
+      "preco": 238.0
+    },
+    {
+      "nome": "Mix de frutos do mar",
+      "descricao": null,
+      "categoria": "Para compartilhar",
+      "preco": 329.0
+    },
+    {
+      "nome": "Lagosta grelhada",
+      "descricao": null,
+      "categoria": "Para compartilhar",
+      "preco": 250.0
+    },
+    {
+      "nome": "Peixe frito ou no forno",
+      "descricao": null,
+      "categoria": "Para compartilhar",
+      "preco": 189.0
+    },
+    {
+      "nome": "Picanha argentina na chapa",
+      "descricao": null,
+      "categoria": "Para compartilhar",
+      "preco": 175.0
+    },
+    {
+      "nome": "Filé à parmegiana",
+      "descricao": null,
+      "categoria": "Para compartilhar",
+      "preco": 128.0
+    },
+    {
+      "nome": "Bolo de rolo",
+      "descricao": null,
+      "categoria": "Para adoçar a vida",
+      "preco": 32.0
+    },
+    {
+      "nome": "Brownie de chocolate",
+      "descricao": null,
+      "categoria": "Para adoçar a vida",
+      "preco": 26.0
+    },
+    {
+      "nome": "Gelato siciliano",
+      "descricao": null,
+      "categoria": "Para adoçar a vida",
+      "preco": 22.0
+    },
+    {
+      "nome": "Picolé",
+      "descricao": null,
+      "categoria": "Para adoçar a vida",
+      "preco": null
+    }
+  ]
+}
