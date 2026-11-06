@@ -136,7 +136,7 @@
       "nome": "Filé Especial",
       "descricao": null,
       "categoria": null,
-      "preco": 30.0
+      "preco": 31.0
     },
     {
       "nome": "Galego Burguer",
@@ -190,7 +190,7 @@
       "nome": "X-Burger",
       "descricao": null,
       "categoria": "Hamburgers",
-      "preco": 12.0
+      "preco": 13.0
     },
     {
       "nome": "X-Bacon",

@@ -136,7 +136,7 @@
       "nome": "Pastel de Aratu",
       "descricao": null,
       "categoria": "Pastéis",
-      "preco": 25.0
+      "preco": 22.0
     },
     {
       "nome": "Pastel de Camarão",
@@ -341,6 +341,12 @@
       "descricao": null,
       "categoria": "Para adoçar a vida",
       "preco": null
+    },
+    {
+      "nome": "Piscininha infantil",
+      "descricao": null,
+      "categoria": null,
+      "preco": 20.0
     }
   ]
 }
