@@ -1,169 +1,169 @@
 {
   "pratos": [
     {
-      "nome": "Sertão (unitário)",
+      "nome": "Sertão (valor unitário)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 27.0
     },
     {
-      "nome": "Sertão (combo (+ fritas e bebida))",
+      "nome": "Sertão (valor do combo)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 37.0
     },
     {
-      "nome": "Xique-Xique (unitário)",
+      "nome": "Xique-Xique (valor unitário)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 27.0
     },
     {
-      "nome": "Xique-Xique (combo (+ fritas e bebida))",
+      "nome": "Xique-Xique (valor do combo)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 37.0
     },
     {
-      "nome": "Ducabrunco (unitário)",
+      "nome": "Ducabrunco (valor unitário)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 27.0
     },
     {
-      "nome": "Ducabrunco (combo (+ fritas e bebida))",
+      "nome": "Ducabrunco (valor do combo)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 37.0
     },
     {
-      "nome": "Lampião (unitário)",
+      "nome": "Lampião (valor unitário)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 27.0
     },
     {
-      "nome": "Lampião (combo (+ fritas e bebida))",
+      "nome": "Lampião (valor do combo)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 37.0
     },
     {
-      "nome": "Suculento (unitário)",
+      "nome": "Suculento (valor unitário)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 32.0
     },
     {
-      "nome": "Suculento (combo (+ fritas e bebida))",
+      "nome": "Suculento (valor do combo)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 42.0
     },
     {
-      "nome": "Desgramado (unitário)",
+      "nome": "Desgramado (valor unitário)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 38.0
     },
     {
-      "nome": "Desgramado (combo (+ fritas e bebida))",
+      "nome": "Desgramado (valor do combo)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 48.0
     },
     {
-      "nome": "Marminino (unitário)",
+      "nome": "Marminino (valor unitário)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 27.0
     },
     {
-      "nome": "Marminino (combo (+ fritas e bebida))",
+      "nome": "Marminino (valor do combo)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 37.0
     },
     {
-      "nome": "Mandacaru (unitário)",
+      "nome": "Mandacaru (valor unitário)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 27.0
     },
     {
-      "nome": "Mandacaru (combo (+ fritas e bebida))",
+      "nome": "Mandacaru (valor do combo)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 37.0
     },
     {
-      "nome": "Maria Bonita (unitário)",
+      "nome": "Maria Bonita (valor unitário)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 27.0
     },
     {
-      "nome": "Maria Bonita (combo (+ fritas e bebida))",
+      "nome": "Maria Bonita (valor do combo)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 37.0
     },
     {
-      "nome": "Vegetariano (unitário)",
+      "nome": "Vegetariano (valor unitário)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 25.0
     },
     {
-      "nome": "Vegetariano (combo (+ fritas e bebida))",
+      "nome": "Vegetariano (valor do combo)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 35.0
     },
     {
-      "nome": "Kids (unitário)",
+      "nome": "Kids (valor unitário)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 19.0
     },
     {
-      "nome": "Kids (combo (+ fritas e bebida))",
+      "nome": "Kids (valor do combo)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 29.0
     },
     {
-      "nome": "Asa Branca (unitário)",
+      "nome": "Asa Branca (valor unitário)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 27.0
     },
     {
-      "nome": "Asa Branca (combo (+ fritas e bebida))",
+      "nome": "Asa Branca (valor do combo)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 37.0
     },
     {
-      "nome": "Corisco (unitário)",
+      "nome": "Corisco (valor unitário)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 32.0
     },
     {
-      "nome": "Corisco (combo (+ fritas e bebida))",
+      "nome": "Corisco (valor do combo)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 42.0
     },
     {
-      "nome": "Eu Sozinho (unitário)",
+      "nome": "Eu Sozinho (valor unitário)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 32.0
     },
     {
-      "nome": "Eu Sozinho (combo (+ fritas e bebida))",
+      "nome": "Eu Sozinho (valor do combo)",
       "descricao": null,
       "categoria": "Burger",
       "preco": 42.0
