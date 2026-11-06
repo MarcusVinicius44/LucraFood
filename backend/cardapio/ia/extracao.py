@@ -46,7 +46,8 @@ Regras:
 - "categoria" é o título da seção do cardápio (ex.: "Lanches", "Bebidas"), se houver.
 - Mantenha os nomes como estão escritos, corrigindo só erros óbvios de leitura.
 - Se o nome sozinho for ambíguo porque só diz o recheio/sabor e o tipo de produto está no título
-  da seção (ex.: "Queijo" na seção "Pastéis"), inclua o tipo no nome: "Pastel de Queijo"."""
+  da seção (ex.: "Queijo" na seção "Pastéis"), inclua o tipo no nome: "Pastel de Queijo".
+  Isso NÃO vale em seções de adicionais, extras ou complementos: lá mantenha só o nome ("Queijo")."""
 
 
 def _normalizar_preco(v):
