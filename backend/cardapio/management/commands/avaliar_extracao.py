@@ -13,6 +13,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from cardapio.avaliacao import Resultado, comparar
 from cardapio.ia.extracao import CardapioExtraido, FalhaDeCota, extrair_cardapio_com_uso
+from cardapio.ia.limitador import LimitadorSaida
 
 EXTENSOES = {".jpg", ".jpeg", ".png", ".webp"}
 LIMITE_TOKENS_MIN = 8000  # limite por minuto do plano: uma foto acima disso nunca passa, esperar não resolve
@@ -27,9 +28,10 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--foto", help="Nome (sem extensão) de uma única foto, ex.: cardapio_01")
+        parser.add_argument("--faixas", type=int, default=1, help="Dividir cada foto em N faixas horizontais (padrão: 1, foto inteira)")
         parser.add_argument("--pasta", help="Pasta com fotos e gabaritos (padrão: evals/cardapios)")
 
-    def handle(self, *args, foto=None, pasta=None, **opts):
+    def handle(self, *args, foto=None, pasta=None, faixas=1, **opts):
         pasta = Path(pasta) if pasta else Path(settings.BASE_DIR).parent / "evals" / "cardapios"
         if not pasta.is_dir():
             raise CommandError(f"Pasta não encontrada: {pasta}")
@@ -40,6 +42,7 @@ class Command(BaseCommand):
             if not fotos:
                 raise CommandError(f"Foto '{foto}' não encontrada em {pasta}")
 
+        limitador = LimitadorSaida(ao_esperar=self._aviso_limite)
         total, avaliadas, falhas, falhas_cota, tabela = Resultado(), 0, [], [], []
         for caminho in fotos:
             gabarito_path = caminho.with_suffix(".json")
@@ -53,7 +56,7 @@ class Command(BaseCommand):
             try:
                 mime = mimetypes.guess_type(caminho.name)[0] or "image/jpeg"
                 extraido, uso = extrair_cardapio_com_uso(
-                    caminho.read_bytes(), mime, esperar=self._esperar
+                    caminho.read_bytes(), mime, esperar=self._esperar, faixas=faixas, limitador=limitador
                 )
             except FalhaDeCota as erro:
                 self.stdout.write(self.style.ERROR(f"   FALHA DE COTA: {erro}"))
@@ -69,12 +72,12 @@ class Command(BaseCommand):
             avaliadas += 1
             total.somar(r)
             self._mostrar(r)
-            self.stdout.write(f"   tokens: {uso.entrada} entrada + {uso.saida} saída ({segundos:.1f}s)")
-            tabela.append((caminho.name, r, uso))
-            if uso.entrada + uso.saida > LIMITE_TOKENS_MIN:
+            self.stdout.write(f"   tokens: {uso.entrada} entrada + {uso.saida} saída | tempo total: {segundos:.0f}s")
+            tabela.append((caminho.name, r, uso, segundos))
+            if uso.maior_chamada > LIMITE_TOKENS_MIN:
                 self.stdout.write(self.style.WARNING(
-                    f"   AVISO: {uso.entrada + uso.saida} tokens > {LIMITE_TOKENS_MIN}/min. "
-                    "Esta foto sozinha estoura o limite por minuto; esperar não resolve (reduza a imagem)."
+                    f"   AVISO: uma chamada sozinha usou {uso.maior_chamada} tokens > {LIMITE_TOKENS_MIN}/min; "
+                    "esperar não resolve (reduza a imagem ou use mais faixas)."
                 ))
 
         self._tabela(tabela)
@@ -94,18 +97,21 @@ class Command(BaseCommand):
         self.stdout.write(self.style.WARNING(f"   429 do Groq: esperando {segundos:.0f}s para tentar de novo..."))
         time.sleep(segundos)
 
+    def _aviso_limite(self, segundos: float):
+        self.stdout.write(self.style.WARNING(f"   limite de saída/min: esperando {segundos:.0f}s antes da próxima chamada..."))
+
     def _tabela(self, linhas):
         if not linhas:
             return
-        self.stdout.write("\n" + f"{'foto':<18}{'gab':>5}{'ext':>5}{'achou':>6}{'falta':>6}{'inv':>5}{'$err':>5}{'tok.ent':>9}{'tok.sai':>9}")
-        ent = sai = 0
-        for nome, r, uso in linhas:
-            ent, sai = ent + uso.entrada, sai + uso.saida
+        self.stdout.write("\n" + f"{'foto':<18}{'gab':>5}{'ext':>5}{'achou':>6}{'falta':>6}{'inv':>5}{'$err':>5}{'tok.ent':>9}{'tok.sai':>9}{'tempo':>7}")
+        ent = sai = tempo = 0
+        for nome, r, uso, seg in linhas:
+            ent, sai, tempo = ent + uso.entrada, sai + uso.saida, tempo + seg
             self.stdout.write(
                 f"{nome:<18}{r.gabarito:>5}{r.extraidos:>5}{r.encontrados:>6}{len(r.faltando):>6}"
-                f"{len(r.inventados):>5}{len(r.precos_errados):>5}{uso.entrada:>9}{uso.saida:>9}"
+                f"{len(r.inventados):>5}{len(r.precos_errados):>5}{uso.entrada:>9}{uso.saida:>9}{seg:>6.0f}s"
             )
-        self.stdout.write(f"{'TOTAL tokens':<18}{'':>32}{ent:>9}{sai:>9}")
+        self.stdout.write(f"{'TOTAL tokens':<18}{'':>32}{ent:>9}{sai:>9}{tempo:>6.0f}s")
 
     def _mostrar(self, r: Resultado, detalhes: bool = True):
         self.stdout.write(

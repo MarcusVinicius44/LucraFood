@@ -6,10 +6,15 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from . import calculos
+import io
+
 import httpx2 as httpx
+from PIL import Image
 from openai import RateLimitError
 
-from .ia.extracao import FalhaDeCota, extrair_cardapio, extrair_cardapio_com_uso
+from .ia.faixas import juntar, recortar
+from .ia.limitador import LimitadorSaida
+from .ia.extracao import FalhaDeCota, SaidaCortada, extrair_cardapio, extrair_cardapio_com_uso
 from .models import Restaurante
 
 
@@ -144,6 +149,176 @@ class Retry429Test(TestCase):
         cliente.chat.completions.create.return_value = r
         _, uso = extrair_cardapio_com_uso(b"fake", cliente=cliente)
         self.assertEqual((uso.entrada, uso.saida), (1500, 200))
+
+
+def _png(largura=100, altura=300):
+    buf = io.BytesIO()
+    Image.new("RGB", (largura, altura), "white").save(buf, format="PNG")
+    return buf.getvalue()
+
+
+class FaixasTest(TestCase):
+    def test_recortar_cobre_a_imagem_com_sobreposicao(self):
+        faixas = [Image.open(io.BytesIO(f)) for f in recortar(_png(100, 300), n=3, sobreposicao=0.10, minimo_px=0)]
+        self.assertEqual(len(faixas), 3)
+        self.assertTrue(all(f.width == 100 for f in faixas))
+        # miolo = 100 + 30 + 30 de margem; pontas = 100 + 30
+        self.assertEqual([f.height for f in faixas], [130, 160, 130])
+
+    def test_recortar_uma_faixa_devolve_imagem_inteira(self):
+        (unica,) = recortar(_png(100, 300), n=1)
+        self.assertEqual(Image.open(io.BytesIO(unica)).size, (100, 300))
+
+    def test_recortar_valida_argumentos(self):
+        with self.assertRaises(ValueError):
+            recortar(_png(), n=0)
+        with self.assertRaises(ValueError):
+            recortar(_png(), sobreposicao=0.6)
+
+    def _p(self, nome, preco=None):
+        return SimpleNamespace(nome=nome, preco=None if preco is None else Decimal(str(preco)))
+
+    def test_juntar_remove_repetido_da_sobreposicao_ignorando_acento_e_caixa(self):
+        a = [self._p("X-Burger", 20), self._p("Pastel de Camarão", 12)]
+        b = [self._p("pastel de camarao", 12), self._p("Suco", 8)]
+        self.assertEqual([p.nome for p in juntar([a, b])], ["X-Burger", "Pastel de Camarão", "Suco"])
+
+    def test_juntar_prefere_versao_com_preco(self):
+        a = [self._p("Suco")]
+        b = [self._p("Suco", 8)]
+        (resultado,) = juntar([a, b])
+        self.assertEqual(resultado.preco, Decimal("8"))
+
+    def test_juntar_mantem_mesmo_nome_com_precos_diferentes(self):
+        a = [self._p("Pizza", 30)]
+        b = [self._p("Pizza", 50)]
+        self.assertEqual(len(juntar([a, b])), 2)
+
+    def test_juntar_mantem_repetidos_dentro_da_mesma_faixa(self):
+        a = [self._p("Suco", 8), self._p("Suco", 8)]
+        self.assertEqual(len(juntar([a])), 2)
+
+    def test_extrair_em_faixas_junta_e_soma_tokens(self):
+        cliente = MagicMock()
+        respostas = [
+            '{"pratos": [{"nome": "Coxinha", "preco": 7}, {"nome": "Kibe", "preco": 8}]}',
+            '{"pratos": [{"nome": "Kibe", "preco": 8}, {"nome": "Suco", "preco": 6}]}',
+        ]
+        saidas = []
+        for texto in respostas:
+            r = _resposta(texto)
+            r.usage = SimpleNamespace(prompt_tokens=1000, completion_tokens=100)
+            saidas.append(r)
+        cliente.chat.completions.create.side_effect = saidas
+        cardapio, uso = extrair_cardapio_com_uso(_png(), cliente=cliente, faixas=2)
+        self.assertEqual([p.nome for p in cardapio.pratos], ["Coxinha", "Kibe", "Suco"])
+        self.assertEqual((uso.entrada, uso.saida), (2000, 200))
+        self.assertEqual(uso.maior_chamada, 1100)  # por chamada, não a soma das faixas
+        self.assertEqual(cliente.chat.completions.create.call_count, 2)
+
+    def test_sobreposicao_minima_em_pixels(self):
+        # 10% de 300 = 30px, mas o mínimo de 40px vale (limitado à metade da faixa: 50px)
+        faixas = [Image.open(io.BytesIO(f)) for f in recortar(_png(100, 300), n=3, sobreposicao=0.10, minimo_px=40)]
+        self.assertEqual([f.height for f in faixas], [140, 180, 140])
+
+    def test_contexto_e_precos_em_lista_chegam_as_faixas_seguintes(self):
+        cliente = MagicMock()
+        cliente.chat.completions.create.side_effect = [
+            _resposta(
+                '{"colunas_preco": ["P","G"], "pratos": [{"nome": "Calabresa", "categoria": "Pizzas", "precos": [30, 50]}]}'
+            ),
+            _resposta('{"pratos": [{"nome": "Mussarela", "precos": [28, 48]}]}'),
+        ]
+        cardapio, _ = extrair_cardapio_com_uso(_png(), cliente=cliente, faixas=2)
+        self.assertEqual(
+            [(p.nome, p.preco) for p in cardapio.pratos],
+            [("Calabresa (P)", Decimal("30")), ("Calabresa (G)", Decimal("50")),
+             ("Mussarela (P)", Decimal("28")), ("Mussarela (G)", Decimal("48"))],
+        )
+        segunda = cliente.chat.completions.create.call_args_list[1].kwargs["messages"][1]["content"][0]["text"]
+        self.assertIn("faixa 2 de 2", segunda)
+        self.assertIn('"Pizzas"', segunda)
+        self.assertIn('["P", "G"]', segunda)
+
+    def test_precos_em_lista_sem_rotulo_usa_tamanho_n(self):
+        cliente = MagicMock()
+        cliente.chat.completions.create.return_value = _resposta(
+            '{"pratos": [{"nome": "Abobrinha", "precos": [30, 40]}]}'
+        )
+        cardapio = extrair_cardapio(b"fake", cliente=cliente)
+        self.assertEqual([p.nome for p in cardapio.pratos], ["Abobrinha (tamanho 1)", "Abobrinha (tamanho 2)"])
+
+    def test_preco_unico_continua_igual_e_sem_precos_no_resultado(self):
+        cliente = MagicMock()
+        cliente.chat.completions.create.return_value = _resposta('{"pratos": [{"nome": "Suco", "preco": "R$ 8,50"}]}')
+        (prato,) = extrair_cardapio(b"fake", cliente=cliente).pratos
+        self.assertEqual(prato.preco, Decimal("8.50"))
+        self.assertIsNone(prato.precos)
+
+    def test_envia_max_tokens_na_chamada(self):
+        cliente = MagicMock()
+        cliente.chat.completions.create.return_value = _resposta('{"pratos": [{"nome": "Suco", "preco": 8}]}')
+        extrair_cardapio(b"fake", cliente=cliente)
+        self.assertEqual(cliente.chat.completions.create.call_args.kwargs["max_tokens"], 900)
+
+    def test_saida_cortada_levanta_erro_claro_sem_tentar_de_novo(self):
+        cliente = MagicMock()
+        r = _resposta('{"pratos": [{"nome": "Su')
+        r.choices[0].finish_reason = "length"
+        cliente.chat.completions.create.return_value = r
+        with self.assertRaises(SaidaCortada):
+            extrair_cardapio(b"fake", cliente=cliente)
+        self.assertEqual(cliente.chat.completions.create.call_count, 1)
+
+
+class LimitadorTest(TestCase):
+    def _limitador(self):
+        relogio = SimpleNamespace(t=0.0)
+        esperas = []
+
+        def esperar(s):
+            esperas.append(s)
+            relogio.t += s
+
+        return LimitadorSaida(limite=1000, janela=60, relogio=lambda: relogio.t, esperar=esperar), relogio, esperas
+
+    def test_primeira_chamada_nao_espera(self):
+        lim, _, esperas = self._limitador()
+        lim.aguardar(900)
+        self.assertEqual(esperas, [])
+
+    def test_espera_a_janela_expirar_antes_da_proxima(self):
+        lim, relogio, esperas = self._limitador()
+        lim.aguardar(900)
+        lim.registrar(600)
+        relogio.t = 10
+        lim.aguardar(900)  # 600 usados + 900 > 1000: espera os 600 saírem da janela (50s + folga)
+        self.assertEqual(len(esperas), 1)
+        self.assertAlmostEqual(esperas[0], 50.1, places=3)
+
+    def test_chamada_pequena_nao_bloqueia_a_proxima(self):
+        lim, _, esperas = self._limitador()
+        lim.registrar(50)
+        lim.aguardar(900)  # 50 + 900 <= 1000
+        self.assertEqual(esperas, [])
+
+    def test_reserva_acima_do_limite_e_erro(self):
+        lim, _, _ = self._limitador()
+        with self.assertRaises(ValueError):
+            lim.aguardar(1200)
+
+    def test_extracao_em_faixas_espaca_as_chamadas(self):
+        lim, relogio, esperas = self._limitador()
+        cliente = MagicMock()
+        respostas = []
+        for nome in ("A", "B"):
+            r = _resposta('{"pratos": [{"nome": "%s", "preco": 1}]}' % nome)
+            r.usage = SimpleNamespace(prompt_tokens=100, completion_tokens=500)
+            respostas.append(r)
+        cliente.chat.completions.create.side_effect = respostas
+        extrair_cardapio_com_uso(_png(), cliente=cliente, faixas=2, limitador=lim)
+        self.assertEqual(len(esperas), 1)  # só antes da segunda faixa
+        self.assertGreater(relogio.t, 59)
 
 
 class MargemMinimaValidacaoTest(TestCase):
