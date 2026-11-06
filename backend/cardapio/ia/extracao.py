@@ -31,13 +31,18 @@ Responda SOMENTE com um objeto JSON no formato:
 Regras:
 - Um item por prato/produto vendido. Ignore telefones, endereços, horários e slogans.
 - "preco" em reais como número (ex.: 24.9). Prato com UM preço: use "preco" e deixe "precos" null.
-- Prato com VÁRIOS preços em colunas (tamanhos P/M/G, 30/40/50 cm etc.): faça UM item só,
+- Prato com VÁRIOS preços (colunas de tamanho P/M/G, 30/40/50 cm, unitário/combo, ou linhas como
+  "1 pessoa ... 2 pessoas"): faça UM item só,
   "preco" null e "precos" com os valores na ordem das colunas (null onde ilegível).
-  Em "colunas_preco" escreva os rótulos das colunas na mesma ordem (ex.: ["P","M","G"]);
-  se a imagem não mostra rótulos, "colunas_preco" null.
+  Em "colunas_preco" escreva os rótulos das colunas na mesma ordem (ex.: ["P","M","G"]).
+- O rótulo de cada preço é o texto impresso junto dele no cardápio (cabeçalho da coluna ou texto
+  ao lado do valor, ex.: "Valor Unitário", "1 pessoa", "2 pessoas"), copiado como está escrito.
+  Se nenhum preço tiver rótulo legível (só ícones ou nada), "colunas_preco" null.
 - Se o preço estiver ilegível ou ausente, use null. NUNCA invente preço.
 - "categoria" é o título da seção do cardápio (ex.: "Lanches", "Bebidas"), se houver.
-- Mantenha os nomes como estão escritos, corrigindo só erros óbvios de leitura."""
+- Mantenha os nomes como estão escritos, corrigindo só erros óbvios de leitura.
+- Se o nome sozinho for ambíguo porque só diz o recheio/sabor e o tipo de produto está no título
+  da seção (ex.: "Queijo" na seção "Pastéis"), inclua o tipo no nome: "Pastel de Queijo"."""
 
 
 def _normalizar_preco(v):
