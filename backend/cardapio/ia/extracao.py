@@ -41,12 +41,18 @@ Regras:
   Em "colunas_preco" escreva os rótulos das colunas na mesma ordem (ex.: ["P","M","G"]).
 - O rótulo de cada preço é o texto impresso junto dele no cardápio (cabeçalho da coluna ou texto
   ao lado do valor, ex.: "Valor Unitário", "1 pessoa", "2 pessoas"), copiado como está escrito.
+  Rótulo escrito ao lado de cada preço também vale: "MEIA - R$ 30,00 / INTEIRA - R$ 55,00"
+  -> "precos": [30, 55] e "colunas_preco": ["meia", "inteira"].
   Se nenhum preço tiver rótulo legível (só ícones ou nada), "colunas_preco" null.
 - Se o preço estiver ilegível ou ausente, use null. NUNCA invente preço.
 - "categoria" é o título da seção do cardápio (ex.: "Lanches", "Bebidas"), se houver.
 - Mantenha os nomes como estão escritos, corrigindo só erros óbvios de leitura.
+- Quantidade ou peso impresso na mesma linha do nome faz parte do nome, entre parênteses:
+  "Coxinha 10 unid." -> "Coxinha (10 unid.)"; "Fritas *300g" -> "Fritas (300g)".
 - Se o nome sozinho for ambíguo porque só diz o recheio/sabor e o tipo de produto está no título
-  da seção (ex.: "Queijo" na seção "Pastéis"), inclua o tipo no nome: "Pastel de Queijo".
+  da seção, inclua o tipo no nome, em TODOS os itens dessa seção (ex.: seção "Esfihas" com
+  "Carne" e "Queijo" -> "Esfiha de Carne", "Esfiha de Queijo"; seção "Tapiocas" com "Frango" ->
+  "Tapioca de Frango").
   Isso NÃO vale em seções de adicionais, extras ou complementos: lá mantenha só o nome ("Queijo")."""
 
 
