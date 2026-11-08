@@ -93,13 +93,15 @@ class FichaLida(BaseModel):
 
 @dataclass
 class ItemExtraido:
-    """Item pronto para o dono revisar. `quantidade` já está na unidade do cadastro (ou None)."""
+    """Item pronto para o dono revisar. `quantidade` está em `unidade`: a do cadastro, ou, para
+    ingrediente fora do cadastro, a unidade-base da medida escrita (kg -> g, l -> ml)."""
 
     nome_lido: str
     ingrediente: Optional[dict]  # {"id", "nome", "unidade"} do cadastro, ou None
     quantidade_lida: Optional[Decimal]
     unidade_lida: Optional[str]
     quantidade: Optional[Decimal]
+    unidade: Optional[str] = None
     motivos: list[str] = field(default_factory=list)
 
     @property
@@ -113,7 +115,7 @@ class ItemExtraido:
             "quantidade_lida": None if self.quantidade_lida is None else str(self.quantidade_lida),
             "unidade_lida": self.unidade_lida,
             "quantidade": None if self.quantidade is None else str(self.quantidade),
-            "unidade": self.ingrediente["unidade"] if self.ingrediente else None,
+            "unidade": self.unidade,
             "precisa_confirmar": self.precisa_confirmar,
             "motivos": self.motivos,
         }
@@ -142,6 +144,8 @@ def resolver(itens: list[ItemLido], cadastro: list[dict]) -> list[ItemExtraido]:
 
         quantidade = None
         canonica = _unidade_canonica(lido.unidade)
+        # Unidade em que `quantidade` sai: a do cadastro; sem ingrediente, a unidade-base da
+        # medida escrita (150 g de um item fora do cadastro continua 150 g, para o dono cadastrar).
         destino = ingrediente["unidade"] if ingrediente else None
         if lido.quantidade is None:
             motivos.append(SEM_QUANTIDADE)
@@ -151,13 +155,15 @@ def resolver(itens: list[ItemLido], cadastro: list[dict]) -> list[ItemExtraido]:
         elif lido.unidade is None:
             if destino == "un":
                 quantidade = calculos.converter_unidade(lido.quantidade, "un", "un")
-            elif destino is not None:
+            else:
                 motivos.append(SEM_UNIDADE)
         elif canonica is None:
             motivos.append(UNIDADE_INFORMAL)
-        elif destino is not None:
+        else:
+            alvo = destino or calculos.FATORES_UNIDADE[canonica][0]
             try:
-                quantidade = calculos.converter_unidade(lido.quantidade, canonica, destino)
+                quantidade = calculos.converter_unidade(lido.quantidade, canonica, alvo)
+                destino = alvo
             except ValueError:
                 motivos.append(UNIDADE_INCOMPATIVEL)
 
@@ -168,6 +174,7 @@ def resolver(itens: list[ItemLido], cadastro: list[dict]) -> list[ItemExtraido]:
                 quantidade_lida=lido.quantidade,
                 unidade_lida=lido.unidade,
                 quantidade=quantidade,
+                unidade=destino,
                 motivos=motivos,
             )
         )

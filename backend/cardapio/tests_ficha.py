@@ -262,11 +262,34 @@ class ExtrairFichaTest(TestCase):
         self.assertEqual((carne["quantidade"], carne["unidade"], carne["precisa_confirmar"]), ("150.000", "g", False))
         self.assertEqual((queijo["quantidade"], queijo["quantidade_lida"], queijo["motivos"]), (None, "2", ["unidade_informal"]))
 
-    def test_id_inventado_vira_null(self):
+    def test_id_inventado_vira_null_mas_mantem_a_quantidade(self):
         (item,) = self.extrair(_itens(self.item("bacon", 99, 30, "g")))
         self.assertIsNone(item.ingrediente)
         self.assertEqual(item.motivos, ["sem_ingrediente"])
-        self.assertIsNone(item.quantidade)
+        self.assertEqual((item.quantidade, item.unidade), (Decimal("30.000"), "g"))
+
+    def test_fora_do_cadastro_mantem_quantidade_exata_e_converte(self):
+        mussarela, vinho, sorvete, sal, cenoura = (
+            i.para_json()
+            for i in self.extrair(
+                _itens(
+                    self.item("mussarela", None, 150, "g"),
+                    self.item("vinho", None, "0,2", "l"),
+                    self.item("sorvete", None, 2, "bola"),
+                    self.item("sal", None, None, None),
+                    self.item("cenouras", None, 2, "un"),
+                )
+            )
+        )
+        self.assertEqual((mussarela["quantidade"], mussarela["unidade"]), ("150.000", "g"))
+        self.assertEqual((vinho["quantidade"], vinho["unidade"]), ("200.000", "ml"))
+        self.assertEqual((sorvete["quantidade"], sorvete["motivos"]), (None, ["sem_ingrediente", "unidade_informal"]))
+        self.assertEqual((sal["quantidade"], sal["motivos"]), (None, ["sem_ingrediente", "sem_quantidade"]))
+        self.assertEqual((cenoura["quantidade"], cenoura["unidade"]), ("2.000", "un"))
+
+    def test_fora_do_cadastro_sem_unidade_nao_chuta(self):
+        (item,) = self.extrair(_itens(self.item("presunto", None, 30, None)))
+        self.assertEqual((item.quantidade, item.unidade, item.motivos), (None, None, ["sem_ingrediente", "sem_unidade"]))
 
     def test_unidade_incompativel(self):
         (item,) = self.extrair(_itens(self.item("queijo", 3, 100, "ml")))
