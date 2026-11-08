@@ -68,7 +68,7 @@ Princípios: a IA **sugere, o dono confirma**; nunca gravar valores financeiros 
 ## 9. Stack (definida e em uso)
 - **Back-end:** Django 5.2 + Django REST Framework, SQLite no desenvolvimento (app `backend/cardapio/`).
 - **Front-end:** React + TypeScript (Vite, `localhost:5173`), mobile-first, captura de foto pela câmera. *Ainda não iniciado.*
-- **IA:** Groq via biblioteca `openai` (API compatível), modelo `qwen/qwen3.8-27b` com visão, JSON e tool calling. Trocar de provedor ou modelo é só mudar variáveis no `.env`.
+- **IA:** Gemini 3.5 Flash-Lite (`gemini-3.5-flash-lite`, plano gratuito do AI Studio) via biblioteca `openai` (API compatível), com visão e saída JSON; o tool calling do agente de ficha técnica ainda não foi testado nesse modelo. Groq (`qwen/qwen3.8-27b`) continua disponível como alternativa com `LUCRAFOOD_PROVEDOR=groq`, mas o limite de ~1.000 tokens de saída/min do plano gratuito corta cardápios grandes (ver README, "Evolução da extração"). Trocar de provedor ou modelo é só mudar variáveis no `.env`.
 - **Validação:** Pydantic na saída da IA; cálculos em Python puro com `Decimal` (`calculos.py`).
 - **Hospedagem:** a definir.
 

@@ -2,7 +2,7 @@
 
 Dois grupos distintos:
 - **A. Ferramentas de desenvolvimento** (Claude Code): agentes e skills que usamos para *construir* o projeto.
-- **B. Agentes do produto** (dentro do app): a IA que o dono do restaurante usa. Construídos sobre o Groq (SDK `openai`).
+- **B. Agentes do produto** (dentro do app): a IA que o dono do restaurante usa. Construídos sobre o Gemini (SDK `openai`, API compatível), com o Groq como alternativa.
 
 ---
 
@@ -24,7 +24,7 @@ Regra: só acionar subagente quando valer a pena (tarefa grande e independente).
 | Skill | Uso |
 |---|---|
 | `init` | Gerar o `CLAUDE.md` com convenções, comandos e regras de negócio do projeto. |
-| ~~`claude-api`~~ | **Não se aplica agora:** o produto usa Groq via SDK `openai`, não a API da Anthropic. Só entra se o provedor for trocado para Claude. |
+| ~~`claude-api`~~ | **Não se aplica agora:** o produto usa Gemini (ou Groq) via SDK `openai`, não a API da Anthropic. Só entra se o provedor for trocado para Claude. |
 | `artifact-design` / `dataviz` | Desenhar o painel de diagnóstico (cards de custo/margem, semáforo, ranking de pratos) com gráficos consistentes e acessíveis. |
 | `run` | Subir o app e confirmar que cada mudança funciona de verdade, não só nos testes. |
 
@@ -60,7 +60,7 @@ Regra: só acionar subagente quando valer a pena (tarefa grande e independente).
 
 ## B. Agentes do produto (dentro do LucraFood)
 
-Todos usam o Groq (SDK `openai`, modelo `qwen/qwen3.8-27b` com visão, JSON e tool calling), saída validada com Pydantic e confirmação humana antes de gravar valores financeiros. O Agente 1 já existe em `backend/cardapio/ia/extracao.py`.
+Todos usam o Gemini por padrão (SDK `openai`, modelo `gemini-3.5-flash-lite` com visão e JSON; tool calling ainda não testado nele), com o Groq (`qwen/qwen3.8-27b`) como alternativa via `LUCRAFOOD_PROVEDOR=groq`; saída validada com Pydantic e confirmação humana antes de gravar valores financeiros. O Agente 1 já existe em `backend/cardapio/ia/extracao.py`.
 
 | # | Agente | Entrada | Saída | Ferramentas (tool use) |
 |---|---|---|---|---|
