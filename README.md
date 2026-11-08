@@ -44,12 +44,14 @@ python manage.py avaliar_extracao                           # Gemini (padrão)
 
 `python manage.py avaliar_ficha` sobre as 10 frases de `evals/fichas/` (42 ingredientes esperados, cadastro fictício de 21 itens), cada uma cobrindo um caso: sinônimo, pão sem número, kg e litro com vírgula, concha/xícara/fio, ingrediente fora do cadastro, queijo parecido mas diferente, erro de digitação e texto com ruído.
 
-| Data | Provedor e modelo | Ingrediente certo | Quantidade certa | Ligados ao ingrediente errado | Chamadas |
-|---|---|---|---|---|---|
-| 08/11/2026 | Gemini `gemini-3.5-flash-lite` | 40 de 42 (95,2%) | 33 de 33 | 0 | 10 (~1 s por frase) |
+| Data | Gabarito | Provedor e modelo | Ingrediente certo | Quantidade certa | Ligados ao ingrediente errado | Chamadas |
+|---|---|---|---|---|---|---|
+| 08/11/2026 | rascunho da IA | Gemini `gemini-3.5-flash-lite` | 40 de 42 (95,2%) | 33 de 33 | 0 | 10 (~1 s por frase) |
+| 08/11/2026 | revisado em f06, f07 e f09 | Gemini `gemini-3.5-flash-lite` | **42 de 42** | **33 de 33** | **0** | 10 (~1 s por frase) |
 
-- Duas rodadas no mesmo dia deram o mesmo resultado. Os 2 erros são "queijo" (frases f07 e f09) que ficou sem ingrediente em vez de "Queijo prato": é a falha segura, porque o dono escolhe na revisão em vez de receber um custo errado.
-- **As respostas esperadas são um rascunho escrito por IA e ainda não revisado.** Os números acima valem para esse rascunho.
+- **O gabarito foi ajustado depois da primeira rodada, e o prompt não mudou.** A primeira rodada (repetida duas vezes, com o mesmo resultado) errou só "queijo" nas frases f07 e f09: a IA deixou sem ingrediente, e o rascunho esperava "Queijo prato". Revisando, concordei com a IA e virou regra do conjunto: **nome genérico não é ligado automaticamente; o dono escolhe.** Um custo errado é pior que uma pergunta a mais na revisão.
+- Na mesma revisão, a f09 foi reescrita porque era ambígua ("frango empanado na farinha (uns 30 g)": os 30 g podiam ser do frango ou da farinha), e uma frase ambígua não mede acerto. Ambiguidade de propósito fica para quando medirmos os motivos de revisão.
+- As frases f01 a f05, f08 e f10 ainda são rascunho da IA, não revisado. O conjunto também ainda não mede se os motivos de revisão (`precisa_confirmar`) estão certos.
 
 ## Stack
 
