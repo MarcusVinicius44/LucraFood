@@ -1,21 +1,24 @@
 Conjunto de avaliação da ficha técnica por texto.
 
-ATENÇÃO: frases.json é um rascunho escrito por IA (Claude) em 08/11/2026. O dono revisou
-f06, f07 e f09 em 08/11; as demais frases ainda não foram revisadas.
+frases.json foi escrito por IA (Claude) e revisado pelo dono em 08/11/2026 (todas as frases).
 
 Arquivos:
     ingredientes.json   cadastro fixo e fictício de um restaurante: [{"id", "nome", "unidade"}]
     frases.json         {"frases": [{"id", "caso", "prato", "texto", "esperado": [...]}]}
 
-Cada item esperado: {"nome": str, "ingrediente": id|null, "quantidade": str|null}
+Cada item esperado: {"nome": str, "ingrediente": id|null, "quantidade": str|null, "unidade"?: str}
 - "ingrediente": id do cadastro, ou null quando o ingrediente não está cadastrado
   (a IA deve deixar null em vez de forçar um parecido).
-- "quantidade": já na unidade do cadastro (kg -> g, l -> ml). null quando o texto usa
-  medida informal (concha, xícara, fio, bolas) ou não diz quanto: o sistema não chuta,
-  o dono informa. Pão/peça sem número conta como 1 (o sistema marca para confirmar).
-- Nome genérico não é ligado automaticamente; o dono escolhe. Ex.: "queijo" com "Queijo prato"
-  no cadastro fica null (vai para revisão), mesmo sendo o único queijo cadastrado: um custo
-  errado é pior que uma pergunta a mais. Nome específico liga normalmente ("blend bovino").
+- "quantidade": a quantidade escrita quando o texto usa g, kg, ml, l ou unidades, já na unidade
+  do cadastro (kg -> g, l -> ml). Vale também para ingrediente null (fora do cadastro): a
+  quantidade fica, na unidade-base da medida, e o item traz "unidade" ("150 g de mussarela" ->
+  "150", "g"). null só com medida informal (concha, xícara, fio, bolas) ou quando o texto não
+  diz quanto: o sistema não chuta, o dono informa. Pão/peça sem número conta como 1 (o sistema
+  marca para confirmar).
+- "unidade": obrigatória nos itens null com quantidade (sem cadastro, 150 pode ser g ou ml).
+- Só fica sem ingrediente o nome genérico de produto com variações de preço bem diferentes no
+  cadastro (ex.: queijo). Nomes genéricos com um candidato óbvio (pão, leite, óleo, farinha,
+  frango) são ligados.
 - Frase ambígua não serve para medir ingrediente e quantidade (ex.: "frango empanado na farinha
   (uns 30 g)": os 30 g podem ser do frango ou da farinha). Ambiguidade de propósito só quando
   formos medir os motivos de revisão, com "precisa_confirmar" como resposta certa.
@@ -23,7 +26,8 @@ Cada item esperado: {"nome": str, "ingrediente": id|null, "quantidade": str|null
 
 Pontuação (cardapio/avaliacao_ficha.py, testada sem API):
 - ingrediente: item esperado ligado ao id certo (ou null certo).
-- quantidade: entre os itens do cadastro acertados, quantidade igual à esperada.
+- quantidade: em todo item com ingrediente acertado (inclusive null), quantidade igual à
+  esperada; nos itens com "unidade" no esperado, a unidade também precisa bater.
 - errados: itens ligados a um id que não estava na resposta esperada.
 
 Regra: exemplos do prompt (cardapio/ia/ficha.py) NÃO podem vir destas frases.

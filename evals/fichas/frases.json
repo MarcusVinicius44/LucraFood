@@ -1,5 +1,5 @@
 {
-  "_origem": "Rascunho escrito por IA (Claude) em 08/11/2026. Revisado pelo dono em 08/11 só em f06, f07 e f09 (queijo genérico fica null; f09 reescrita sem ambiguidade); as demais frases ainda não foram revisadas.",
+  "_origem": "Escrito por IA (Claude) em 08/11/2026 e revisado pelo dono em 08/11/2026 (todas as frases).",
   "frases": [
     {
       "id": "f01",
@@ -58,7 +58,7 @@
         {"nome": "açúcar", "ingrediente": 15, "quantidade": null},
         {"nome": "farinha", "ingrediente": 16, "quantidade": "300"},
         {"nome": "leite", "ingrediente": 14, "quantidade": "240"},
-        {"nome": "cenoura", "ingrediente": null, "quantidade": null}
+        {"nome": "cenoura", "ingrediente": null, "quantidade": "2", "unidade": "un"}
       ]
     },
     {
@@ -70,7 +70,7 @@
         {"nome": "massa de pizza", "ingrediente": 19, "quantidade": "1"},
         {"nome": "molho de tomate", "ingrediente": 17, "quantidade": "120"},
         {"nome": "calabresa", "ingrediente": 18, "quantidade": "200"},
-        {"nome": "mussarela", "ingrediente": null, "quantidade": null},
+        {"nome": "mussarela", "ingrediente": null, "quantidade": "150", "unidade": "g"},
         {"nome": "cebola", "ingrediente": 21, "quantidade": null}
       ]
     },
@@ -82,7 +82,7 @@
       "esperado": [
         {"nome": "ovos", "ingrediente": 13, "quantidade": "2"},
         {"nome": "óleo", "ingrediente": 9, "quantidade": null},
-        {"nome": "queijo", "ingrediente": null, "quantidade": null},
+        {"nome": "queijo", "ingrediente": null, "quantidade": "50", "unidade": "g"},
         {"nome": "sal", "ingrediente": null, "quantidade": null},
         {"nome": "pimenta", "ingrediente": null, "quantidade": null}
       ]
@@ -95,8 +95,8 @@
       "esperado": [
         {"nome": "pão de hambúrguer", "ingrediente": 1, "quantidade": "1"},
         {"nome": "queijo prato", "ingrediente": 3, "quantidade": "40"},
-        {"nome": "presunto", "ingrediente": null, "quantidade": null},
-        {"nome": "manteiga", "ingrediente": null, "quantidade": null}
+        {"nome": "presunto", "ingrediente": null, "quantidade": "30", "unidade": "g"},
+        {"nome": "manteiga", "ingrediente": null, "quantidade": "10", "unidade": "g"}
       ]
     },
     {
@@ -108,7 +108,7 @@
         {"nome": "frango", "ingrediente": 12, "quantidade": "120"},
         {"nome": "farinha", "ingrediente": 16, "quantidade": "30"},
         {"nome": "molho de tomate", "ingrediente": 17, "quantidade": "100"},
-        {"nome": "queijo", "ingrediente": null, "quantidade": null},
+        {"nome": "queijo", "ingrediente": null, "quantidade": "60", "unidade": "g"},
         {"nome": "arroz", "ingrediente": 10, "quantidade": "150"}
       ]
     },

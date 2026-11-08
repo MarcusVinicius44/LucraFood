@@ -2,8 +2,10 @@
 
 Ingrediente: acerta se o item esperado aparece ligado ao mesmo id do cadastro; quando o
 esperado é null (fora do cadastro), acerta se a IA também deixou null para um nome parecido.
-Quantidade: só conta nos itens do cadastro que a IA acertou; compara a quantidade já na
-unidade do cadastro (null esperado = a IA não deve ter convertido, ex.: "1 concha").
+Quantidade: conta em todo item cujo ingrediente foi acertado (inclusive os null). Compara a
+quantidade na unidade do cadastro, ou, fora do cadastro, na unidade-base da medida escrita,
+conferindo também "unidade" quando o esperado a informa. null esperado = medida informal
+ou ausente (ex.: "1 concha"), que o sistema não deve converter.
 Errados: itens ligados a um id que não era esperado (associação errada ou inventada).
 """
 import unicodedata
@@ -24,7 +26,7 @@ def _decimal(valor):
 class ResultadoFicha:
     esperados: int = 0
     ingrediente_ok: int = 0
-    quantidades: int = 0  # itens do cadastro acertados, onde a quantidade é avaliada
+    quantidades: int = 0  # itens com ingrediente acertado, onde a quantidade é avaliada
     quantidade_ok: int = 0
     faltando: list = field(default_factory=list)  # nomes esperados que a IA não ligou certo
     quantidade_errada: list = field(default_factory=list)  # (nome, esperado, extraído)
@@ -57,25 +59,26 @@ def comparar(esperado: list[dict], extraido: list[dict]) -> ResultadoFicha:
     for esp in esperado:
         if esp["ingrediente"] is not None:
             achado = tirar(lambda item: id_de(item) == esp["ingrediente"])
-            if achado is None:
-                r.faltando.append(esp["nome"])
-                continue
-            r.ingrediente_ok += 1
-            r.quantidades += 1
-            if _decimal(achado["quantidade"]) == _decimal(esp["quantidade"]):
-                r.quantidade_ok += 1
-            else:
-                r.quantidade_errada.append((esp["nome"], esp["quantidade"], achado["quantidade"]))
         else:
             alvo = _normalizar(esp["nome"])
             achado = tirar(
                 lambda item: id_de(item) is None
                 and (alvo in _normalizar(item["nome_lido"]) or _normalizar(item["nome_lido"]) in alvo)
             )
-            if achado is None:
-                r.faltando.append(esp["nome"])
-            else:
-                r.ingrediente_ok += 1
+        if achado is None:
+            r.faltando.append(esp["nome"])
+            continue
+        r.ingrediente_ok += 1
+        r.quantidades += 1
+        mesma_quantidade = _decimal(achado["quantidade"]) == _decimal(esp["quantidade"])
+        # "unidade" é obrigatória no esperado quando não há cadastro para dizer se 150 é g ou ml.
+        mesma_unidade = "unidade" not in esp or achado.get("unidade") == esp["unidade"]
+        if mesma_quantidade and mesma_unidade:
+            r.quantidade_ok += 1
+        else:
+            esperado_txt = f"{esp['quantidade']} {esp.get('unidade') or ''}".strip()
+            obtido_txt = f"{achado['quantidade']} {achado.get('unidade') or ''}".strip()
+            r.quantidade_errada.append((esp["nome"], esperado_txt, obtido_txt))
 
     for item in livres:
         if id_de(item) is None:

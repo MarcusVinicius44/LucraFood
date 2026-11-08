@@ -407,9 +407,9 @@ class FichaPorTextoViewTest(BaseFicha):
         self.assertEqual(self.prato.itens.count(), 0)
 
 
-def _extraido(nome, id_=None, quantidade=None):
+def _extraido(nome, id_=None, quantidade=None, unidade=None):
     ingrediente = {"id": id_, "nome": f"#{id_}", "unidade": "g"} if id_ else None
-    return {"nome_lido": nome, "ingrediente": ingrediente, "quantidade": quantidade}
+    return {"nome_lido": nome, "ingrediente": ingrediente, "quantidade": quantidade, "unidade": unidade}
 
 
 class AvaliacaoFichaTest(TestCase):
@@ -424,13 +424,23 @@ class AvaliacaoFichaTest(TestCase):
             self.ESPERADO,
             [_extraido("carne", 2, "150.000"), _extraido("feijão", 11), _extraido("2 Cenouras")],
         )
-        self.assertEqual((r.ingrediente_ok, r.esperados, r.quantidade_ok, r.quantidades), (3, 3, 2, 2))
+        # A cenoura (null) também conta na quantidade: esperado null, veio null.
+        self.assertEqual((r.ingrediente_ok, r.esperados, r.quantidade_ok, r.quantidades), (3, 3, 3, 3))
         self.assertEqual((r.faltando, r.errados, r.sobrando), ([], [], []))
 
     def test_quantidade_convertida_quando_devia_ficar_null(self):
         r = comparar_ficha(self.ESPERADO[1:2], [_extraido("feijão", 11, "100")])
         self.assertEqual((r.ingrediente_ok, r.quantidade_ok), (1, 0))
-        self.assertEqual(r.quantidade_errada, [("feijão", None, "100")])
+        self.assertEqual(r.quantidade_errada, [("feijão", "None", "100")])
+
+    def test_fora_do_cadastro_confere_quantidade_e_unidade(self):
+        esperado = [{"nome": "mussarela", "ingrediente": None, "quantidade": "150", "unidade": "g"}]
+        certo = comparar_ficha(esperado, [_extraido("mussarela", quantidade="150.000", unidade="g")])
+        sem_qtd = comparar_ficha(esperado, [_extraido("mussarela")])
+        outra_unidade = comparar_ficha(esperado, [_extraido("mussarela", quantidade="150.000", unidade="ml")])
+        self.assertEqual((certo.quantidade_ok, certo.quantidades), (1, 1))
+        self.assertEqual((sem_qtd.ingrediente_ok, sem_qtd.quantidade_ok), (1, 0))
+        self.assertEqual(outra_unidade.quantidade_errada, [("mussarela", "150 g", "150.000 ml")])
 
     def test_ligado_ao_id_errado_conta_como_errado_e_faltando(self):
         # "mussarela" forçada para "queijo prato" (id 3) quando o certo era null.
