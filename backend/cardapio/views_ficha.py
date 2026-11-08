@@ -12,7 +12,10 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 
 from . import calculos
+from .ia import ficha as ia_ficha
+from .ia.extracao import FalhaDeCota, ProvedorIndisponivel
 from .models import Ingrediente, ItemFichaTecnica, Prato, Restaurante
+from .views import resposta_erro_ia
 
 MSG_INGREDIENTE_REPETIDO = "Já existe um ingrediente com esse nome neste restaurante."
 MSG_UNIDADE_EM_USO = (
@@ -245,3 +248,50 @@ def ficha_tecnica(request, pk):
     if request.method == "PUT":
         return Response(salvar_ficha(prato, request.data))
     return Response(ficha_do_prato(prato))
+
+
+# --- Ficha por texto (IA) --------------------------------------------------
+
+MSG_SEM_INGREDIENTES = (
+    "Não encontrei ingredientes nesse texto. Escreva o que vai no prato e quanto, "
+    'por exemplo: "pão, 150 g de carne, 2 fatias de queijo".'
+)
+
+
+@api_view(["POST"])
+@parser_classes([JSONParser])
+def extrair_ficha_texto(request, pk):
+    """{"texto": "..."} -> itens lidos pela IA para o dono REVISAR. Nada é salvo aqui."""
+    prato = get_object_or_404(Prato.objects.select_related("restaurante"), pk=pk)
+    texto = request.data.get("texto") if isinstance(request.data, dict) else None
+    if not isinstance(texto, str) or not texto.strip():
+        return Response({"erro": "Envie a receita no campo 'texto'."}, status=400)
+    texto = texto.strip()
+    if len(texto) > ia_ficha.TEXTO_MAX:
+        return Response({"erro": f"Texto acima de {ia_ficha.TEXTO_MAX} caracteres."}, status=400)
+    cadastro = list(prato.restaurante.ingredientes.order_by("nome").values("id", "nome", "unidade"))
+    try:
+        itens = ia_ficha.extrair_ficha(texto, cadastro, prato.nome)
+    except ia_ficha.TextoSemIngredientes:
+        return Response(
+            {"erro": MSG_SEM_INGREDIENTES, "codigo": "sem_ingredientes"}, status=status.HTTP_422_UNPROCESSABLE_ENTITY
+        )
+    except (FalhaDeCota, ProvedorIndisponivel, ValueError) as erro:
+        return resposta_erro_ia(erro)
+    return Response(
+        {
+            "prato": prato.id,
+            "nome": prato.nome,
+            "precisa_confirmar": any(item.precisa_confirmar for item in itens),
+            "itens": [item.para_json() for item in itens],
+        }
+    )
+
+
+@api_view(["POST"])
+@parser_classes([JSONParser])
+def confirmar_ficha(request, pk):
+    """Grava a ficha revisada pelo dono. Mesma validação e gravação do PUT /ficha/ (substitui a anterior):
+    cada item precisa de um ingrediente cadastrado e da quantidade na unidade do cadastro."""
+    prato = get_object_or_404(_pratos(), pk=pk)
+    return Response(salvar_ficha(prato, request.data))

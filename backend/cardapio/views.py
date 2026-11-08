@@ -39,19 +39,25 @@ def extrair(request):
             },
             status=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    except FalhaDeCota:
+    except (FalhaDeCota, ProvedorIndisponivel, ValueError) as erro:
+        return resposta_erro_ia(erro)
+    return Response(cardapio.model_dump(mode="json"))
+
+
+def resposta_erro_ia(erro):
+    """Converte os erros da camada de IA (foto ou ficha) na resposta HTTP certa."""
+    if isinstance(erro, FalhaDeCota):
         return Response(
             {"erro": "Limite de uso da IA atingido. Tente de novo em alguns minutos."},
             status=status.HTTP_429_TOO_MANY_REQUESTS,
         )
-    except ProvedorIndisponivel:
+    if isinstance(erro, ProvedorIndisponivel):
         return Response(
             {"erro": "O serviço de IA está sobrecarregado. Tente de novo em alguns minutos."},
             status=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
-    except ValueError as erro:
-        return Response({"erro": str(erro)}, status=status.HTTP_502_BAD_GATEWAY)
-    return Response(cardapio.model_dump(mode="json"))
+    # ValueError: a IA não devolveu dados válidos nem na segunda tentativa.
+    return Response({"erro": str(erro)}, status=status.HTTP_502_BAD_GATEWAY)
 
 
 class PratoConfirmadoSerializer(serializers.Serializer):

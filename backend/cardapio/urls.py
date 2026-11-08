@@ -11,4 +11,6 @@ urlpatterns = [
     path("pratos/<int:pk>/", views_ficha.PratoDetalhe.as_view()),
     path("pratos/<int:pk>/ficha/", views_ficha.ficha_tecnica),
     path("pratos/<int:pk>/diagnostico/", views_ficha.diagnostico),
+    path("pratos/<int:pk>/ficha/extrair/", views_ficha.extrair_ficha_texto),
+    path("pratos/<int:pk>/ficha/confirmar/", views_ficha.confirmar_ficha),
 ]

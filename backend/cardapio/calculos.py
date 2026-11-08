@@ -76,3 +76,26 @@ def diagnosticar(
     if semaforo != "verde":
         sugerido = preco_sugerido(custo, desejada, taxa_app_pct, impostos_pct)
     return Diagnostico(Decimal(custo), m_balcao, m_delivery, semaforo, sugerido)
+
+
+# Unidade de medida -> (unidade do cadastro, fator). Só medidas exatas: "fatia" ou "colher"
+# não entram, porque transformá-las em gramas seria chute (o dono informa).
+FATORES_UNIDADE = {
+    "mg": ("g", Decimal("0.001")),
+    "g": ("g", Decimal("1")),
+    "kg": ("g", Decimal("1000")),
+    "ml": ("ml", Decimal("1")),
+    "l": ("ml", Decimal("1000")),
+    "un": ("un", Decimal("1")),
+}
+MILESIMO = Decimal("0.001")
+
+
+def converter_unidade(quantidade, de: str, para: str) -> Decimal:
+    """Converte para a unidade do cadastro (ex.: 0,2 kg -> 200 g). ValueError se não houver conversão exata."""
+    if de not in FATORES_UNIDADE:
+        raise ValueError(f"Unidade sem conversão exata: {de!r}.")
+    base, fator = FATORES_UNIDADE[de]
+    if base != para:
+        raise ValueError(f"Não dá para converter {de} em {para}.")
+    return (Decimal(quantidade) * fator).quantize(MILESIMO, ROUND_HALF_UP)

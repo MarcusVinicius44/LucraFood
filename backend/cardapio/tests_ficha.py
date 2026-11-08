@@ -1,8 +1,14 @@
 """Testes de ingredientes, ficha técnica e diagnóstico (sem IA)."""
+import json
 from decimal import Decimal
+from types import SimpleNamespace
+from unittest.mock import MagicMock, patch
 
 from django.test import TestCase
 
+from . import calculos
+from .ia import ficha as ia_ficha
+from .ia.extracao import FalhaDeCota, ProvedorIndisponivel
 from .models import Ingrediente, ItemFichaTecnica, Prato, Restaurante
 
 
@@ -194,3 +200,183 @@ class IngredienteTest(BaseFicha):
         url = f"/api/ingredientes/{self.carne.id}/"
         self.assertEqual(self.client.patch(url, {"nome": "Blend bovino"}, content_type="application/json").status_code, 200)
         self.assertEqual(ItemFichaTecnica.objects.filter(ingrediente__nome="Blend bovino").count(), 1)
+
+
+# --- Ficha por texto (IA falsa, sem rede) ----------------------------------
+
+
+class ConverterUnidadeTest(TestCase):
+    def test_conversoes_exatas(self):
+        self.assertEqual(calculos.converter_unidade(Decimal("0.2"), "kg", "g"), Decimal("200.000"))
+        self.assertEqual(calculos.converter_unidade(Decimal("1.5"), "l", "ml"), Decimal("1500.000"))
+        self.assertEqual(calculos.converter_unidade(Decimal("150"), "g", "g"), Decimal("150.000"))
+
+    def test_sem_conversao_exata_e_erro(self):
+        for de, para in (("fatia", "g"), ("ml", "g"), ("un", "g")):
+            with self.subTest(de=de, para=para), self.assertRaises(ValueError):
+                calculos.converter_unidade(Decimal("1"), de, para)
+
+
+def _resposta(texto):
+    return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=texto))], usage=None)
+
+
+def _cliente(*textos):
+    cliente = MagicMock()
+    cliente.chat.completions.create.side_effect = [_resposta(t) for t in textos]
+    return cliente
+
+
+CADASTRO = [
+    {"id": 1, "nome": "Pão", "unidade": "un"},
+    {"id": 2, "nome": "Carne", "unidade": "g"},
+    {"id": 3, "nome": "Queijo", "unidade": "g"},
+    {"id": 4, "nome": "Leite", "unidade": "ml"},
+]
+
+
+def _itens(*itens):
+    return json.dumps({"itens": list(itens)})
+
+
+class ExtrairFichaTest(TestCase):
+    def extrair(self, *respostas):
+        return ia_ficha.extrair_ficha("texto", CADASTRO, "X-Burger", cliente=_cliente(*respostas))
+
+    def item(self, nome, ingrediente, quantidade, unidade):
+        return {"nome_lido": nome, "ingrediente": ingrediente, "quantidade": quantidade, "unidade": unidade}
+
+    def test_caso_completo(self):
+        itens = self.extrair(
+            _itens(
+                self.item("pão", 1, None, None),
+                self.item("hambúrguer", 2, "0,15", "kg"),
+                self.item("queijo", 3, 2, "fatia"),
+            )
+        )
+        pao, carne, queijo = (i.para_json() for i in itens)
+        # "pão" sem número: 1 unidade, mas marcado para o dono confirmar (decisão B).
+        self.assertEqual((pao["quantidade"], pao["motivos"]), ("1.000", ["sem_quantidade"]))
+        self.assertEqual((carne["quantidade"], carne["unidade"], carne["precisa_confirmar"]), ("150.000", "g", False))
+        self.assertEqual((queijo["quantidade"], queijo["quantidade_lida"], queijo["motivos"]), (None, "2", ["unidade_informal"]))
+
+    def test_id_inventado_vira_null(self):
+        (item,) = self.extrair(_itens(self.item("bacon", 99, 30, "g")))
+        self.assertIsNone(item.ingrediente)
+        self.assertEqual(item.motivos, ["sem_ingrediente"])
+        self.assertIsNone(item.quantidade)
+
+    def test_unidade_incompativel(self):
+        (item,) = self.extrair(_itens(self.item("queijo", 3, 100, "ml")))
+        self.assertEqual((item.quantidade, item.motivos), (None, ["unidade_incompativel"]))
+
+    def test_numero_sem_unidade(self):
+        carne, pao = self.extrair(_itens(self.item("carne", 2, 150, None), self.item("pães", 1, 2, None)))
+        self.assertEqual((carne.quantidade, carne.motivos), (None, ["sem_unidade"]))
+        self.assertEqual((pao.quantidade, pao.motivos), (Decimal("2.000"), []))
+
+    def test_carne_sem_quantidade_nao_vira_1(self):
+        (item,) = self.extrair(_itens(self.item("carne", 2, None, None)))
+        self.assertEqual((item.quantidade, item.motivos), (None, ["sem_quantidade"]))
+
+    def test_sinonimos_de_unidade(self):
+        (item,) = self.extrair(_itens(self.item("leite", 4, "1,5", "Litros")))
+        self.assertEqual(item.quantidade, Decimal("1500.000"))
+
+    def test_mesmo_ingrediente_duas_vezes(self):
+        _, segundo = self.extrair(_itens(self.item("carne", 2, 100, "g"), self.item("carne moída", 2, 50, "g")))
+        self.assertEqual(segundo.motivos, ["ingrediente_repetido"])
+
+    def test_json_invalido_tenta_de_novo_uma_vez(self):
+        itens = self.extrair("isso não é json", _itens(self.item("carne", 2, 150, "g")))
+        self.assertEqual(itens[0].quantidade, Decimal("150.000"))
+
+    def test_duas_respostas_invalidas_dao_value_error(self):
+        with self.assertRaises(ValueError):
+            self.extrair('{"itens": [{"nome_lido": ""}]}', "nada")
+
+    def test_quantidade_negativa_e_invalida(self):
+        with self.assertRaises(ValueError):
+            self.extrair(_itens(self.item("carne", 2, -5, "g")), _itens(self.item("carne", 2, -5, "g")))
+
+    def test_remove_think_e_cercas(self):
+        resposta = "<think>hmm</think>```json\n" + _itens(self.item("carne", 2, 150, "g")) + "\n```"
+        (item,) = self.extrair(resposta)
+        self.assertEqual(item.quantidade, Decimal("150.000"))
+
+    def test_sem_ingredientes(self):
+        with self.assertRaises(ia_ficha.TextoSemIngredientes):
+            self.extrair('{"itens": []}')
+
+    def test_prompt_recebe_cadastro_e_texto(self):
+        cliente = _cliente(_itens(self.item("carne", 2, 150, "g")))
+        ia_ficha.extrair_ficha("150 g de carne", CADASTRO, "X-Burger", cliente=cliente)
+        mensagem = cliente.chat.completions.create.call_args.kwargs["messages"][1]["content"]
+        self.assertIn('"nome": "Carne"', mensagem)
+        self.assertIn("150 g de carne", mensagem)
+
+
+class FichaPorTextoViewTest(BaseFicha):
+    def url(self, acao):
+        return f"/api/pratos/{self.prato.id}/ficha/{acao}/"
+
+    def extrair(self, dados):
+        return self.client.post(self.url("extrair"), dados, content_type="application/json")
+
+    def test_extrai_sem_salvar(self):
+        resposta_ia = _itens(
+            {"nome_lido": "pão", "ingrediente": self.pao.id, "quantidade": None, "unidade": None},
+            {"nome_lido": "carne", "ingrediente": self.carne.id, "quantidade": 150, "unidade": "g"},
+        )
+        with patch("cardapio.ia.ficha.get_cliente", return_value=_cliente(resposta_ia)):
+            resposta = self.extrair({"texto": "pão e 150 g de carne"})
+        self.assertEqual(resposta.status_code, 200)
+        corpo = resposta.json()
+        self.assertTrue(corpo["precisa_confirmar"])
+        self.assertEqual([i["ingrediente"]["nome"] for i in corpo["itens"]], ["Pão", "Carne"])
+        self.assertEqual(self.prato.itens.count(), 0)  # nada gravado
+
+    def test_cadastro_enviado_e_so_do_restaurante(self):
+        outro = Restaurante.objects.create(nome="Outro")
+        Ingrediente.objects.create(restaurante=outro, nome="Bacon", preco_embalagem=10, quantidade_embalagem=100)
+        with patch("cardapio.views_ficha.ia_ficha.extrair_ficha", return_value=[]) as falso:
+            self.extrair({"texto": "bacon"})
+        cadastro = falso.call_args.args[1]
+        self.assertEqual([c["nome"] for c in cadastro], ["Carne", "Pão", "Queijo"])
+
+    def test_texto_vazio_ou_longo_400(self):
+        self.assertEqual(self.extrair({"texto": "  "}).status_code, 400)
+        self.assertEqual(self.extrair({}).status_code, 400)
+        self.assertEqual(self.extrair({"texto": "x" * (ia_ficha.TEXTO_MAX + 1)}).status_code, 400)
+
+    def test_erros_da_ia(self):
+        casos = (
+            (ia_ficha.TextoSemIngredientes("x"), 422),
+            (FalhaDeCota("x"), 429),
+            (ProvedorIndisponivel("x"), 503),
+            (ValueError("x"), 502),
+        )
+        for erro, codigo in casos:
+            with self.subTest(codigo=codigo), patch("cardapio.views_ficha.ia_ficha.extrair_ficha", side_effect=erro):
+                resposta = self.extrair({"texto": "pão"})
+                self.assertEqual(resposta.status_code, codigo)
+        with patch("cardapio.views_ficha.ia_ficha.extrair_ficha", side_effect=ia_ficha.TextoSemIngredientes("x")):
+            self.assertEqual(self.extrair({"texto": "oi"}).json()["codigo"], "sem_ingredientes")
+
+    def test_confirmar_grava_e_substitui(self):
+        self.ficha_xburger()
+        resposta = self.client.post(
+            self.url("confirmar"),
+            {"itens": [{"ingrediente": self.carne.id, "quantidade": "150"}]},
+            content_type="application/json",
+        )
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(self.prato.itens.count(), 1)
+        self.assertEqual(resposta.json()["diagnostico"]["custo"], "7.50")  # 6,30 + embalagem 1,20
+
+    def test_confirmar_recusa_item_sem_ingrediente_ou_quantidade(self):
+        for item in ({"ingrediente": None, "quantidade": 1}, {"ingrediente": self.carne.id, "quantidade": None}):
+            with self.subTest(item=item):
+                resposta = self.client.post(self.url("confirmar"), {"itens": [item]}, content_type="application/json")
+                self.assertEqual(resposta.status_code, 400)
+        self.assertEqual(self.prato.itens.count(), 0)
