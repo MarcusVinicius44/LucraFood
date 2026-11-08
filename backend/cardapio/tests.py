@@ -404,6 +404,7 @@ class LimitadorTest(TestCase):
         with self.assertRaises(ValueError):
             lim.aguardar(1200)
 
+    @patch.dict(os.environ, {"LUCRAFOOD_PROVEDOR": "groq", "LUCRAFOOD_MAX_TOKENS": ""})
     def test_extracao_em_faixas_espaca_as_chamadas(self):
         lim, relogio, esperas = self._limitador()
         cliente = MagicMock()
@@ -431,8 +432,15 @@ def _ambiente(**valores):
 
 
 class ConfigProvedorTest(TestCase):
-    def test_padrao_e_groq_com_limites_do_plano_gratuito(self):
-        with _ambiente():
+    def test_padrao_e_gemini_sem_variavel_ou_com_variavel_vazia(self):
+        for ambiente in ({}, {"LUCRAFOOD_PROVEDOR": ""}):
+            with self.subTest(ambiente=ambiente), _ambiente(**ambiente):
+                cfg = config()
+                self.assertEqual((cfg.provedor, cfg.var_chave, cfg.modelo),
+                                 ("gemini", "GEMINI_API_KEY", "gemini-3.5-flash-lite"))
+
+    def test_groq_com_limites_do_plano_gratuito(self):
+        with _ambiente(LUCRAFOOD_PROVEDOR="groq"):
             cfg = config()
         self.assertEqual((cfg.provedor, cfg.var_chave, cfg.max_tokens), ("groq", "GROQ_API_KEY", 900))
         self.assertEqual((cfg.limite_saida_min, cfg.limite_tokens_min), (1000, 8000))
@@ -448,7 +456,7 @@ class ConfigProvedorTest(TestCase):
     def test_modelo_antigo_do_groq_nao_vaza_para_o_gemini(self):
         with _ambiente(LUCRAFOOD_PROVEDOR="gemini", LUCRAFOOD_MODELO_VISAO="qwen/qwen3.8-27b"):
             self.assertTrue(config().modelo.startswith("gemini"))
-        with _ambiente(LUCRAFOOD_MODELO_VISAO="qwen/outro"):
+        with _ambiente(LUCRAFOOD_PROVEDOR="groq", LUCRAFOOD_MODELO_VISAO="qwen/outro"):
             self.assertEqual(config().modelo, "qwen/outro")
 
     def test_modelo_e_limites_sobrescritos_pelo_ambiente(self):

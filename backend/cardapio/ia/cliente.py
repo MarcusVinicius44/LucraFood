@@ -11,6 +11,8 @@ from functools import lru_cache
 
 from openai import OpenAI
 
+PROVEDOR_PADRAO = "gemini"
+
 PADROES = {
     "groq": {
         "base_url": "https://api.groq.com/openai/v1",
@@ -54,7 +56,9 @@ def config() -> Config:
     Variáveis por provedor (PREFIXO = GROQ ou GEMINI): {PREFIXO}_API_KEY, {PREFIXO}_BASE_URL,
     {PREFIXO}_MODELO_VISAO. LUCRAFOOD_MODELO_VISAO ainda vale para o Groq (nome antigo).
     """
-    provedor = os.getenv("LUCRAFOOD_PROVEDOR", "groq").strip().lower()
+    # Padrão gemini: foi o que bateu a meta na avaliação (ver README, "Evolução da extração").
+    # Variável vazia também cai no padrão.
+    provedor = (os.getenv("LUCRAFOOD_PROVEDOR") or PROVEDOR_PADRAO).strip().lower()
     if provedor not in PADROES:
         raise RuntimeError(f"LUCRAFOOD_PROVEDOR inválido: {provedor!r}. Use um de: {', '.join(PADROES)}.")
     p = PADROES[provedor]

@@ -15,12 +15,12 @@ Pequenos restaurantes costumam precificar no "achismo". Quando entram em aplicat
 - **A IA não faz contas.** Ela extrai dados e conduz a conversa; toda a matemática está em [`calculos.py`](backend/cardapio/calculos.py), em Python puro com `Decimal`. LLMs erram aritmética, e preço errado custa dinheiro ao restaurante.
 - **Saída estruturada e validada.** A resposta do modelo passa por Pydantic. Se falhar, o erro volta para o modelo e há uma nova tentativa; se falhar de novo, o usuário recebe um erro claro em vez de dados inventados.
 - **Sem chute de preço.** Preço ilegível vira `null` e o dono confere antes de salvar. Nada é gravado sem confirmação humana.
-- **Provedor trocável.** Usa a biblioteca `openai` com a API compatível do Groq. Mudar de modelo ou provedor é uma variável de ambiente.
+- **Provedor trocável.** Usa a biblioteca `openai` com a API compatível do provedor: Gemini por padrão, Groq como alternativa. Mudar de modelo ou provedor é uma variável de ambiente (`LUCRAFOOD_PROVEDOR`).
 - **Avaliação medida, não "parece que funciona".** `evals/cardapios/` reúne fotos reais com gabarito, e `python manage.py avaliar_extracao` mede encontrados, faltando, inventados e preços errados. *(1 foto avaliada por enquanto)*
 
 ## Stack
 
-Django + DRF · React + TypeScript *(em construção)* · Groq (`qwen/qwen3.8-27b`, visão + JSON + tool calling) · Pydantic
+Django + DRF · React + TypeScript *(em construção)* · Gemini 3.5 Flash-Lite (visão + JSON; Groq `qwen/qwen3.8-27b` como alternativa) · Pydantic
 
 ## Rodando localmente
 
@@ -28,7 +28,7 @@ Django + DRF · React + TypeScript *(em construção)* · Groq (`qwen/qwen3.8-27
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env             # e cole sua GROQ_API_KEY
+cp .env.example .env             # e cole sua GEMINI_API_KEY (aistudio.google.com)
 
 cd backend
 python manage.py migrate
