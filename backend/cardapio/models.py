@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 
 MSG_MINIMA_MAIOR = "A margem mínima não pode ser maior que a margem desejada."
@@ -62,6 +63,10 @@ class Prato(models.Model):
     categoria = models.CharField(max_length=60, blank=True)
     preco_venda = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     custo_embalagem = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0"))
+    # Porções que a receita da ficha rende (bolo inteiro = 12 fatias). O preço de venda é por porção.
+    rendimento = models.DecimalField(
+        max_digits=8, decimal_places=2, default=Decimal("1"), validators=[MinValueValidator(Decimal("0.01"))]
+    )
 
     def __str__(self):
         return self.nome

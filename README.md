@@ -8,7 +8,7 @@ Pequenos restaurantes costumam precificar no "achismo". Quando entram em aplicat
 
 1. **Foto do cardápio → pratos estruturados** (modelo de visão, saída JSON validada).
 2. **Ficha técnica por texto** — o dono escreve o que vai no prato ("pão, hambúrguer de 150g, 2 fatias de queijo"), a IA liga cada item a um ingrediente cadastrado e o dono revisa antes de salvar. Medidas informais (fatia, concha) não viram gramas: o dono informa.
-3. **Diagnóstico** — custo, margem no balcão, margem no delivery e preço sugerido.
+3. **Diagnóstico** — custo por porção, margem no balcão, margem no delivery e preço sugerido. Receita que rende várias porções (bolo de 12 fatias) é dividida pelo rendimento; a embalagem é por porção e fica fora da divisão.
 
 ## Decisões de engenharia
 
@@ -95,8 +95,8 @@ python manage.py runserver
 | GET/PATCH | `/api/restaurantes/<id>/` | consulta/ajusta taxas, margem desejada (padrão 30) e margem mínima (padrão 10); mínima maior que desejada → 400 |
 | GET/POST | `/api/restaurantes/<id>/ingredientes/` | lista/cadastra ingredientes como o dono compra (preço e tamanho da embalagem) |
 | GET/PATCH/DELETE | `/api/ingredientes/<id>/` | edita/apaga; apagar ingrediente usado em ficha → 409 com os pratos |
-| GET/PATCH | `/api/pratos/<id>/` | corrige preço de venda (ex.: o que veio nulo da foto) e custo da embalagem |
-| GET/PUT | `/api/pratos/<id>/ficha/` | ficha com custo por item e diagnóstico; o PUT `{itens: [{ingrediente, quantidade}]}` troca a ficha inteira |
+| GET/PATCH | `/api/pratos/<id>/` | corrige preço de venda (ex.: o que veio nulo da foto), custo da embalagem e rendimento (porções que a receita rende; padrão 1, zero → 400) |
+| GET/PUT | `/api/pratos/<id>/ficha/` | ficha com custo por item, custo da receita e diagnóstico; o PUT `{itens: [{ingrediente, quantidade}]}` troca a ficha inteira |
 | GET | `/api/pratos/<id>/diagnostico/` | custo, margem balcão, margem delivery, semáforo e preço sugerido; sem preço ou sem ficha → sem semáforo |
 | POST | `/api/pratos/<id>/ficha/extrair/` | JSON `{texto}` → itens lidos pela IA, com `precisa_confirmar` e motivos (não salva); texto sem ingredientes → 422 |
 | POST | `/api/pratos/<id>/ficha/confirmar/` | ficha revisada pelo dono → salva (mesma validação do PUT, substitui a anterior) |

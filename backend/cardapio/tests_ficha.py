@@ -4,6 +4,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from . import calculos
@@ -147,6 +148,42 @@ class PratoTest(BaseFicha):
     def test_preco_zero_ou_embalagem_negativa_400(self):
         self.assertEqual(self.patch({"preco_venda": "0"}).status_code, 400)
         self.assertEqual(self.patch({"custo_embalagem": "-1"}).status_code, 400)
+
+
+class RendimentoTest(BaseFicha):
+    def test_custo_da_porcao_divide_so_os_ingredientes(self):
+        # Bolo: receita de R$24 que rende 12 fatias -> R$2 por fatia; a embalagem (R$0,50) é por fatia.
+        itens = [(Decimal("1"), Decimal("24"))]
+        self.assertEqual(calculos.custo_prato(itens, rendimento=Decimal("12")), Decimal("2.00"))
+        self.assertEqual(calculos.custo_prato(itens, Decimal("0.50"), Decimal("12")), Decimal("2.50"))
+
+    def test_rendimento_zero_ou_negativo_e_erro_no_calculo(self):
+        for rendimento in ("0", "-1"):
+            with self.subTest(rendimento=rendimento), self.assertRaises(ValueError):
+                calculos.custo_prato([(Decimal("1"), Decimal("24"))], rendimento=Decimal(rendimento))
+
+    def test_api_recusa_rendimento_zero_ou_negativo(self):
+        url = f"/api/pratos/{self.prato.id}/"
+        for rendimento in ("0", "-1"):
+            with self.subTest(rendimento=rendimento):
+                resposta = self.client.patch(url, {"rendimento": rendimento}, content_type="application/json")
+                self.assertEqual(resposta.status_code, 400)
+        self.assertEqual(Prato.objects.get(pk=self.prato.pk).rendimento, Decimal("1"))
+
+    def test_modelo_recusa_rendimento_zero(self):
+        self.prato.rendimento = Decimal("0")
+        with self.assertRaises(ValidationError):
+            self.prato.full_clean()
+
+    def test_diagnostico_usa_o_custo_da_porcao(self):
+        self.ficha_xburger()  # ingredientes R$9,15 + embalagem R$1,20
+        ficha = self.client.get(f"/api/pratos/{self.prato.id}/ficha/").json()
+        self.assertEqual((ficha["rendimento"], ficha["custo_receita"], ficha["diagnostico"]["custo"]), ("1.00", "9.15", "10.35"))
+        resposta = self.client.patch(f"/api/pratos/{self.prato.id}/", {"rendimento": "2"}, content_type="application/json")
+        self.assertEqual(resposta.status_code, 200)
+        ficha = self.client.get(f"/api/pratos/{self.prato.id}/ficha/").json()
+        # 9,15 / 2 = 4,575 + 1,20 = 5,775 -> 5,78
+        self.assertEqual((ficha["custo_receita"], ficha["diagnostico"]["custo"]), ("9.15", "5.78"))
 
 
 class IngredienteTest(BaseFicha):

@@ -127,7 +127,9 @@ def diagnostico_do_prato(prato):
     if not itens:
         return {**resultado, "pendente": "sem_ficha", "mensagem": PENDENCIAS["sem_ficha"]}
     custo = calculos.custo_prato(
-        [(item.quantidade, item.ingrediente.custo_por_unidade) for item in itens], prato.custo_embalagem
+        [(item.quantidade, item.ingrediente.custo_por_unidade) for item in itens],
+        prato.custo_embalagem,
+        prato.rendimento,
     )
     r = prato.restaurante
     try:
@@ -164,10 +166,12 @@ class PratoSerializer(serializers.ModelSerializer):
         max_digits=10, decimal_places=2, min_value=Decimal("0.01"), allow_null=True, required=False
     )
     custo_embalagem = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal("0"), required=False)
+    # Porções que a receita rende; zero não pode (o custo da porção é receita / rendimento).
+    rendimento = serializers.DecimalField(max_digits=8, decimal_places=2, min_value=Decimal("0.01"), required=False)
 
     class Meta:
         model = Prato
-        fields = ["id", "nome", "categoria", "preco_venda", "custo_embalagem"]
+        fields = ["id", "nome", "categoria", "preco_venda", "custo_embalagem", "rendimento"]
 
 
 class PratoDetalhe(generics.RetrieveUpdateAPIView):
@@ -207,11 +211,15 @@ class FichaSerializer(serializers.Serializer):
 
 def ficha_do_prato(prato):
     itens = sorted(prato.itens.all(), key=lambda item: item.ingrediente.nome.lower())
+    custo_receita = calculos.custo_prato([(item.quantidade, item.ingrediente.custo_por_unidade) for item in itens])
     return {
         "prato": prato.id,
         "nome": prato.nome,
         "preco_venda": _texto(prato.preco_venda),
         "custo_embalagem": str(prato.custo_embalagem),
+        "rendimento": str(prato.rendimento),
+        # Só ingredientes, a receita inteira. O custo da porção (com embalagem) está em diagnostico.custo.
+        "custo_receita": str(custo_receita),
         "itens": [
             {
                 "ingrediente": item.ingrediente_id,

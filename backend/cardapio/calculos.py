@@ -17,10 +17,21 @@ def _pct(valor) -> Decimal:
     return Decimal(str(valor)) / 100
 
 
-def custo_prato(itens: list[tuple[Decimal, Decimal]], custo_embalagem: Decimal = Decimal("0")) -> Decimal:
-    """itens = [(quantidade_usada, custo_por_unidade), ...]"""
-    total = sum((Decimal(q) * Decimal(c) for q, c in itens), Decimal("0")) + Decimal(custo_embalagem)
-    return total.quantize(CENTAVO, ROUND_HALF_UP)
+def custo_prato(
+    itens: list[tuple[Decimal, Decimal]], custo_embalagem: Decimal = Decimal("0"), rendimento: Decimal = Decimal("1")
+) -> Decimal:
+    """Custo de UMA porção vendida.
+
+    itens = [(quantidade_usada, custo_por_unidade), ...] da receita inteira.
+    rendimento = porções que a receita rende (bolo que rende 12 fatias = 12; padrão 1).
+    A embalagem é por porção vendida, então fica fora da divisão:
+    custo = custo dos ingredientes / rendimento + embalagem.
+    """
+    rendimento = Decimal(rendimento)
+    if rendimento <= 0:
+        raise ValueError("O rendimento precisa ser maior que zero.")
+    ingredientes = sum((Decimal(q) * Decimal(c) for q, c in itens), Decimal("0"))
+    return (ingredientes / rendimento + Decimal(custo_embalagem)).quantize(CENTAVO, ROUND_HALF_UP)
 
 
 def margem(preco: Decimal, custo: Decimal, taxa_app_pct=0, impostos_pct=0) -> Decimal:
