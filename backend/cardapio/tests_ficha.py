@@ -7,6 +7,8 @@ from unittest.mock import MagicMock, patch
 from django.test import TestCase
 
 from . import calculos
+from .avaliacao_ficha import ResultadoFicha
+from .avaliacao_ficha import comparar as comparar_ficha
 from .ia import ficha as ia_ficha
 from .ia.extracao import FalhaDeCota, ProvedorIndisponivel
 from .models import Ingrediente, ItemFichaTecnica, Prato, Restaurante
@@ -380,3 +382,44 @@ class FichaPorTextoViewTest(BaseFicha):
                 resposta = self.client.post(self.url("confirmar"), {"itens": [item]}, content_type="application/json")
                 self.assertEqual(resposta.status_code, 400)
         self.assertEqual(self.prato.itens.count(), 0)
+
+
+def _extraido(nome, id_=None, quantidade=None):
+    ingrediente = {"id": id_, "nome": f"#{id_}", "unidade": "g"} if id_ else None
+    return {"nome_lido": nome, "ingrediente": ingrediente, "quantidade": quantidade}
+
+
+class AvaliacaoFichaTest(TestCase):
+    ESPERADO = [
+        {"nome": "carne", "ingrediente": 2, "quantidade": "150"},
+        {"nome": "feijão", "ingrediente": 11, "quantidade": None},
+        {"nome": "cenoura", "ingrediente": None, "quantidade": None},
+    ]
+
+    def test_tudo_certo(self):
+        r = comparar_ficha(
+            self.ESPERADO,
+            [_extraido("carne", 2, "150.000"), _extraido("feijão", 11), _extraido("2 Cenouras")],
+        )
+        self.assertEqual((r.ingrediente_ok, r.esperados, r.quantidade_ok, r.quantidades), (3, 3, 2, 2))
+        self.assertEqual((r.faltando, r.errados, r.sobrando), ([], [], []))
+
+    def test_quantidade_convertida_quando_devia_ficar_null(self):
+        r = comparar_ficha(self.ESPERADO[1:2], [_extraido("feijão", 11, "100")])
+        self.assertEqual((r.ingrediente_ok, r.quantidade_ok), (1, 0))
+        self.assertEqual(r.quantidade_errada, [("feijão", None, "100")])
+
+    def test_ligado_ao_id_errado_conta_como_errado_e_faltando(self):
+        # "mussarela" forçada para "queijo prato" (id 3) quando o certo era null.
+        r = comparar_ficha([{"nome": "mussarela", "ingrediente": None, "quantidade": None}], [_extraido("mussarela", 3)])
+        self.assertEqual((r.ingrediente_ok, r.faltando, r.errados), (0, ["mussarela"], [("mussarela", 3)]))
+
+    def test_item_a_mais_sem_ingrediente(self):
+        r = comparar_ficha(self.ESPERADO[:1], [_extraido("carne", 2, "150"), _extraido("água")])
+        self.assertEqual((r.ingrediente_ok, r.sobrando), (1, ["água"]))
+
+    def test_soma(self):
+        total = ResultadoFicha()
+        total.somar(comparar_ficha(self.ESPERADO[:1], [_extraido("carne", 2, "150")]))
+        total.somar(comparar_ficha(self.ESPERADO[:1], []))
+        self.assertEqual((total.esperados, total.ingrediente_ok, total.faltando), (2, 1, ["carne"]))

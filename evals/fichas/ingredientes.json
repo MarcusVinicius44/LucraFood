@@ -1,0 +1,23 @@
+[
+  {"id": 1, "nome": "Pão de hambúrguer", "unidade": "un"},
+  {"id": 2, "nome": "Blend bovino", "unidade": "g"},
+  {"id": 3, "nome": "Queijo prato", "unidade": "g"},
+  {"id": 4, "nome": "Bacon", "unidade": "g"},
+  {"id": 5, "nome": "Alface", "unidade": "g"},
+  {"id": 6, "nome": "Tomate", "unidade": "g"},
+  {"id": 7, "nome": "Maionese", "unidade": "g"},
+  {"id": 8, "nome": "Batata congelada", "unidade": "g"},
+  {"id": 9, "nome": "Óleo de soja", "unidade": "ml"},
+  {"id": 10, "nome": "Arroz", "unidade": "g"},
+  {"id": 11, "nome": "Feijão carioca", "unidade": "g"},
+  {"id": 12, "nome": "Peito de frango", "unidade": "g"},
+  {"id": 13, "nome": "Ovo", "unidade": "un"},
+  {"id": 14, "nome": "Leite integral", "unidade": "ml"},
+  {"id": 15, "nome": "Açúcar", "unidade": "g"},
+  {"id": 16, "nome": "Farinha de trigo", "unidade": "g"},
+  {"id": 17, "nome": "Molho de tomate", "unidade": "g"},
+  {"id": 18, "nome": "Calabresa", "unidade": "g"},
+  {"id": 19, "nome": "Massa de pizza", "unidade": "un"},
+  {"id": 20, "nome": "Refrigerante lata", "unidade": "un"},
+  {"id": 21, "nome": "Cebola", "unidade": "g"}
+]

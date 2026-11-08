@@ -1,0 +1,27 @@
+Conjunto de avaliação da ficha técnica por texto.
+
+ATENÇÃO: frases.json é um RASCUNHO escrito por IA (Claude) em 08/11/2026 e ainda não foi
+revisado. Revise frase por frase antes de usar as métricas para decidir algo.
+
+Arquivos:
+    ingredientes.json   cadastro fixo e fictício de um restaurante: [{"id", "nome", "unidade"}]
+    frases.json         {"frases": [{"id", "caso", "prato", "texto", "esperado": [...]}]}
+
+Cada item esperado: {"nome": str, "ingrediente": id|null, "quantidade": str|null}
+- "ingrediente": id do cadastro, ou null quando o ingrediente não está cadastrado
+  (a IA deve deixar null em vez de forçar um parecido).
+- "quantidade": já na unidade do cadastro (kg -> g, l -> ml). null quando o texto usa
+  medida informal (concha, xícara, fio, bolas) ou não diz quanto: o sistema não chuta,
+  o dono informa. Pão/peça sem número conta como 1 (o sistema marca para confirmar).
+- "nome" só serve para relatório e para achar os itens null (comparação por nome parecido).
+
+Pontuação (cardapio/avaliacao_ficha.py, testada sem API):
+- ingrediente: item esperado ligado ao id certo (ou null certo).
+- quantidade: entre os itens do cadastro acertados, quantidade igual à esperada.
+- errados: itens ligados a um id que não estava na resposta esperada.
+
+Regra: exemplos do prompt (cardapio/ia/ficha.py) NÃO podem vir destas frases.
+
+Rodar (da pasta backend/, com o .env preenchido; cada frase = 1 chamada na cota):
+    python manage.py avaliar_ficha
+    python manage.py avaliar_ficha --frase f03

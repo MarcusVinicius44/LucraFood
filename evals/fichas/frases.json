@@ -1,0 +1,127 @@
+{
+  "_origem": "RASCUNHO escrito por IA (Claude) em 08/11/2026, ainda NÃO revisado pelo dono do projeto. Revisar frase por frase antes de confiar nas métricas.",
+  "frases": [
+    {
+      "id": "f01",
+      "caso": "nomes iguais ao cadastro, tudo em gramas",
+      "prato": "X-Salada",
+      "texto": "1 pão de hambúrguer, 150 g de blend bovino, 30 g de queijo prato, 20 g de alface e 40 g de tomate",
+      "esperado": [
+        {"nome": "pão de hambúrguer", "ingrediente": 1, "quantidade": "1"},
+        {"nome": "blend bovino", "ingrediente": 2, "quantidade": "150"},
+        {"nome": "queijo prato", "ingrediente": 3, "quantidade": "30"},
+        {"nome": "alface", "ingrediente": 5, "quantidade": "20"},
+        {"nome": "tomate", "ingrediente": 6, "quantidade": "40"}
+      ]
+    },
+    {
+      "id": "f02",
+      "caso": "sinônimo (hambúrguer = blend) e pão sem número (vira 1 un)",
+      "prato": "X-Bacon",
+      "texto": "pão, hambúrguer de 180g, bacon 40g, maionese 15 g",
+      "esperado": [
+        {"nome": "pão", "ingrediente": 1, "quantidade": "1"},
+        {"nome": "hambúrguer", "ingrediente": 2, "quantidade": "180"},
+        {"nome": "bacon", "ingrediente": 4, "quantidade": "40"},
+        {"nome": "maionese", "ingrediente": 7, "quantidade": "15"}
+      ]
+    },
+    {
+      "id": "f03",
+      "caso": "quantidade por extenso em kg (meio quilo -> 500 g) e ml",
+      "prato": "Porção de fritas",
+      "texto": "meio quilo de batata e 100ml de óleo",
+      "esperado": [
+        {"nome": "batata", "ingrediente": 8, "quantidade": "500"},
+        {"nome": "óleo", "ingrediente": 9, "quantidade": "100"}
+      ]
+    },
+    {
+      "id": "f04",
+      "caso": "unidade informal (concha) não vira gramas",
+      "prato": "PF de frango",
+      "texto": "200g de arroz, 1 concha de feijão, 180 g de peito de frango grelhado e salada de alface 30g",
+      "esperado": [
+        {"nome": "arroz", "ingrediente": 10, "quantidade": "200"},
+        {"nome": "feijão", "ingrediente": 11, "quantidade": null},
+        {"nome": "peito de frango", "ingrediente": 12, "quantidade": "180"},
+        {"nome": "alface", "ingrediente": 5, "quantidade": "30"}
+      ]
+    },
+    {
+      "id": "f05",
+      "caso": "ingrediente fora do cadastro (cenoura) e xícara informal",
+      "prato": "Bolo de cenoura",
+      "texto": "4 ovos, 2 xícaras de açúcar, 300 g de farinha, 240 ml de leite e 2 cenouras",
+      "esperado": [
+        {"nome": "ovos", "ingrediente": 13, "quantidade": "4"},
+        {"nome": "açúcar", "ingrediente": 15, "quantidade": null},
+        {"nome": "farinha", "ingrediente": 16, "quantidade": "300"},
+        {"nome": "leite", "ingrediente": 14, "quantidade": "240"},
+        {"nome": "cenoura", "ingrediente": null, "quantidade": null}
+      ]
+    },
+    {
+      "id": "f06",
+      "caso": "kg com vírgula, queijo parecido mas diferente (mussarela não é queijo prato), sem quantidade",
+      "prato": "Pizza calabresa",
+      "texto": "1 massa de pizza, 120g de molho de tomate, 0,2 kg de calabresa, 150 g de mussarela e cebola",
+      "esperado": [
+        {"nome": "massa de pizza", "ingrediente": 19, "quantidade": "1"},
+        {"nome": "molho de tomate", "ingrediente": 17, "quantidade": "120"},
+        {"nome": "calabresa", "ingrediente": 18, "quantidade": "200"},
+        {"nome": "mussarela", "ingrediente": null, "quantidade": null},
+        {"nome": "cebola", "ingrediente": 21, "quantidade": null}
+      ]
+    },
+    {
+      "id": "f07",
+      "caso": "nome curto (queijo -> queijo prato, único queijo), medida vaga e temperos fora do cadastro",
+      "prato": "Omelete",
+      "texto": "2 ovos, um fio de óleo, 50 g de queijo, sal e pimenta",
+      "esperado": [
+        {"nome": "ovos", "ingrediente": 13, "quantidade": "2"},
+        {"nome": "óleo", "ingrediente": 9, "quantidade": null},
+        {"nome": "queijo", "ingrediente": 3, "quantidade": "50"},
+        {"nome": "sal", "ingrediente": null, "quantidade": null},
+        {"nome": "pimenta", "ingrediente": null, "quantidade": null}
+      ]
+    },
+    {
+      "id": "f08",
+      "caso": "erros de digitação e sem acento",
+      "prato": "Misto quente",
+      "texto": "pao de hamburguer, 40g de qeijo prato, 30 g presunto, manteiga 10g",
+      "esperado": [
+        {"nome": "pão de hambúrguer", "ingrediente": 1, "quantidade": "1"},
+        {"nome": "queijo prato", "ingrediente": 3, "quantidade": "40"},
+        {"nome": "presunto", "ingrediente": null, "quantidade": null},
+        {"nome": "manteiga", "ingrediente": null, "quantidade": null}
+      ]
+    },
+    {
+      "id": "f09",
+      "caso": "texto com ruído e quantidade entre parênteses",
+      "prato": "Frango à parmegiana",
+      "texto": "Esse é o carro-chefe da casa! Vai 250 g de frango empanado na farinha (uns 30 g), molho de tomate 100g, queijo 60g. Serve com arroz 150g.",
+      "esperado": [
+        {"nome": "frango", "ingrediente": 12, "quantidade": "250"},
+        {"nome": "farinha", "ingrediente": 16, "quantidade": "30"},
+        {"nome": "molho de tomate", "ingrediente": 17, "quantidade": "100"},
+        {"nome": "queijo", "ingrediente": 3, "quantidade": "60"},
+        {"nome": "arroz", "ingrediente": 10, "quantidade": "150"}
+      ]
+    },
+    {
+      "id": "f10",
+      "caso": "litro com vírgula (0,3 l -> 300 ml) e item fora do cadastro com unidade informal",
+      "prato": "Milk-shake",
+      "texto": "0,3 l de leite, 2 bolas de sorvete, 20 g de açúcar",
+      "esperado": [
+        {"nome": "leite", "ingrediente": 14, "quantidade": "300"},
+        {"nome": "sorvete", "ingrediente": null, "quantidade": null},
+        {"nome": "açúcar", "ingrediente": 15, "quantidade": "20"}
+      ]
+    }
+  ]
+}
