@@ -1,7 +1,7 @@
 Conjunto de avaliação da ficha técnica por texto.
 
-ATENÇÃO: frases.json é um RASCUNHO escrito por IA (Claude) em 08/11/2026 e ainda não foi
-revisado. Revise frase por frase antes de usar as métricas para decidir algo.
+ATENÇÃO: frases.json é um rascunho escrito por IA (Claude) em 08/11/2026. O dono revisou
+f06, f07 e f09 em 08/11; as demais frases ainda não foram revisadas.
 
 Arquivos:
     ingredientes.json   cadastro fixo e fictício de um restaurante: [{"id", "nome", "unidade"}]
@@ -13,6 +13,12 @@ Cada item esperado: {"nome": str, "ingrediente": id|null, "quantidade": str|null
 - "quantidade": já na unidade do cadastro (kg -> g, l -> ml). null quando o texto usa
   medida informal (concha, xícara, fio, bolas) ou não diz quanto: o sistema não chuta,
   o dono informa. Pão/peça sem número conta como 1 (o sistema marca para confirmar).
+- Nome genérico não é ligado automaticamente; o dono escolhe. Ex.: "queijo" com "Queijo prato"
+  no cadastro fica null (vai para revisão), mesmo sendo o único queijo cadastrado: um custo
+  errado é pior que uma pergunta a mais. Nome específico liga normalmente ("blend bovino").
+- Frase ambígua não serve para medir ingrediente e quantidade (ex.: "frango empanado na farinha
+  (uns 30 g)": os 30 g podem ser do frango ou da farinha). Ambiguidade de propósito só quando
+  formos medir os motivos de revisão, com "precisa_confirmar" como resposta certa.
 - "nome" só serve para relatório e para achar os itens null (comparação por nome parecido).
 
 Pontuação (cardapio/avaliacao_ficha.py, testada sem API):

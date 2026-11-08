@@ -1,5 +1,5 @@
 {
-  "_origem": "RASCUNHO escrito por IA (Claude) em 08/11/2026, ainda NÃO revisado pelo dono do projeto. Revisar frase por frase antes de confiar nas métricas.",
+  "_origem": "Rascunho escrito por IA (Claude) em 08/11/2026. Revisado pelo dono em 08/11 só em f06, f07 e f09 (queijo genérico fica null; f09 reescrita sem ambiguidade); as demais frases ainda não foram revisadas.",
   "frases": [
     {
       "id": "f01",
@@ -76,13 +76,13 @@
     },
     {
       "id": "f07",
-      "caso": "nome curto (queijo -> queijo prato, único queijo), medida vaga e temperos fora do cadastro",
+      "caso": "nome genérico (queijo) não é ligado automaticamente, medida vaga e temperos fora do cadastro",
       "prato": "Omelete",
       "texto": "2 ovos, um fio de óleo, 50 g de queijo, sal e pimenta",
       "esperado": [
         {"nome": "ovos", "ingrediente": 13, "quantidade": "2"},
         {"nome": "óleo", "ingrediente": 9, "quantidade": null},
-        {"nome": "queijo", "ingrediente": 3, "quantidade": "50"},
+        {"nome": "queijo", "ingrediente": null, "quantidade": null},
         {"nome": "sal", "ingrediente": null, "quantidade": null},
         {"nome": "pimenta", "ingrediente": null, "quantidade": null}
       ]
@@ -101,14 +101,14 @@
     },
     {
       "id": "f09",
-      "caso": "texto com ruído e quantidade entre parênteses",
+      "caso": "texto com ruído, ingrediente com quantidade aproximada e queijo genérico",
       "prato": "Frango à parmegiana",
-      "texto": "Esse é o carro-chefe da casa! Vai 250 g de frango empanado na farinha (uns 30 g), molho de tomate 100g, queijo 60g. Serve com arroz 150g.",
+      "texto": "Esse é o carro-chefe da casa! Frango empanado: 120 g de frango e uns 30 g de farinha, molho de tomate 100g, queijo 60g. Serve com arroz 150g.",
       "esperado": [
-        {"nome": "frango", "ingrediente": 12, "quantidade": "250"},
+        {"nome": "frango", "ingrediente": 12, "quantidade": "120"},
         {"nome": "farinha", "ingrediente": 16, "quantidade": "30"},
         {"nome": "molho de tomate", "ingrediente": 17, "quantidade": "100"},
-        {"nome": "queijo", "ingrediente": 3, "quantidade": "60"},
+        {"nome": "queijo", "ingrediente": null, "quantidade": null},
         {"nome": "arroz", "ingrediente": 10, "quantidade": "150"}
       ]
     },
