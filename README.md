@@ -44,14 +44,22 @@ python manage.py avaliar_extracao                           # Gemini (padrão)
 
 `python manage.py avaliar_ficha` sobre as 10 frases de `evals/fichas/` (42 ingredientes esperados, cadastro fictício de 21 itens), cada uma cobrindo um caso: sinônimo, pão sem número, kg e litro com vírgula, concha/xícara/fio, ingrediente fora do cadastro, queijo parecido mas diferente, erro de digitação e texto com ruído.
 
-| Data | Gabarito | Provedor e modelo | Ingrediente certo | Quantidade certa | Ligados ao ingrediente errado | Chamadas |
-|---|---|---|---|---|---|---|
-| 08/11/2026 | rascunho da IA | Gemini `gemini-3.5-flash-lite` | 40 de 42 (95,2%) | 33 de 33 | 0 | 10 (~1 s por frase) |
-| 08/11/2026 | revisado em f06, f07 e f09 | Gemini `gemini-3.5-flash-lite` | **42 de 42** | **33 de 33** | **0** | 10 (~1 s por frase) |
+| Data | Gabarito | Provedor e modelo | Ingrediente certo | Quantidade certa | Ligados ao ingrediente errado |
+|---|---|---|---|---|---|
+| 08/11/2026 | rascunho da IA | Gemini `gemini-3.5-flash-lite` | 40 de 42 (95,2%) | 33 de 33 (só itens do cadastro) | 0 |
+| 08/11/2026 | revisado em f06, f07 e f09 | Gemini `gemini-3.5-flash-lite` | 42 de 42 | 33 de 33 (só itens do cadastro) | 0 |
+| 08/11/2026 | **revisado pelo dono (todas as frases)** | Gemini `gemini-3.5-flash-lite` | **40 a 42 de 42** (5 rodadas: 42, 42, 41, 41, 40) | **100% em todas as rodadas** (40 a 42 itens, inclusive fora do cadastro) | 0 ou 1 |
 
-- **O gabarito foi ajustado depois da primeira rodada, e o prompt não mudou.** A primeira rodada (repetida duas vezes, com o mesmo resultado) errou só "queijo" nas frases f07 e f09: a IA deixou sem ingrediente, e o rascunho esperava "Queijo prato". Revisando, concordei com a IA e virou regra do conjunto: **nome genérico não é ligado automaticamente; o dono escolhe.** Um custo errado é pior que uma pergunta a mais na revisão.
-- Na mesma revisão, a f09 foi reescrita porque era ambígua ("frango empanado na farinha (uns 30 g)": os 30 g podiam ser do frango ou da farinha), e uma frase ambígua não mede acerto. Ambiguidade de propósito fica para quando medirmos os motivos de revisão.
-- As frases f01 a f05, f08 e f10 ainda são rascunho da IA, não revisado. O conjunto também ainda não mede se os motivos de revisão (`precisa_confirmar`) estão certos.
+Cada rodada faz 10 chamadas (~1 s por frase; algumas rodadas levaram ~70 s por esperarem 503 do Gemini). **O prompt não mudou em nenhuma dessas rodadas**: mudaram o gabarito, a métrica e um defeito do Python. O motivo de cada ajuste:
+
+1. **"queijo" genérico vai para revisão** (f07 e f09, depois da primeira rodada). A IA deixou "queijo" sem ingrediente e o rascunho esperava "Queijo prato". O dono concordou com a IA: um custo errado é pior que uma pergunta a mais.
+2. **f09 reescrita** porque era ambígua ("frango empanado na farinha (uns 30 g)": os 30 g podiam ser do frango ou da farinha), e frase ambígua não mede acerto.
+3. **Regra dos nomes genéricos** (revisão completa): só fica sem ingrediente o nome genérico de produto com variações de preço bem diferentes (ex.: queijo). Genéricos com um candidato óbvio (pão, leite, óleo, farinha, frango) são ligados, como o gabarito já esperava.
+4. **Item fora do cadastro guarda a quantidade escrita.** "150 g de mussarela" deve voltar 150 g, para o dono cadastrar o ingrediente já sabendo quanto usa. O Python apagava essa quantidade quando o ingrediente ficava `null`. Isso foi corrigido em [`9b4c657`](https://github.com/MarcusVinicius44/LucraFood/commit/9b4c657), e esses itens passaram a contar na métrica de quantidade, conferindo também a unidade. Pela mesma regra, "2 cenouras" (f05) passou a esperar 2 un. Medida informal (concha, xícara, fio, bolas) continua sem quantidade.
+
+**Variação entre rodadas** (mesmo prompt, mesmo gabarito), toda na f07 ("2 ovos, um fio de óleo, 50 g de queijo, sal e pimenta"): em 2 de 5 rodadas a IA ligou "queijo" a Queijo prato, e uma vez juntou "sal e pimenta" num item só. Uma rodada de 41 não teve a saída guardada, então o item que faltou nela é desconhecido. O cadastro de avaliação tem um único queijo, o que deixa esse caso no limite da regra 3.
+
+Ainda não medido: se os motivos de revisão (`precisa_confirmar`) estão certos.
 
 ## Stack
 
@@ -95,7 +103,9 @@ python manage.py runserver
 - [x] Extração de cardápio por foto com validação e retry
 - [x] Motor de cálculo de custo, margem e preço sugerido (com testes)
 - [x] Ficha técnica: ingredientes, ficha por prato, diagnóstico e extração por texto com revisão
-- [ ] **Próximo passo:** ficha em conversa de várias rodadas (a IA pergunta o que faltou: "quantos gramas tem a fatia de queijo?")
+- [ ] **Próximo passo:** ligar e marcar para confirmar quando o nome lido é diferente do cadastrado ("leite" → "Leite integral"), em vez de ligar em silêncio ou deixar sem ingrediente
+- [ ] **Próximo passo:** medir os motivos de revisão, com frases ambíguas de propósito
+- [ ] Ficha em conversa de várias rodadas (a IA pergunta o que faltou: "quantos gramas tem a fatia de queijo?")
 - [ ] Painel com semáforo e simulador de preço (React)
 - [x] Conjunto de avaliação com fotos reais e métricas
 - [ ] Teste com restaurantes de verdade
