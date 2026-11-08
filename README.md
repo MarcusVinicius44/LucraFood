@@ -48,7 +48,8 @@ python manage.py avaliar_extracao                           # Gemini (padrão)
 |---|---|---|---|---|---|
 | 08/11/2026 | rascunho da IA | Gemini `gemini-3.5-flash-lite` | 40 de 42 (95,2%) | 33 de 33 (só itens do cadastro) | 0 |
 | 08/11/2026 | revisado em f06, f07 e f09 | Gemini `gemini-3.5-flash-lite` | 42 de 42 | 33 de 33 (só itens do cadastro) | 0 |
-| 08/11/2026 | **revisado pelo dono (todas as frases)** | Gemini `gemini-3.5-flash-lite` | **40 a 42 de 42** (5 rodadas: 42, 42, 41, 41, 40) | **100% em todas as rodadas** (40 a 42 itens, inclusive fora do cadastro) | 0 ou 1 |
+| 08/11/2026 | revisado pelo dono (todas as frases) | Gemini `gemini-3.5-flash-lite` | 40 a 42 de 42 (5 rodadas: 42, 42, 41, 41, 40) | 100% em todas as rodadas (40 a 42 itens, inclusive fora do cadastro) | 0 ou 1 |
+| 08/11/2026 | revisado + Cheddar e Parmesão no cadastro | Gemini `gemini-3.5-flash-lite` | **42 de 42 nas 5 rodadas** | **42 de 42 nas 5 rodadas** | **0** |
 
 Cada rodada faz 10 chamadas (~1 s por frase; algumas rodadas levaram ~70 s por esperarem 503 do Gemini). **O prompt não mudou em nenhuma dessas rodadas**: mudaram o gabarito, a métrica e um defeito do Python. O motivo de cada ajuste:
 
@@ -57,7 +58,9 @@ Cada rodada faz 10 chamadas (~1 s por frase; algumas rodadas levaram ~70 s por e
 3. **Regra dos nomes genéricos** (revisão completa): só fica sem ingrediente o nome genérico de produto com variações de preço bem diferentes (ex.: queijo). Genéricos com um candidato óbvio (pão, leite, óleo, farinha, frango) são ligados, como o gabarito já esperava.
 4. **Item fora do cadastro guarda a quantidade escrita.** "150 g de mussarela" deve voltar 150 g, para o dono cadastrar o ingrediente já sabendo quanto usa. O Python apagava essa quantidade quando o ingrediente ficava `null`. Isso foi corrigido em [`9b4c657`](https://github.com/MarcusVinicius44/LucraFood/commit/9b4c657), e esses itens passaram a contar na métrica de quantidade, conferindo também a unidade. Pela mesma regra, "2 cenouras" (f05) passou a esperar 2 un. Medida informal (concha, xícara, fio, bolas) continua sem quantidade.
 
-**Variação entre rodadas** (mesmo prompt, mesmo gabarito), toda na f07 ("2 ovos, um fio de óleo, 50 g de queijo, sal e pimenta"): em 2 de 5 rodadas a IA ligou "queijo" a Queijo prato, e uma vez juntou "sal e pimenta" num item só. Uma rodada de 41 não teve a saída guardada, então o item que faltou nela é desconhecido. O cadastro de avaliação tem um único queijo, o que deixa esse caso no limite da regra 3.
+**Variação entre rodadas** (mesmo prompt, mesmo gabarito), toda na f07 ("2 ovos, um fio de óleo, 50 g de queijo, sal e pimenta"): em 2 de 5 rodadas a IA ligou "queijo" a Queijo prato, e uma vez juntou "sal e pimenta" num item só. Uma rodada de 41 não teve a saída guardada, então o item que faltou nela é desconhecido. O cadastro de avaliação tinha um único queijo, o que deixava esse caso no limite da regra 3.
+
+5. **Cheddar e Parmesão no cadastro de avaliação**, com preços bem diferentes do Queijo prato (R$ 65 e R$ 130/kg contra R$ 45/kg), para "queijo" ser de fato genérico como a regra 3 descreve. Os preços só documentam a regra: a IA recebe apenas id, nome e unidade. Com isso, a f07 ficou estável e as 5 rodadas deram 42 de 42 nos ingredientes e nas quantidades. A saída completa de cada rodada está em [`evals/fichas/resultados/`](evals/fichas/resultados/).
 
 Ainda não medido: se os motivos de revisão (`precisa_confirmar`) estão certos.
 

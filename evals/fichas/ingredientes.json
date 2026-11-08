@@ -1,7 +1,7 @@
 [
   {"id": 1, "nome": "Pão de hambúrguer", "unidade": "un"},
   {"id": 2, "nome": "Blend bovino", "unidade": "g"},
-  {"id": 3, "nome": "Queijo prato", "unidade": "g"},
+  {"id": 3, "nome": "Queijo prato", "unidade": "g", "preco_embalagem": 45.00, "quantidade_embalagem": 1000},
   {"id": 4, "nome": "Bacon", "unidade": "g"},
   {"id": 5, "nome": "Alface", "unidade": "g"},
   {"id": 6, "nome": "Tomate", "unidade": "g"},
@@ -19,5 +19,7 @@
   {"id": 18, "nome": "Calabresa", "unidade": "g"},
   {"id": 19, "nome": "Massa de pizza", "unidade": "un"},
   {"id": 20, "nome": "Refrigerante lata", "unidade": "un"},
-  {"id": 21, "nome": "Cebola", "unidade": "g"}
+  {"id": 21, "nome": "Cebola", "unidade": "g"},
+  {"id": 22, "nome": "Cheddar", "unidade": "g", "preco_embalagem": 65.00, "quantidade_embalagem": 1000},
+  {"id": 23, "nome": "Parmesão", "unidade": "g", "preco_embalagem": 130.00, "quantidade_embalagem": 1000}
 ]

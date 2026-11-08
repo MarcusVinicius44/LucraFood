@@ -4,6 +4,9 @@ frases.json foi escrito por IA (Claude) e revisado pelo dono em 08/11/2026 (toda
 
 Arquivos:
     ingredientes.json   cadastro fixo e fictício de um restaurante: [{"id", "nome", "unidade"}]
+                        Os três queijos (Queijo prato R$45/kg, Cheddar R$65/kg, Parmesão R$130/kg)
+                        têm preço só para documentar a regra do nome genérico: a IA recebe apenas
+                        id, nome e unidade (ver _mensagem_usuario em cardapio/ia/ficha.py).
     frases.json         {"frases": [{"id", "caso", "prato", "texto", "esperado": [...]}]}
 
 Cada item esperado: {"nome": str, "ingrediente": id|null, "quantidade": str|null, "unidade"?: str}
