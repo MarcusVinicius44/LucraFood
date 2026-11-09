@@ -5,6 +5,7 @@ As views só juntam os dados do banco e chamam calculos.py: nenhuma conta mora a
 from decimal import ROUND_HALF_UP, Decimal
 
 from django.db import transaction
+from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, serializers, status
 from rest_framework.decorators import api_view, parser_classes
@@ -148,6 +149,16 @@ def diagnostico_do_prato(prato):
     }
 
 
+def resumo_da_ficha(prato):
+    """Quantos ingredientes a ficha tem e quando foi confirmada (o painel e a tela do prato mostram)."""
+    return {
+        "ficha_itens": len(prato.itens.all()),
+        "ficha_confirmada_em": (
+            timezone.localtime(prato.ficha_confirmada_em).isoformat() if prato.ficha_confirmada_em else None
+        ),
+    }
+
+
 def _pratos():
     return Prato.objects.select_related("restaurante").prefetch_related("itens__ingrediente")
 
@@ -172,6 +183,7 @@ def pratos_do_restaurante(request, pk):
                 "preco_venda": _texto(prato.preco_venda),
                 "custo_embalagem": _texto(prato.custo_embalagem),
                 "rendimento": _texto(prato.rendimento),
+                **resumo_da_ficha(prato),
                 **diagnostico_do_prato(prato),
             }
             for prato in pratos
@@ -241,6 +253,7 @@ def ficha_do_prato(prato):
         "rendimento": str(prato.rendimento),
         # Só ingredientes, a receita inteira. O custo da porção (com embalagem) está em diagnostico.custo.
         "custo_receita": str(custo_receita),
+        **resumo_da_ficha(prato),
         "itens": [
             {
                 "ingrediente": item.ingrediente_id,
@@ -265,6 +278,9 @@ def salvar_ficha(prato, dados):
             ItemFichaTecnica(prato=prato, ingrediente_id=item["ingrediente"], quantidade=item["quantidade"])
             for item in entrada.validated_data["itens"]
         )
+        # Lista vazia limpa a ficha: aí não há confirmação a mostrar.
+        prato.ficha_confirmada_em = timezone.now() if entrada.validated_data["itens"] else None
+        prato.save(update_fields=["ficha_confirmada_em"])
     return ficha_do_prato(_pratos().get(pk=prato.pk))
 
 

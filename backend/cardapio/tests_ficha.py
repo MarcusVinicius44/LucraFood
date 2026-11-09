@@ -180,6 +180,34 @@ class PratosDoRestauranteTest(BaseFicha):
         self.assertEqual(self.client.get("/api/restaurantes/9999/pratos/").status_code, 404)
 
 
+class ResumoDaFichaTest(BaseFicha):
+    def test_sem_ficha_nao_tem_data(self):
+        ficha = self.client.get(f"/api/pratos/{self.prato.id}/ficha/").json()
+        self.assertEqual((ficha["ficha_itens"], ficha["ficha_confirmada_em"]), (0, None))
+
+    def test_gravar_ficha_conta_itens_e_marca_a_data(self):
+        ficha = self.ficha_xburger().json()
+        self.assertEqual(ficha["ficha_itens"], 3)
+        self.assertIsNotNone(ficha["ficha_confirmada_em"])
+        self.assertTrue(ficha["ficha_confirmada_em"].endswith("-03:00"))  # horário de Brasília
+        painel = self.client.get(f"/api/restaurantes/{self.restaurante.id}/pratos/").json()[0]
+        self.assertEqual((painel["ficha_itens"], painel["ficha_confirmada_em"]), (3, ficha["ficha_confirmada_em"]))
+
+    def test_confirmar_pela_ia_tambem_marca(self):
+        r = self.client.post(
+            f"/api/pratos/{self.prato.id}/ficha/confirmar/",
+            {"itens": [{"ingrediente": self.carne.id, "quantidade": 150}]},
+            content_type="application/json",
+        ).json()
+        self.assertEqual(r["ficha_itens"], 1)
+        self.assertIsNotNone(r["ficha_confirmada_em"])
+
+    def test_esvaziar_a_ficha_apaga_a_data(self):
+        self.ficha_xburger()
+        ficha = self.put_ficha([]).json()
+        self.assertEqual((ficha["ficha_itens"], ficha["ficha_confirmada_em"]), (0, None))
+
+
 class RendimentoTest(BaseFicha):
     def test_custo_da_porcao_divide_so_os_ingredientes(self):
         # Bolo: receita de R$24 que rende 12 fatias -> R$2 por fatia; a embalagem (R$0,50) é por fatia.

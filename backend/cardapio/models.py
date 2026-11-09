@@ -67,6 +67,9 @@ class Prato(models.Model):
     rendimento = models.DecimalField(
         max_digits=8, decimal_places=2, default=Decimal("1"), validators=[MinValueValidator(Decimal("0.01"))]
     )
+    # Quando o dono gravou a ficha pela última vez (PUT ou confirmar). Nulo = sem ficha.
+    # Junto com o número de ingredientes, ajuda o dono a perceber se esqueceu algo.
+    ficha_confirmada_em = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.nome
