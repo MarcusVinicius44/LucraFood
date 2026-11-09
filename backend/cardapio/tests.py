@@ -545,3 +545,35 @@ class AvaliacaoTest(TestCase):
 
         r = comparar([self._p("Suco", None), self._p("Água", None)], [self._p("Suco", None), self._p("Água", 3)])
         self.assertEqual([x[0] for x in r.precos_errados], ["Água"])
+
+
+class ConfirmarTest(TestCase):
+    """Confirmar a lista revisada grava os pratos uma vez só."""
+
+    def confirmar(self, pratos, restaurante="Bar do Zé"):
+        return self.client.post(
+            "/api/cardapio/confirmar/", {"restaurante": restaurante, "pratos": pratos}, content_type="application/json"
+        )
+
+    def test_grava_os_pratos(self):
+        r = self.confirmar([{"nome": "X-Burger", "preco": "20.00"}, {"nome": "Suco", "preco": None}])
+        self.assertEqual((r.status_code, r.json()["pratos_salvos"]), (201, 2))
+
+    def test_confirmar_de_novo_da_409_e_nao_duplica(self):
+        from .models import Prato
+
+        self.confirmar([{"nome": "X-Burger", "preco": "20.00"}])
+        r = self.confirmar([{"nome": " x-burger ", "preco": "20.00"}, {"nome": "Suco", "preco": "8.00"}])
+        self.assertEqual(r.status_code, 409)
+        self.assertEqual(r.json()["pratos"], ["x-burger"])  # o DRF já tira os espaços das pontas
+        self.assertIn("restaurante_id", r.json())
+        self.assertEqual(Prato.objects.count(), 1)  # nem o Suco entra: tudo ou nada
+
+    def test_mesmo_prato_duas_vezes_na_lista_da_400(self):
+        r = self.confirmar([{"nome": "Suco", "preco": "8.00"}, {"nome": "SUCO", "preco": "9.00"}])
+        self.assertEqual(r.status_code, 400)
+        self.assertIn("SUCO", str(r.json()))
+
+    def test_prato_com_mesmo_nome_em_outro_restaurante_pode(self):
+        self.confirmar([{"nome": "Suco", "preco": "8.00"}])
+        self.assertEqual(self.confirmar([{"nome": "Suco", "preco": "8.00"}], restaurante="Outro").status_code, 201)

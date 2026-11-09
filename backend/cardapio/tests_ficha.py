@@ -150,6 +150,36 @@ class PratoTest(BaseFicha):
         self.assertEqual(self.patch({"custo_embalagem": "-1"}).status_code, 400)
 
 
+class PratosDoRestauranteTest(BaseFicha):
+    def listar(self):
+        return self.client.get(f"/api/restaurantes/{self.restaurante.id}/pratos/")
+
+    def test_cada_prato_vem_com_diagnostico(self):
+        self.ficha_xburger()
+        Prato.objects.create(restaurante=self.restaurante, nome="Suco", preco_venda=Decimal("8"))
+        r = self.listar()
+        self.assertEqual(r.status_code, 200)
+        por_nome = {p["nome"]: p for p in r.json()}
+        self.assertEqual(por_nome["X-Burger"]["semaforo"], "amarelo")
+        self.assertEqual(por_nome["X-Burger"]["preco_venda"], "20.00")
+        self.assertEqual((por_nome["Suco"]["semaforo"], por_nome["Suco"]["pendente"]), (None, "sem_ficha"))
+
+    def test_mesmo_resultado_da_rota_do_prato(self):
+        self.ficha_xburger()
+        lista = self.listar().json()[0]
+        d = self.client.get(f"/api/pratos/{self.prato.id}/diagnostico/").json()
+        for campo in ("semaforo", "custo", "margem_balcao_pct", "margem_delivery_pct", "preco_sugerido_delivery"):
+            self.assertEqual(lista[campo], d[campo], campo)
+
+    def test_nao_mistura_restaurantes(self):
+        outro = Restaurante.objects.create(nome="Outro")
+        Prato.objects.create(restaurante=outro, nome="Pastel", preco_venda=Decimal("9"))
+        self.assertEqual([p["nome"] for p in self.listar().json()], ["X-Burger"])
+
+    def test_restaurante_inexistente_404(self):
+        self.assertEqual(self.client.get("/api/restaurantes/9999/pratos/").status_code, 404)
+
+
 class RendimentoTest(BaseFicha):
     def test_custo_da_porcao_divide_so_os_ingredientes(self):
         # Bolo: receita de R$24 que rende 12 fatias -> R$2 por fatia; a embalagem (R$0,50) é por fatia.

@@ -158,6 +158,27 @@ def diagnostico(request, pk):
     return Response({"prato": prato.id, "nome": prato.nome, **diagnostico_do_prato(prato)})
 
 
+@api_view(["GET"])
+def pratos_do_restaurante(request, pk):
+    """Painel: todos os pratos do restaurante, cada um com o diagnóstico (mesmo cálculo da rota do prato)."""
+    restaurante = get_object_or_404(Restaurante, pk=pk)
+    pratos = _pratos().filter(restaurante=restaurante).order_by("categoria", "nome")
+    return Response(
+        [
+            {
+                "id": prato.id,
+                "nome": prato.nome,
+                "categoria": prato.categoria,
+                "preco_venda": _texto(prato.preco_venda),
+                "custo_embalagem": _texto(prato.custo_embalagem),
+                "rendimento": _texto(prato.rendimento),
+                **diagnostico_do_prato(prato),
+            }
+            for prato in pratos
+        ]
+    )
+
+
 # --- Prato -----------------------------------------------------------------
 
 

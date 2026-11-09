@@ -67,19 +67,58 @@ class PratoConfirmadoSerializer(serializers.Serializer):
     preco = serializers.DecimalField(max_digits=10, decimal_places=2, allow_null=True, required=False)
 
 
+MSG_PRATO_REPETIDO_NA_LISTA = "O mesmo prato aparece mais de uma vez na lista; deixe uma linha só."
+MSG_PRATO_JA_SALVO = (
+    "Estes pratos já estão salvos neste restaurante. Confirmar de novo duplicaria os pratos; "
+    "tire-os da lista ou corrija no painel."
+)
+
+
+def chave_do_nome(nome):
+    """Compara nomes de prato sem diferenciar maiúsculas e espaços ("X-Burger " = "x-burger")."""
+    return " ".join(nome.split()).casefold()
+
+
+def _repetidos(nomes):
+    vistos, repetidos = set(), []
+    for nome in nomes:
+        chave = chave_do_nome(nome)
+        if chave in vistos and nome not in repetidos:
+            repetidos.append(nome)
+        vistos.add(chave)
+    return repetidos
+
+
 class ConfirmarSerializer(serializers.Serializer):
     restaurante = serializers.CharField(max_length=120)
     pratos = PratoConfirmadoSerializer(many=True)
+
+    def validate_pratos(self, pratos):
+        repetidos = _repetidos([p["nome"] for p in pratos])
+        if repetidos:
+            raise serializers.ValidationError(f"{MSG_PRATO_REPETIDO_NA_LISTA} Repetidos: {', '.join(repetidos)}.")
+        return pratos
 
 
 @api_view(["POST"])
 @parser_classes([JSONParser])
 def confirmar(request):
-    """Salva a lista já conferida/corrigida pelo dono."""
+    """Salva a lista já conferida/corrigida pelo dono.
+
+    Recusa (409) prato que já existe no restaurante: um clique duplo ou um "voltar" no
+    navegador não pode duplicar o cardápio.
+    """
     dados = ConfirmarSerializer(data=request.data)
     dados.is_valid(raise_exception=True)
     with transaction.atomic():
         restaurante, _ = Restaurante.objects.get_or_create(nome=dados.validated_data["restaurante"])
+        salvos = {chave_do_nome(nome) for nome in restaurante.pratos.values_list("nome", flat=True)}
+        ja_salvos = [p["nome"] for p in dados.validated_data["pratos"] if chave_do_nome(p["nome"]) in salvos]
+        if ja_salvos:
+            return Response(
+                {"erro": MSG_PRATO_JA_SALVO, "restaurante_id": restaurante.id, "pratos": ja_salvos},
+                status=status.HTTP_409_CONFLICT,
+            )
         criados = [
             Prato.objects.create(
                 restaurante=restaurante,
