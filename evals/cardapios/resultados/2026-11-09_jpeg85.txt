@@ -1,0 +1,99 @@
+Provedor: gemini | modelo: gemini-3.5-flash-lite | max_tokens: 8192 | limite de saída/min: nenhum | faixas: 1
+
+== cardapio_01.jpg
+   provedor recusou (429 limite de taxa ou 503 sobrecarga): esperando 10s para tentar de novo...
+   gabarito: 6 | extraídos: 6 | encontrados: 6 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 6/6
+   tokens: 1875 entrada + 514 saída | chamadas: 2 | tempo total: 15s
+
+== cardapio_02.jpg
+   gabarito: 53 | extraídos: 53 | encontrados: 53 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 53/53
+   tokens: 1883 entrada + 4025 saída | chamadas: 1 | tempo total: 9s
+
+== cardapio_03.jpg
+   gabarito: 39 | extraídos: 39 | encontrados: 39 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 39/39
+   tokens: 1861 entrada + 1951 saída | chamadas: 1 | tempo total: 6s
+
+== cardapio_04.jpg
+   gabarito: 11 | extraídos: 11 | encontrados: 11 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 11/11
+   tokens: 1897 entrada + 683 saída | chamadas: 1 | tempo total: 4s
+
+== cardapio_05.jpg
+   gabarito: 58 | extraídos: 58 | encontrados: 55 | faltando: 3 | inventados: 3 | preços errados: 1
+   preços certos entre os encontrados: 54/55
+   FALTANDO:  Caldinho de Sururu
+   FALTANDO:  Caldinho de Feijão
+   FALTANDO:  Caldinho de Camarão
+   INVENTADO: Sururu
+   INVENTADO: Feijão
+   INVENTADO: Camarão
+   PREÇO:     Peixe frito ou no forno: esperado R$ 189.00, veio R$ 169.00
+   tokens: 1887 entrada + 2985 saída | chamadas: 1 | tempo total: 8s
+
+== cardapio_06.jpg
+   gabarito: 64 | extraídos: 64 | encontrados: 64 | faltando: 0 | inventados: 0 | preços errados: 32
+   preços certos entre os encontrados: 32/64
+   PREÇO:     Pizza Abobrinha (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Abobrinha (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza A Moda da Casa (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza A Moda da Casa (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza A Moda 2 (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza A Moda 2 (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Alho e Óleo (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Alho e Óleo (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Atum (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Atum (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Alemã (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Alemã (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Bacon (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Bacon (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Bolonhesa (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Bolonhesa (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Catupiry (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Catupiry (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Escarola (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Escarola (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Francesa (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Francesa (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Frango com Catupiry (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Frango com Catupiry (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Frango Caipira (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Frango Caipira (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Marguerita (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Marguerita (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Portuguesa (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Portuguesa (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Strogonoff de Frango (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Strogonoff de Frango (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   tokens: 1859 entrada + 1175 saída | chamadas: 1 | tempo total: 5s
+
+== cardapio_07.jpg
+   provedor recusou (429 limite de taxa ou 503 sobrecarga): esperando 10s para tentar de novo...
+   gabarito: 6 | extraídos: 6 | encontrados: 6 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 6/6
+   tokens: 1875 entrada + 702 saída | chamadas: 2 | tempo total: 18s
+
+== cardapio_08.jpg
+   gabarito: 17 | extraídos: 17 | encontrados: 17 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 17/17
+   tokens: 1897 entrada + 1187 saída | chamadas: 1 | tempo total: 4s
+
+foto                gab  ext achou falta  inv $err  tok.ent  tok.sai  cham  tempo
+cardapio_01.jpg       6    6     6     0    0    0     1875      514     2    15s
+cardapio_02.jpg      53   53    53     0    0    0     1883     4025     1     9s
+cardapio_03.jpg      39   39    39     0    0    0     1861     1951     1     6s
+cardapio_04.jpg      11   11    11     0    0    0     1897      683     1     4s
+cardapio_05.jpg      58   58    55     3    3    1     1887     2985     1     8s
+cardapio_06.jpg      64   64    64     0    0   32     1859     1175     1     5s
+cardapio_07.jpg       6    6     6     0    0    0     1875      702     2    18s
+cardapio_08.jpg      17   17    17     0    0    0     1897     1187     1     4s
+TOTAL (avaliadas)                                     15034    13222    10    68s
+
+==================================================
+TOTAL: 8 foto(s) avaliada(s), 0 falha(s) na extração, 0 falha(s) de cota, 0 com provedor indisponível
+Chamadas à API (contam na cota diária, inclusive as que falharam): 10
+   gabarito: 254 | extraídos: 254 | encontrados: 251 | faltando: 3 | inventados: 3 | preços errados: 33
+   preços certos entre os encontrados: 218/251

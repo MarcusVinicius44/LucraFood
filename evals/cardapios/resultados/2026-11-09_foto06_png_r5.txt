@@ -1,0 +1,16 @@
+Provedor: gemini | modelo: gemini-3.5-flash-lite | max_tokens: 8192 | limite de saída/min: nenhum | faixas: 1
+
+== cardapio_06.png
+   gabarito: 64 | extraídos: 64 | encontrados: 64 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 64/64
+   tokens: 1859 entrada + 1580 saída | chamadas: 1 | tempo total: 9s
+
+foto                gab  ext achou falta  inv $err  tok.ent  tok.sai  cham  tempo
+cardapio_06.png      64   64    64     0    0    0     1859     1580     1     9s
+TOTAL (avaliadas)                                      1859     1580     1     9s
+
+==================================================
+TOTAL: 1 foto(s) avaliada(s), 0 falha(s) na extração, 0 falha(s) de cota, 0 com provedor indisponível
+Chamadas à API (contam na cota diária, inclusive as que falharam): 1
+   gabarito: 64 | extraídos: 64 | encontrados: 64 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 64/64

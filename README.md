@@ -40,6 +40,22 @@ python manage.py avaliar_extracao                           # Gemini (padrão)
 - **Limitações conhecidas** (não corrigidas no prompt): na foto 05 os caldinhos vêm só com o sabor ("Sururu" em vez de "Caldinho de Sururu") em todas as rodadas; na foto 02 o título de seção "HAMBURGUER DE PICANHA" às vezes é lido como prato (1 de 2 rodadas).
 - **Sobre os gabaritos:** foram montados com ajuda de IA e conferidos ampliando a foto onde a extração discordava. Todos os "preços errados" encontrados até agora eram erro do gabarito ([`9e72ac4`](https://github.com/MarcusVinicius44/LucraFood/commit/9e72ac4)).
 
+### Foto reduzida pelo navegador (JPEG)
+
+O frontend envia a foto como está se ela tiver até 4 MB e for JPG, PNG ou WEBP. Só a foto maior (comum em celular) ou em outro formato (HEIC) é reduzida para 2400 px no lado maior e recomprimida em JPEG. Para saber se essa recompressão atrapalha, as 8 fotos foram convertidas do jeito que o navegador faz (`evals/cardapios/gerar_jpeg.py`) e avaliadas. Como elas têm menos de 1000 px, nenhuma foi reduzida: **o teste mede só a troca de PNG por JPEG**. Gemini `gemini-3.5-flash-lite`, 09/11/2026, saídas em `evals/cardapios/resultados/`.
+
+| Rodada (8 fotos) | Pratos | Preços certos | Onde errou |
+|---|---|---|---|
+| PNG original | 251 de 254 | **251 de 251** | (só os caldinhos de sempre) |
+| JPEG 85%, rodada 1 | 251 de 254 | 218 de 251 | foto 06: 32 pizzas (41→47, 51→53); foto 05: 189→169 |
+| JPEG 85%, rodada 2 | 251 de 254 | 250 de 251 | foto 05: 189→169 |
+| JPEG 92% | 244 de 248 (foto 07 deu *timeout* do provedor) | 212 de 244 | foto 06: 32 pizzas |
+
+Repetindo só a foto 06 (preços escritos à mão, foto com 513 px de largura): **PNG acertou 7 de 7 rodadas; JPEG errou as 32 pizzas em 4 de 8** (85%: 1 de 4; 92%: 3 de 4, mais 1 *timeout*). Os valores 47 e 53 não existem na foto.
+
+- **Conclusão:** nessas fotos pequenas, recomprimir em JPEG piora a leitura de dígitos manuscritos, e subir a qualidade de 85% para 92% não resolveu. Por isso o app só recomprime quando precisa (foto acima de 4 MB ou HEIC).
+- **O que ainda não foi medido:** o caso real da redução, foto de celular com 4000 px ou mais reduzida para 2400 px. Nela cada dígito tem 4 a 5 vezes mais pixels do que nas fotos de avaliação, então o efeito deve ser menor, mas falta conferir com fotos de cardápio em alta resolução e gabarito.
+
 ### Ficha técnica por texto
 
 `python manage.py avaliar_ficha` sobre as 10 frases de `evals/fichas/` (42 ingredientes esperados, cadastro fictício de 21 itens), cada uma cobrindo um caso: sinônimo, pão sem número, kg e litro com vírgula, concha/xícara/fio, ingrediente fora do cadastro, queijo parecido mas diferente, erro de digitação e texto com ruído.

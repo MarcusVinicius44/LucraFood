@@ -1,0 +1,66 @@
+Provedor: gemini | modelo: gemini-3.5-flash-lite | max_tokens: 8192 | limite de saída/min: nenhum | faixas: 1
+
+== cardapio_01.png
+   gabarito: 6 | extraídos: 6 | encontrados: 6 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 6/6
+   tokens: 1875 entrada + 514 saída | chamadas: 1 | tempo total: 4s
+
+== cardapio_02.png
+   gabarito: 53 | extraídos: 54 | encontrados: 53 | faltando: 0 | inventados: 1 | preços errados: 0
+   preços certos entre os encontrados: 53/53
+   INVENTADO: HAMBURGUER DE PICANHA
+   tokens: 1883 entrada + 4736 saída | chamadas: 1 | tempo total: 11s
+
+== cardapio_03.png
+   gabarito: 39 | extraídos: 39 | encontrados: 39 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 39/39
+   tokens: 1861 entrada + 1963 saída | chamadas: 1 | tempo total: 7s
+
+== cardapio_04.png
+   gabarito: 11 | extraídos: 11 | encontrados: 11 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 11/11
+   tokens: 1897 entrada + 683 saída | chamadas: 1 | tempo total: 4s
+
+== cardapio_05.png
+   gabarito: 58 | extraídos: 58 | encontrados: 55 | faltando: 3 | inventados: 3 | preços errados: 0
+   preços certos entre os encontrados: 55/55
+   FALTANDO:  Caldinho de Sururu
+   FALTANDO:  Caldinho de Feijão
+   FALTANDO:  Caldinho de Camarão
+   INVENTADO: Sururu
+   INVENTADO: Feijão
+   INVENTADO: Camarão
+   tokens: 1887 entrada + 3217 saída | chamadas: 1 | tempo total: 8s
+
+== cardapio_06.png
+   gabarito: 64 | extraídos: 64 | encontrados: 64 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 64/64
+   tokens: 1859 entrada + 1602 saída | chamadas: 1 | tempo total: 6s
+
+== cardapio_07.png
+   gabarito: 6 | extraídos: 6 | encontrados: 6 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 6/6
+   tokens: 1875 entrada + 702 saída | chamadas: 1 | tempo total: 3s
+
+== cardapio_08.png
+   gabarito: 17 | extraídos: 17 | encontrados: 17 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 17/17
+   tokens: 1897 entrada + 1312 saída | chamadas: 1 | tempo total: 5s
+fotomesa.jpeg: sem gabarito (fotomesa.json), ignorada
+
+foto                gab  ext achou falta  inv $err  tok.ent  tok.sai  cham  tempo
+cardapio_01.png       6    6     6     0    0    0     1875      514     1     4s
+cardapio_02.png      53   54    53     0    1    0     1883     4736     1    11s
+cardapio_03.png      39   39    39     0    0    0     1861     1963     1     7s
+cardapio_04.png      11   11    11     0    0    0     1897      683     1     4s
+cardapio_05.png      58   58    55     3    3    0     1887     3217     1     8s
+cardapio_06.png      64   64    64     0    0    0     1859     1602     1     6s
+cardapio_07.png       6    6     6     0    0    0     1875      702     1     3s
+cardapio_08.png      17   17    17     0    0    0     1897     1312     1     5s
+TOTAL (avaliadas)                                     15034    14729     8    48s
+
+==================================================
+TOTAL: 8 foto(s) avaliada(s), 0 falha(s) na extração, 0 falha(s) de cota, 0 com provedor indisponível
+Chamadas à API (contam na cota diária, inclusive as que falharam): 8
+   gabarito: 254 | extraídos: 255 | encontrados: 251 | faltando: 3 | inventados: 4 | preços errados: 0
+   preços certos entre os encontrados: 251/251

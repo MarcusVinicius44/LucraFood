@@ -1,0 +1,48 @@
+Provedor: gemini | modelo: gemini-3.5-flash-lite | max_tokens: 8192 | limite de saída/min: nenhum | faixas: 1
+
+== cardapio_06.jpg
+   gabarito: 64 | extraídos: 64 | encontrados: 64 | faltando: 0 | inventados: 0 | preços errados: 32
+   preços certos entre os encontrados: 32/64
+   PREÇO:     Pizza Abobrinha (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Abobrinha (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza A Moda da Casa (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza A Moda da Casa (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza A Moda 2 (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza A Moda 2 (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Alho e Óleo (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Alho e Óleo (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Atum (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Atum (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Alemã (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Alemã (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Bacon (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Bacon (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Bolonhesa (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Bolonhesa (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Catupiry (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Catupiry (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Escarola (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Escarola (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Francesa (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Francesa (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Frango com Catupiry (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Frango com Catupiry (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Frango Caipira (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Frango Caipira (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Marguerita (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Marguerita (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Portuguesa (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Portuguesa (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   PREÇO:     Pizza Strogonoff de Frango (Média 6 fatias): esperado R$ 41.00, veio R$ 47.00
+   PREÇO:     Pizza Strogonoff de Frango (Grande 8 fatias): esperado R$ 51.00, veio R$ 53.00
+   tokens: 1859 entrada + 1196 saída | chamadas: 1 | tempo total: 5s
+
+foto                gab  ext achou falta  inv $err  tok.ent  tok.sai  cham  tempo
+cardapio_06.jpg      64   64    64     0    0   32     1859     1196     1     5s
+TOTAL (avaliadas)                                      1859     1196     1     5s
+
+==================================================
+TOTAL: 1 foto(s) avaliada(s), 0 falha(s) na extração, 0 falha(s) de cota, 0 com provedor indisponível
+Chamadas à API (contam na cota diária, inclusive as que falharam): 1
+   gabarito: 64 | extraídos: 64 | encontrados: 64 | faltando: 0 | inventados: 0 | preços errados: 32
+   preços certos entre os encontrados: 32/64
