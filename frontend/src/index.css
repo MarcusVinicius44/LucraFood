@@ -339,3 +339,87 @@ a { color: var(--verde); }
   border-top: 1px dashed var(--borda);
   padding-top: 0.5rem;
 }
+
+/* --- Fase 3: prato, ficha, ingredientes, passos ------------------------ */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.pilha-curta { display: flex; flex-direction: column; gap: 0.4rem; }
+.botao-pequeno { min-height: 40px; padding: 0.45rem 0.9rem; font-size: 0.9rem; margin-top: 0.4rem; }
+.voltar { text-decoration: none; font-weight: 500; font-size: 0.9rem; }
+.aviso-sucesso { background: var(--sem-verde-fundo); border-color: #b9dcc7; color: var(--verde-escuro); }
+
+.campo select,
+.campo textarea {
+  font: 400 1rem var(--fonte-texto);
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  background: #fff;
+  color: var(--texto);
+  min-height: 44px;
+  width: 100%;
+}
+.campo textarea { resize: vertical; line-height: 1.45; }
+.campo select:focus,
+.campo textarea:focus { border-color: var(--verde); outline: none; box-shadow: 0 0 0 3px var(--verde-claro); }
+.campo select:disabled { background: var(--fundo); color: var(--texto-suave); }
+.campo-invalido select { border-color: var(--erro); }
+
+.grade-2, .grade-3 { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
+@media (min-width: 560px) {
+  .grade-2 { grid-template-columns: 1fr 1fr; }
+  .grade-3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* cartão do painel inteiro clicável */
+.cartao-link { text-decoration: none; color: inherit; transition: border-color 0.15s, box-shadow 0.15s; }
+.cartao-link:hover { border-color: var(--verde); }
+.link-acao { color: var(--verde); font-weight: 600; font-size: 0.9rem; }
+
+/* próximos passos */
+.passos { display: flex; flex-direction: column; gap: 0.75rem; border-color: #cfe3d7; }
+.passos-barra { height: 6px; background: var(--fundo); border-radius: 999px; overflow: hidden; }
+.passos-barra div { height: 100%; background: var(--verde); border-radius: 999px; }
+.passos-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+.passos-lista li { display: flex; gap: 0.75rem; align-items: flex-start; }
+.passo-marca {
+  flex: none; width: 28px; height: 28px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.85rem;
+  background: var(--fundo); color: var(--texto-suave); border: 1px solid var(--borda);
+}
+.passo-feito .passo-marca { background: var(--verde); color: #fff; border-color: var(--verde); }
+.passo-feito strong { color: var(--texto-suave); font-weight: 500; }
+.passo-atual .passo-marca { background: var(--laranja); color: #fff; border-color: var(--laranja); }
+
+/* ficha */
+.lista-ficha { list-style: none; margin: 0; padding: 0; }
+.lista-ficha li {
+  display: grid; grid-template-columns: 1fr auto auto; gap: 0.75rem;
+  padding: 0.55rem 0; border-bottom: 1px solid var(--borda); align-items: baseline;
+}
+.lista-ficha li:last-child { border-bottom: 0; }
+.item-ficha {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  padding: 0.85rem; border: 1px solid var(--borda); border-radius: var(--raio-pequeno); background: #fff;
+}
+.item-marcado { border-color: #f2dc9b; background: #fffcf2; }
+.item-ficha-campos { display: grid; grid-template-columns: 1fr; gap: 0.5rem; align-items: end; }
+@media (min-width: 560px) {
+  .item-ficha-campos { grid-template-columns: 2fr 1fr auto; }
+}
+.item-remover { justify-self: start; }
+.aviso-linha { color: #5c3c00; }
+.aviso-linha::before { content: '⚠ '; }
+.confirmacao { display: flex; gap: 0.5rem; align-items: center; font-weight: 600; }
+.confirmacao input { width: 20px; height: 20px; accent-color: var(--verde); }
+
+.logo-curto { display: none !important; }
+@media (max-width: 479px) {
+  .logo-largo { display: none !important; }
+  .logo-curto { display: block !important; height: 32px; width: 32px; }
+  .cabecalho nav a { padding: 0.4rem 0.55rem; }
+}
+.botao-pequeno { align-self: flex-start; }

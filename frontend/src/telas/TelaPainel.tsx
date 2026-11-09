@@ -1,9 +1,18 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
-import { ErroApi, buscarRestaurante, listarPratos, type PratoPainel, type Restaurante, type Semaforo } from '../api'
+import {
+  ErroApi,
+  buscarRestaurante,
+  listarIngredientes,
+  listarPratos,
+  type PratoPainel,
+  type Restaurante,
+  type Semaforo,
+} from '../api'
 import { esquecerRestaurante, restauranteSalvo } from '../armazenamento'
 import { Carregando } from '../componentes/Carregando'
-import { Etiqueta } from '../componentes/Etiqueta'
+import { NumerosDiagnostico } from '../componentes/NumerosDiagnostico'
+import { ProximosPassos } from '../componentes/ProximosPassos'
 import { SemaforoSelo } from '../componentes/SemaforoSelo'
 import { formatarPct, formatarReais, resumoDaFicha } from '../formato'
 
@@ -22,16 +31,18 @@ export function TelaPainel() {
   const salvo = restauranteSalvo()
   const [restaurante, setRestaurante] = useState<Restaurante | null>(null)
   const [pratos, setPratos] = useState<PratoPainel[] | null>(null)
+  const [totalIngredientes, setTotalIngredientes] = useState(0)
   const [erro, setErro] = useState<ErroApi | null>(null)
   const [filtro, setFiltro] = useState<Filtro>(null)
   const navegar = useNavigate()
 
   useEffect(() => {
     if (!salvo) return
-    Promise.all([buscarRestaurante(salvo.id), listarPratos(salvo.id)])
-      .then(([r, p]) => {
+    Promise.all([buscarRestaurante(salvo.id), listarPratos(salvo.id), listarIngredientes(salvo.id)])
+      .then(([r, p, i]) => {
         setRestaurante(r)
         setPratos(p)
+        setTotalIngredientes(i.length)
       })
       .catch((e: unknown) => setErro(e instanceof ErroApi ? e : new ErroApi(0, 'Erro inesperado ao carregar o painel.')))
   }, [salvo?.id]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -69,9 +80,8 @@ export function TelaPainel() {
   }
 
   const contagem = (tipo: Semaforo | 'pendente') => pratos.filter((p) => tipoDoPrato(p) === tipo).length
-  const semFicha = pratos.filter((p) => p.pendente === 'sem_ficha').length
-  const semPreco = pratos.filter((p) => p.pendente === 'sem_preco').length
-  const taxasZeradas = Number(restaurante.taxa_delivery_pct) === 0 && Number(restaurante.impostos_pct) === 0
+  const semFicha = pratos.filter((p) => p.ficha_itens === 0).length
+  const semPreco = pratos.filter((p) => !p.preco_venda).length
   const visiveis = filtro ? pratos.filter((p) => tipoDoPrato(p) === filtro) : pratos
 
   // Agrupa por categoria, mantendo a ordem que vem do backend (categoria, nome).
@@ -87,6 +97,8 @@ export function TelaPainel() {
         <h1>{restaurante.nome}</h1>
         <p className="suave">{pratos.length} {pratos.length === 1 ? 'prato' : 'pratos'} no cardápio.</p>
       </div>
+
+      <ProximosPassos restaurante={restaurante} pratos={pratos} totalIngredientes={totalIngredientes} />
 
       <div className="resumo" role="group" aria-label="Filtrar pratos pelo semáforo">
         {FILTROS.map(({ valor, semaforo }) => (
@@ -113,16 +125,11 @@ export function TelaPainel() {
           {semPreco === 1 ? '1 prato está' : `${semPreco} pratos estão`} sem preço de venda.
         </div>
       )}
-      {taxasZeradas && (
-        <div className="aviso aviso-atencao">
-          A taxa do delivery e os impostos estão em 0%. As margens abaixo ainda não descontam o app nem os impostos.
-        </div>
-      )}
 
       <p className="suave pequeno">
         Calculado pelo sistema com a sua ficha técnica e as taxas do restaurante: delivery {formatarPct(restaurante.taxa_delivery_pct)},
         impostos {formatarPct(restaurante.impostos_pct)}, margem desejada {formatarPct(restaurante.margem_desejada_pct)},
-        mínima {formatarPct(restaurante.margem_minima_pct)}. A IA não faz nenhuma conta.
+        mínima {formatarPct(restaurante.margem_minima_pct)}. A IA não faz nenhuma conta. <Link to="/ajustes">Mudar taxas</Link>
       </p>
 
       {visiveis.length === 0 && <p className="suave">Nenhum prato neste filtro.</p>}
@@ -143,9 +150,15 @@ export function TelaPainel() {
   )
 }
 
+const ACAO_PENDENTE: Record<string, string> = {
+  sem_preco: 'Informar preço',
+  sem_ficha: 'Montar ficha',
+  configuracao: 'Ver prato',
+}
+
 function CartaoPrato({ prato, margemDesejada }: { prato: PratoPainel; margemDesejada: string }) {
   return (
-    <article className="cartao prato-painel">
+    <Link to={`/pratos/${prato.id}`} className="cartao prato-painel cartao-link">
       <div className="prato-painel-topo">
         <div>
           <div className="prato-painel-nome">{prato.nome}</div>
@@ -155,39 +168,8 @@ function CartaoPrato({ prato, margemDesejada }: { prato: PratoPainel; margemDese
         </div>
         <SemaforoSelo semaforo={prato.semaforo} />
       </div>
-
-      {prato.semaforo ? (
-        <>
-          <div className="numeros">
-            <div className="numero">
-              <span className="numero-rotulo">Margem delivery</span>
-              <span className="numero-valor">{formatarPct(prato.margem_delivery_pct)}</span>
-            </div>
-            <div className="numero">
-              <span className="numero-rotulo">Margem balcão</span>
-              <span className="numero-valor">{formatarPct(prato.margem_balcao_pct)}</span>
-            </div>
-            <div className="numero">
-              <span className="numero-rotulo">Custo por porção</span>
-              <span className="numero-valor">{formatarReais(prato.custo)}</span>
-            </div>
-          </div>
-          {prato.preco_sugerido_delivery && (
-            <div className="sugestao">
-              <Etiqueta origem={`Custo da sua ficha + taxas do restaurante, para chegar a ${formatarPct(margemDesejada)} de margem no delivery.`}>
-                sugestão
-              </Etiqueta>
-              <span>
-                Preço no delivery: <strong>{formatarReais(prato.preco_sugerido_delivery)}</strong>
-              </span>
-              <span className="suave pequeno">para chegar a {formatarPct(margemDesejada)} de margem</span>
-            </div>
-          )}
-        </>
-      ) : (
-        // Pendente: só a explicação, nenhum número (custo zero daria um falso "saudável").
-        <p className="suave pequeno" style={{ margin: 0 }}>{prato.mensagem}</p>
-      )}
-    </article>
+      <NumerosDiagnostico diagnostico={prato} margemDesejada={margemDesejada} />
+      {prato.pendente && <span className="link-acao">{ACAO_PENDENTE[prato.pendente]} →</span>}
+    </Link>
   )
 }

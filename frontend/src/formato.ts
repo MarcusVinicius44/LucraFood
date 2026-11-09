@@ -66,3 +66,71 @@ export function resumoDaFicha(itens: number, confirmadaEm: string | null): strin
   const dia = formatarDiaMes(confirmadaEm)
   return dia ? `${texto} · confirmada em ${dia}` : texto
 }
+
+export type NumeroLido = { ok: true; valor: string | null } | { ok: false; erro: string }
+
+/**
+ * Lê um número digitado em pt-BR e devolve no formato da API ("1500.5").
+ * "1,5" → "1.5"; "1.500" (milhar) → "1500"; "1.500,25" → "1500.25"; "0.5" → "0.5".
+ * Vazio = null. Não faz conta: só troca o separador.
+ */
+export function lerNumero(texto: string, casas: number, { permitirZero = false } = {}): NumeroLido {
+  let t = texto.replace(/\s/g, '')
+  if (t === '') return { ok: true, valor: null }
+  if (t.includes(',')) t = t.replace(/\./g, '').replace(',', '.')
+  else if (/^\d{1,3}(\.\d{3})+$/.test(t)) t = t.replace(/\./g, '') // "1.500" é mil e quinhentos
+  const padrao = new RegExp(String.raw`^\d+(\.\d{1,${casas}})?$`)
+  if (!padrao.test(t)) {
+    return { ok: false, erro: casas ? `Use só números, até ${casas} casas depois da vírgula` : 'Use só números inteiros' }
+  }
+  const [inteiro, decimal] = t.split('.')
+  const valor = decimal ? `${Number(inteiro)}.${decimal}` : String(Number(inteiro))
+  if (!permitirZero && Number(valor) === 0) return { ok: false, erro: 'Precisa ser maior que zero' }
+  return { ok: true, valor }
+}
+
+/** Quantidade de ficha ou de embalagem (até 3 casas, maior que zero). */
+export const lerQuantidade = (texto: string) => lerNumero(texto, 3)
+
+/** Percentual de 0 a 100, até 2 casas ("23%" ou "23,5"). */
+export function lerPercentual(texto: string): NumeroLido {
+  const lido = lerNumero(texto.replace('%', ''), 2, { permitirZero: true })
+  if (lido.ok && lido.valor !== null && Number(lido.valor) > 100) return { ok: false, erro: 'Use de 0 a 100' }
+  return lido
+}
+
+/** Número do backend ("150.000") para o campo de texto: "150"; "0.500" → "0,5". */
+export function numeroParaCampo(valor: string | null | undefined): string {
+  if (valor === null || valor === undefined || valor === '') return ''
+  const n = Number(valor)
+  return Number.isFinite(n) ? n.toLocaleString('pt-BR', { maximumFractionDigits: 3, useGrouping: false }) : ''
+}
+
+const NOMES_UNIDADE: Record<string, [string, string]> = {
+  g: ['g', 'g'],
+  ml: ['ml', 'ml'],
+  un: ['unidade', 'unidades'],
+}
+
+/** "150.000" + "g" → "150 g"; "2" + "un" → "2 unidades". */
+export function formatarQuantidade(valor: string | null, unidade: string | null): string {
+  if (valor === null) return '—'
+  const n = Number(valor)
+  const texto = n.toLocaleString('pt-BR', { maximumFractionDigits: 3 })
+  const [um, varios] = NOMES_UNIDADE[unidade ?? ''] ?? [unidade ?? '', unidade ?? '']
+  return `${texto} ${n === 1 ? um : varios}`.trim()
+}
+
+const reaisUnitario = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 4,
+})
+
+/** Custo por grama/ml/unidade: até 4 casas ("0.0420" → "R$ 0,042"), senão o grama vira R$ 0,04. */
+export function formatarReaisUnitario(valor: string | null | undefined): string {
+  if (valor === null || valor === undefined || valor === '') return '—'
+  const n = Number(valor)
+  return Number.isFinite(n) ? reaisUnitario.format(n).replace(/\s/g, ' ') : '—'
+}
