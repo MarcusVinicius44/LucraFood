@@ -28,7 +28,8 @@ O LucraFood usa IA para fazer a parte chata e deixa as contas para um código qu
 1. **O dono fotografa o cardápio.** A IA lê a foto e devolve os pratos com nome, categoria e preço.
 2. **Ele confere o que a IA leu.** Nada é gravado sem confirmação humana.
 3. **Ele conta o que vai em cada prato, em texto livre:** *"pão, hambúrguer de 150 g, 2 fatias de queijo"*. A IA liga cada item a um ingrediente cadastrado e marca o que precisa de atenção ("fatia" não tem peso exato, "queijo" pode ser três produtos diferentes).
-4. **Ele recebe o diagnóstico de cada prato:** custo, margem no balcão, margem no delivery e um semáforo 🟢 🟡 🔴, com o preço sugerido para voltar à margem desejada.
+4. **O sistema pergunta o que faltou.** *"Quanto dá mais ou menos 1 fatia de queijo prato, em gramas?"* → *"uns 18"* → anota 2 × 18 g = 36 g. A IA só entende a resposta; a conta é do sistema.
+5. **Ele recebe o diagnóstico de cada prato:** custo, margem no balcão, margem no delivery e um semáforo 🟢 🟡 🔴, com o preço sugerido para voltar à margem desejada.
 
 O painel guia o primeiro acesso passo a passo (cadastrar ingredientes, montar as fichas, ajustar taxas) até o restaurante ter o diagnóstico do cardápio inteiro.
 
@@ -49,6 +50,8 @@ O princípio do projeto é **a IA lê e conversa; ela nunca faz conta.** Modelos
 |---|---|
 | Ler a foto do cardápio (inclusive preço escrito à mão) | IA (modelo de visão, saída JSON) |
 | Entender "meio quilo de batata" e ligar "hambúrguer" a "Blend bovino" | IA (texto → JSON, com o cadastro do restaurante no contexto) |
+| Entender a resposta do dono na conversa ("cada fatia uns 18 gramas") | IA (só número e unidade, como foram ditos) |
+| Escolher a pergunta e calcular 2 fatias × 18 g = 36 g | Python |
 | Converter kg → g, conferir se o ingrediente existe, decidir o que o dono precisa revisar | Python |
 | Custo, margem, semáforo, preço sugerido | Python puro com `Decimal` ([`calculos.py`](backend/cardapio/calculos.py)) |
 
@@ -70,6 +73,7 @@ Em vez de "parece que funciona", a IA é avaliada com dados reais e gabarito, po
 | Foto tirada no celular | cardápio fotografado na tela, 17 pratos | 17 de 17 pratos e preços |
 | Ficha técnica por texto | 10 frases com sinônimos, kg/litro, medidas caseiras, erro de digitação | **42 de 42 ingredientes e quantidades, em 5 rodadas seguidas** |
 | Pedido de conferência ao dono | 7 frases ambíguas de propósito | 21 de 21 itens |
+| Leitura das respostas na conversa | 14 respostas ("uns 2 quilos", "trezentos e cinquenta gramas", "pula essa") | 13 de 14 |
 
 A avaliação também orientou decisões de produto. Ela mostrou que o plano gratuito do Groq corta cardápios grandes (troquei para o Gemini) e que recomprimir a foto em JPEG no navegador faz o modelo errar dígitos escritos à mão (o app só recomprime quando precisa). O histórico completo, com cada rodada e o que mudou entre elas, está em [docs/AVALIACAO.md](docs/AVALIACAO.md).
 
@@ -80,7 +84,7 @@ A avaliação também orientou decisões de produto. Ela mostrou que o plano gra
 | Backend | Python, Django 5.2, Django REST Framework, SQLite |
 | Frontend | React 19, TypeScript, Vite, React Router, mobile-first (câmera do celular) |
 | IA | Gemini 3.5 Flash-Lite (visão + JSON) pela biblioteca `openai`; Groq como alternativa; Pydantic para validar a saída |
-| Qualidade | 138 testes no backend (IA simulada, sem rede), 43 no frontend (Vitest), conjuntos de avaliação com fotos e frases reais |
+| Qualidade | 164 testes no backend (IA simulada, sem rede), 43 no frontend (Vitest), conjuntos de avaliação com fotos e frases reais |
 
 ## Arquitetura
 
@@ -90,7 +94,8 @@ backend/cardapio/
 ├── ia/
 │   ├── cliente.py     provedor configurável (Gemini/Groq) e limites do plano gratuito
 │   ├── extracao.py    foto → pratos (JSON validado, nova tentativa, tratamento de 429/503)
-│   └── ficha.py       texto → itens da ficha, conferidos e convertidos pelo Python
+│   ├── ficha.py       texto → itens da ficha, conferidos e convertidos pelo Python
+│   └── conversa.py    pergunta o que faltou; a IA lê a resposta, o Python faz a conta
 ├── views*.py          API REST em duas etapas: a IA lê, o dono confirma, só então grava
 └── avaliacao*.py      comparação com o gabarito (testada sem API)
 
@@ -105,7 +110,8 @@ evals/                 fotos de cardápio e frases com gabarito + saídas de cad
 - [x] Ficha técnica: ingredientes, ficha à mão e por texto com revisão, rendimento da receita
 - [x] Frontend completo, com fluxo guiado para o primeiro acesso
 - [x] Conjuntos de avaliação com fotos e frases reais
-- [ ] Ficha em conversa: a IA pergunta o que faltou ("quantos gramas tem a fatia de queijo?")
+- [x] Ficha em conversa: o sistema pergunta o que faltou ("quanto dá 1 fatia de queijo?") e anota a resposta
+- [ ] Lembrar as medidas do restaurante ("1 fatia de queijo prato = 18 g") para não perguntar de novo
 - [ ] Simulador de preço ("e se eu cobrar R$ 2 a mais?")
 - [ ] Teste com restaurantes de verdade
 

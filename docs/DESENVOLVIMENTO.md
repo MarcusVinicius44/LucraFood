@@ -47,6 +47,7 @@ python manage.py extrair_cardapio caminho/da/foto.jpg              # uma foto, m
 python manage.py avaliar_extracao [--foto cardapio_01]             # fotos de evals/cardapios/
 python manage.py avaliar_ficha [--frase f03]                       # frases de evals/fichas/
 python manage.py avaliar_ficha --frases frases_revisao.json        # motivos de revisão
+python manage.py avaliar_conversa [--resposta c03]                 # respostas da ficha em conversa
 ```
 
 Regras: o prompt só muda com a avaliação rodada antes e depois, e os exemplos do prompt não podem vir das fotos ou frases de avaliação. Guarde a saída de cada rodada em `evals/*/resultados/`.
@@ -64,6 +65,7 @@ Regras: o prompt só muda com a avaliação rodada antes e depois, e os exemplos
 | GET/PUT | `/api/pratos/<id>/ficha/` | ficha com custo por item, custo da receita e diagnóstico; o PUT `{itens: [{ingrediente, quantidade}]}` troca a ficha inteira |
 | GET | `/api/pratos/<id>/diagnostico/` | custo, margem balcão, margem delivery, semáforo e preço sugerido; sem preço ou sem ficha → sem semáforo |
 | POST | `/api/pratos/<id>/ficha/extrair/` | JSON `{texto}` → itens lidos pela IA, com `precisa_confirmar` e motivos (não salva); texto sem ingredientes → 422 |
+| POST | `/api/pratos/<id>/ficha/conversa/` | ficha em conversa: `{itens, pulados, pergunta?, resposta?}` → item atualizado e próxima pergunta (sem resposta, só a primeira pergunta e sem IA; não salva) |
 | POST | `/api/pratos/<id>/ficha/confirmar/` | ficha revisada pelo dono → salva (mesma validação do PUT, substitui a anterior) |
 
 ## Notas do dono
