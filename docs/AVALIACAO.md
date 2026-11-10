@@ -26,7 +26,7 @@ python manage.py avaliar_extracao                           # Gemini (padrão)
 
 ### Foto 09: foto de celular apontada para a tela (10/11/2026)
 
-Primeira foto tirada no celular do dono (`cardapio_09.jpeg`): um cardápio aberto no monitor, fotografado de lado, com reflexo e o padrão de linhas da tela. Chegou com 900 × 1600 px e 208 KB (o aplicativo de mensagens já tinha reduzido), então foi enviada como está, sem a recompressão do navegador. Gabarito com 17 pratos, escrito por IA (Claude) olhando a foto e **ainda não revisado pelo dono**.
+Primeira foto tirada no celular do dono (`cardapio_09.jpeg`): um cardápio aberto no monitor, fotografado de lado, com reflexo e o padrão de linhas da tela. Chegou com 900 × 1600 px e 208 KB (o aplicativo de mensagens já tinha reduzido), então foi enviada como está, sem a recompressão do navegador. Gabarito com 17 pratos, escrito por IA (Claude) olhando a foto e revisado pelo dono em 10/11/2026.
 
 | Data | Provedor e modelo | Pratos | Preços certos | Tempo |
 |---|---|---|---|---|
@@ -97,13 +97,13 @@ Uma rodada de cada, Gemini `gemini-3.5-flash-lite`. Saídas em [`evals/fichas/re
 
 ## Ficha em conversa: leitura das respostas (10/11/2026)
 
-Na ficha em conversa, o Python escolhe a pergunta ("Quanto dá mais ou menos 1 fatia de Queijo prato, em gramas?") e faz a conta; a IA só lê a resposta do dono e devolve o número e a unidade como foram ditos, ou "não sabe" / "não entendi" (`ia/conversa.py`). `python manage.py avaliar_conversa` mede só essa leitura, com 14 respostas em `evals/fichas/respostas.json` (**rascunho escrito por IA, ainda não revisado pelo dono**). A conta (2 × 18 g = 36 g, kg → g) é testada sem API em `tests_conversa.py`.
+Na ficha em conversa, o Python escolhe a pergunta ("Quanto dá mais ou menos 1 fatia de Queijo prato, em gramas?") e faz a conta; a IA só lê a resposta do dono e devolve o número e a unidade como foram ditos, ou "não sabe" / "não entendi" (`ia/conversa.py`). `python manage.py avaliar_conversa` mede só essa leitura, com 14 respostas em `evals/fichas/respostas.json` (escritas por IA e revisadas pelo dono em 10/11/2026). A conta (2 × 18 g = 36 g, kg → g) é testada sem API em `tests_conversa.py`.
 
 | Data | Provedor e modelo | Respostas lidas certo | Saída |
 |---|---|---|---|
 | 10/11/2026 | Gemini `gemini-3.5-flash-lite` | 13 de 14 | [`2026-11-10_conversa_r1.txt`](../evals/fichas/resultados/2026-11-10_conversa_r1.txt) |
 
-- **O único erro (c02):** a resposta "uma colher de sopa mais ou menos" voltou como unidade "colher de sopa" sem a quantidade 1. Na tela o resultado é o mesmo do esperado (o Python recusa medida caseira e pede o valor em ml), mas a leitura não bate com o gabarito.
+- **O único erro (c02):** a resposta "uma colher de sopa mais ou menos" voltou como unidade "colher de sopa" sem a quantidade 1. Na tela o resultado é o mesmo do esperado (o Python recusa medida caseira e pede o valor em ml), mas a leitura não bate com o gabarito. O dono decidiu manter como erro: ele disse "uma", e o gabarito registra o que foi dito (o 1 passa a importar se a resposta um dia aceitar uma medida lembrada).
 - **Primeira medição do prompt novo:** serve de referência para qualquer mudança nele.
 - **Teste no navegador** (banco temporário): a receita "pão, 150 de blend bovino, 2 fatias de queijo prato e 30 g de óleo" gerou 3 perguntas, respondidas com "isso mesmo" (150 g), "cada fatia uns 18 gramas" (36 g) e "uns 33 ml"; a resposta "uma colher" para o óleo foi recusada pedindo ml.
 

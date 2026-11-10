@@ -33,8 +33,8 @@ Cada item esperado: {"nome": str, "ingrediente": id|null, "quantidade": str|null
 
 respostas.json (ficha em conversa): {"respostas": [{"id", "caso", "pergunta", "resposta", "esperado"}]}
     esperado = {"entendeu", "nao_sabe", "quantidade": str|null, "unidade": str|null}, a leitura da
-    resposta como foi dita (sem conversão; a conta é do Python). RASCUNHO escrito por IA (Claude) em
-    10/11/2026, ainda não revisado pelo dono. Rodar: python manage.py avaliar_conversa [--resposta c03]
+    resposta como foi dita (sem conversão; a conta é do Python). Escrito por IA (Claude) e revisado
+    pelo dono em 10/11/2026 (c02 fica como erro: o dono disse "uma", então o esperado é 1). Rodar: python manage.py avaliar_conversa [--resposta c03]
     (1 chamada por resposta). Comparação em cardapio/avaliacao_conversa.py.
 
 Pontuação (cardapio/avaliacao_ficha.py, testada sem API):

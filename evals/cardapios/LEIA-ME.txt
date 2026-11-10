@@ -20,4 +20,4 @@ Rodar (da pasta backend/, com o .env preenchido):
 
 Origem das fotos:
 - cardapio_09.jpeg: foto de celular do dono (cardápio aberto no monitor), 900x1600, 10/11/2026.
-  Gabarito escrito por IA (Claude) olhando a foto, ainda não revisado pelo dono.
+  Gabarito escrito por IA (Claude) olhando a foto e revisado pelo dono em 10/11/2026.
