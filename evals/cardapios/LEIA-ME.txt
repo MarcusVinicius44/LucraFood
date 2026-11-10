@@ -17,3 +17,7 @@ O gabarito usa o mesmo formato que a extração devolve:
 Rodar (da pasta backend/, com o .env preenchido):
     python manage.py avaliar_extracao                  # todas as fotos (chama a API real)
     python manage.py avaliar_extracao --foto cardapio_01
+
+Origem das fotos:
+- cardapio_09.jpeg: foto de celular do dono (cardápio aberto no monitor), 900x1600, 10/11/2026.
+  Gabarito escrito por IA (Claude) olhando a foto, ainda não revisado pelo dono.

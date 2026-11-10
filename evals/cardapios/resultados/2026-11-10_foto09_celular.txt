@@ -1,0 +1,18 @@
+Provedor: gemini | modelo: gemini-3.5-flash-lite | max_tokens: 8192 | limite de saída/min: nenhum | faixas: 1
+
+== cardapio_09.jpeg
+   provedor recusou (429 limite de taxa ou 503 sobrecarga): esperando 10s para tentar de novo...
+   provedor recusou (429 limite de taxa ou 503 sobrecarga): esperando 30s para tentar de novo...
+   gabarito: 17 | extraídos: 17 | encontrados: 17 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 17/17
+   tokens: 1895 entrada + 1049 saída | chamadas: 3 | tempo total: 51s
+
+foto                gab  ext achou falta  inv $err  tok.ent  tok.sai  cham  tempo
+cardapio_09.jpeg     17   17    17     0    0    0     1895     1049     3    51s
+TOTAL (avaliadas)                                      1895     1049     3    51s
+
+==================================================
+TOTAL: 1 foto(s) avaliada(s), 0 falha(s) na extração, 0 falha(s) de cota, 0 com provedor indisponível
+Chamadas à API (contam na cota diária, inclusive as que falharam): 3
+   gabarito: 17 | extraídos: 17 | encontrados: 17 | faltando: 0 | inventados: 0 | preços errados: 0
+   preços certos entre os encontrados: 17/17

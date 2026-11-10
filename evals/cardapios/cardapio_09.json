@@ -1,0 +1,106 @@
+{
+  "pratos": [
+    {
+      "nome": "Batata Canoa",
+      "descricao": null,
+      "categoria": "Porções",
+      "preco": 20.0
+    },
+    {
+      "nome": "Batata Palito",
+      "descricao": null,
+      "categoria": "Porções",
+      "preco": 20.0
+    },
+    {
+      "nome": "Iscas de Frango",
+      "descricao": null,
+      "categoria": "Porções",
+      "preco": 20.0
+    },
+    {
+      "nome": "Peixe Empanado",
+      "descricao": null,
+      "categoria": "Porções",
+      "preco": 20.0
+    },
+    {
+      "nome": "Mix de Vegetais Grelhados",
+      "descricao": null,
+      "categoria": "Porções",
+      "preco": 20.0
+    },
+    {
+      "nome": "Mandioquinha Frita",
+      "descricao": null,
+      "categoria": "Porções",
+      "preco": 20.0
+    },
+    {
+      "nome": "Refrigerante 1",
+      "descricao": null,
+      "categoria": "Bebidas",
+      "preco": 20.0
+    },
+    {
+      "nome": "Refrigerante 2",
+      "descricao": null,
+      "categoria": "Bebidas",
+      "preco": 20.0
+    },
+    {
+      "nome": "Suco natural",
+      "descricao": null,
+      "categoria": "Bebidas",
+      "preco": 20.0
+    },
+    {
+      "nome": "Água",
+      "descricao": null,
+      "categoria": "Bebidas",
+      "preco": 20.0
+    },
+    {
+      "nome": "Água com gás",
+      "descricao": null,
+      "categoria": "Bebidas",
+      "preco": 20.0
+    },
+    {
+      "nome": "Picanha na Manteiga",
+      "descricao": "Picanha grelhada, arroz, farofa e vinagrete da casa",
+      "categoria": "Pratos Principais",
+      "preco": 20.0
+    },
+    {
+      "nome": "Tábua de Frios",
+      "descricao": "Mix de queijo, salames, molhos",
+      "categoria": "Pratos Principais",
+      "preco": 20.0
+    },
+    {
+      "nome": "Peixe Frito com Batata",
+      "descricao": "Peixe empanado com batata gratinada e queijo",
+      "categoria": "Pratos Principais",
+      "preco": 20.0
+    },
+    {
+      "nome": "Picanha com Batata Frita",
+      "descricao": "Picanha grelhada, arroz, farofa e vinagrete da casa",
+      "categoria": "Pratos Principais",
+      "preco": 20.0
+    },
+    {
+      "nome": "Costela Fogo de Chão",
+      "descricao": "Picanha grelhada, arroz, farofa e vinagrete da casa",
+      "categoria": "Pratos Principais",
+      "preco": 20.0
+    },
+    {
+      "nome": "Tábua Mista G",
+      "descricao": "Batata frita, picanha, tilápia, asa de frango, molhos",
+      "categoria": "Pratos Principais",
+      "preco": 20.0
+    }
+  ]
+}
