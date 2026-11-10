@@ -9,7 +9,7 @@ Arquivos:
                         id, nome e unidade (ver _mensagem_usuario em cardapio/ia/ficha.py).
     frases.json         {"frases": [{"id", "caso", "prato", "texto", "esperado": [...]}]}
     frases_revisao.json mesmo formato, frases ambíguas de propósito para medir os motivos de revisão.
-                        RASCUNHO escrito por IA (Claude) em 10/11/2026, ainda não revisado pelo dono.
+                        Escrito por IA (Claude) e revisado pelo dono em 10/11/2026.
 
 Cada item esperado: {"nome": str, "ingrediente": id|null, "quantidade": str|null, "unidade"?: str}
 - "ingrediente": id do cadastro, ou null quando o ingrediente não está cadastrado

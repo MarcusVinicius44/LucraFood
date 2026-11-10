@@ -76,7 +76,7 @@ Cada rodada faz 10 chamadas (~1 s por frase; algumas rodadas levaram ~70 s por e
 
 **Regra C:** quando a IA liga o que o dono escreveu a um ingrediente de nome diferente, o item continua ligado, mas pode vir marcado para conferir (`nome_diferente`). A decisão é do Python (`nome_confere` em `ia/ficha.py`), comparando palavras sem acento, maiúsculas, plural simples e palavras como "de". **O prompt não mudou.**
 
-**Motivos de revisão:** o gabarito ganhou o campo opcional `confirmar` (true/false) e o comando mede se `precisa_confirmar` saiu como esperado. As 10 frases revisadas não foram alteradas; as frases ambíguas de propósito ficam em `evals/fichas/frases_revisao.json`, **rascunho escrito por IA e ainda não revisado pelo dono**.
+**Motivos de revisão:** o gabarito ganhou o campo opcional `confirmar` (true/false) e o comando mede se `precisa_confirmar` saiu como esperado. As 10 frases revisadas não foram alteradas; as frases ambíguas de propósito ficam em `evals/fichas/frases_revisao.json`, escritas por IA e **revisadas pelo dono em 10/11/2026** (depois das rodadas abaixo; nenhuma frase mudou na revisão).
 
 A regra teve duas versões no mesmo dia:
 
