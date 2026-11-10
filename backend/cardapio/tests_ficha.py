@@ -354,7 +354,8 @@ class ExtrairFichaTest(TestCase):
         pao, carne, queijo = (i.para_json() for i in itens)
         # "pão" sem número: 1 unidade, mas marcado para o dono confirmar (decisão B).
         self.assertEqual((pao["quantidade"], pao["motivos"]), ("1.000", ["sem_quantidade"]))
-        self.assertEqual((carne["quantidade"], carne["unidade"], carne["precisa_confirmar"]), ("150.000", "g", False))
+        # "hambúrguer" ligado a "Carne": quantidade certa, mas o nome difere (Regra C).
+        self.assertEqual((carne["quantidade"], carne["unidade"], carne["motivos"]), ("150.000", "g", ["nome_diferente"]))
         self.assertEqual((queijo["quantidade"], queijo["quantidade_lida"], queijo["motivos"]), (None, "2", ["unidade_informal"]))
 
     def test_id_inventado_vira_null_mas_mantem_a_quantidade(self):
@@ -406,6 +407,45 @@ class ExtrairFichaTest(TestCase):
     def test_mesmo_ingrediente_duas_vezes(self):
         _, segundo = self.extrair(_itens(self.item("carne", 2, 100, "g"), self.item("carne moída", 2, 50, "g")))
         self.assertEqual(segundo.motivos, ["ingrediente_repetido"])
+
+    def test_nome_igual_ao_cadastro_nao_marca(self):
+        (item,) = self.extrair(_itens(self.item("carne", 2, 150, "g")))
+        self.assertEqual(item.motivos, [])
+        self.assertFalse(item.precisa_confirmar)
+
+    def test_regra_c_nome_diferente_liga_e_marca(self):
+        (item,) = self.extrair(_itens(self.item("hambúrguer", 2, 150, "g")))
+        self.assertEqual((item.ingrediente["id"], item.quantidade), (2, Decimal("150.000")))
+        self.assertEqual(item.motivos, ["nome_diferente"])
+
+    def test_nome_confere(self):
+        confere = ia_ficha.nome_confere
+        self.assertTrue(confere("Pão de hambúrguer", "pão de hambúrguer"))
+        self.assertTrue(confere("ovos", "Ovo"))
+        self.assertTrue(confere("pães", "Pão"))
+        self.assertTrue(confere("hambúrgueres", "Hambúrguer"))
+        self.assertTrue(confere("peito de frango grelhado", "Peito de frango"))
+        self.assertTrue(confere("pão hambúrguer", "Pão de hambúrguer"))  # "de" não conta
+        self.assertTrue(confere("feijao", "Feijão"))
+        self.assertFalse(confere("hambúrguer", "Blend bovino"))  # sinônimo
+        self.assertFalse(confere("qeijo prato", "Queijo prato"))  # erro de digitação
+
+    def test_nome_curto_com_um_candidato_confere(self):
+        cadastro = [{"id": 1, "nome": "Leite integral"}, {"id": 2, "nome": "Óleo de soja"}]
+        self.assertTrue(ia_ficha.nome_confere("leite", "Leite integral", cadastro))
+        self.assertTrue(ia_ficha.nome_confere("óleo", "Óleo de soja", cadastro))
+
+    def test_nome_curto_com_varios_candidatos_marca(self):
+        cadastro = [{"id": 1, "nome": "Leite integral"}, {"id": 2, "nome": "Leite condensado"}]
+        self.assertFalse(ia_ficha.nome_confere("leite", "Leite integral", cadastro))
+        self.assertTrue(ia_ficha.nome_confere("leite condensado", "Leite condensado", cadastro))
+
+    def test_regra_c_no_resolver_usa_o_cadastro(self):
+        cadastro = [{"id": 4, "nome": "Leite integral", "unidade": "ml"}, {"id": 5, "nome": "Leite condensado", "unidade": "g"}]
+        itens = ia_ficha.resolver(
+            [ia_ficha.ItemLido(nome_lido="leite", ingrediente=4, quantidade=200, unidade="ml")], cadastro
+        )
+        self.assertEqual(itens[0].motivos, ["nome_diferente"])
 
     def test_json_invalido_tenta_de_novo_uma_vez(self):
         itens = self.extrair("isso não é json", _itens(self.item("carne", 2, 150, "g")))
@@ -502,9 +542,16 @@ class FichaPorTextoViewTest(BaseFicha):
         self.assertEqual(self.prato.itens.count(), 0)
 
 
-def _extraido(nome, id_=None, quantidade=None, unidade=None):
+def _extraido(nome, id_=None, quantidade=None, unidade=None, motivos=()):
     ingrediente = {"id": id_, "nome": f"#{id_}", "unidade": "g"} if id_ else None
-    return {"nome_lido": nome, "ingrediente": ingrediente, "quantidade": quantidade, "unidade": unidade}
+    return {
+        "nome_lido": nome,
+        "ingrediente": ingrediente,
+        "quantidade": quantidade,
+        "unidade": unidade,
+        "precisa_confirmar": bool(motivos),
+        "motivos": list(motivos),
+    }
 
 
 class AvaliacaoFichaTest(TestCase):
@@ -551,3 +598,20 @@ class AvaliacaoFichaTest(TestCase):
         total.somar(comparar_ficha(self.ESPERADO[:1], [_extraido("carne", 2, "150")]))
         total.somar(comparar_ficha(self.ESPERADO[:1], []))
         self.assertEqual((total.esperados, total.ingrediente_ok, total.faltando), (2, 1, ["carne"]))
+
+    def test_revisao_so_conta_com_confirmar_no_esperado(self):
+        esperado = [
+            {"nome": "leite", "ingrediente": 14, "quantidade": "200", "confirmar": True},
+            {"nome": "ovos", "ingrediente": 13, "quantidade": "2", "confirmar": False},
+            {"nome": "açúcar", "ingrediente": 15, "quantidade": "100"},
+        ]
+        r = comparar_ficha(
+            esperado,
+            [
+                _extraido("leite", 14, "200"),  # devia pedir conferência e não pediu
+                _extraido("ovos", 13, "2"),
+                _extraido("açúcar", 15, "100", motivos=["nome_diferente"]),  # sem "confirmar": não conta
+            ],
+        )
+        self.assertEqual((r.revisao_ok, r.revisoes), (1, 2))
+        self.assertEqual(r.revisao_errada, [("leite", True, False, [])])

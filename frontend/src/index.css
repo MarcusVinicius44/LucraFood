@@ -413,6 +413,9 @@ a { color: var(--verde); }
 .item-remover { justify-self: start; }
 .aviso-linha { color: #5c3c00; }
 .aviso-linha::before { content: '⚠ '; }
+.item-conferir { border-color: var(--borda); background: var(--sem-pendente-fundo); }
+.aviso-linha-leve { color: var(--texto-suave); }
+.aviso-linha-leve::before { content: 'ⓘ '; }
 .confirmacao { display: flex; gap: 0.5rem; align-items: center; font-weight: 600; }
 .confirmacao input { width: 20px; height: 20px; accent-color: var(--verde); }
 

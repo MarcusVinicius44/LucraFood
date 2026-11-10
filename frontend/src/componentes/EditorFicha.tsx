@@ -6,8 +6,12 @@ import { FormIngrediente } from './FormIngrediente'
 
 const UNIDADE_CURTA: Record<Unidade, string> = { g: 'g', ml: 'ml', un: 'un' }
 
+/** Motivos que só pedem um olhar (o item já está completo); os outros pedem que o dono preencha algo. */
+const MOTIVOS_LEVES: MotivoRevisao[] = ['nome_diferente']
+
 /** Por que o item foi marcado para conferência (ia/ficha.py devolve o código). */
-function textoDoMotivo(motivo: MotivoRevisao, linha: LinhaFicha, unidade?: Unidade): string | null {
+function textoDoMotivo(motivo: MotivoRevisao, linha: LinhaFicha, ingrediente?: Ingrediente): string | null {
+  const unidade = ingrediente?.unidade
   switch (motivo) {
     case 'sem_ingrediente':
       return linha.ingrediente ? null : 'Não achei no seu cadastro. Escolha um ingrediente ou cadastre um novo.'
@@ -21,6 +25,10 @@ function textoDoMotivo(motivo: MotivoRevisao, linha: LinhaFicha, unidade?: Unida
       return `A unidade escrita (${linha.escrito}) não combina com o cadastro (${unidade}). Informe em ${unidade}.`
     case 'ingrediente_repetido':
       return 'Este ingrediente aparece em mais de uma linha. Some as quantidades em uma só.'
+    case 'nome_diferente':
+      return ingrediente
+        ? `Você escreveu “${linha.nomeLido}” e liguei a “${ingrediente.nome}”. Confira se é o mesmo produto.`
+        : null
   }
 }
 
@@ -49,10 +57,14 @@ export function EditorFicha({
       {linhas.map((l) => {
         const ing = l.ingrediente ? porId.get(l.ingrediente) : undefined
         const prob = mostrarProblemas ? problemas.get(l.chave) : undefined
-        const avisos = l.motivos.map((m) => textoDoMotivo(m, l, ing?.unidade)).filter(Boolean) as string[]
-        const marcada = l.motivos.length > 0
+        const avisos = l.motivos.flatMap((m) => {
+          const texto = textoDoMotivo(m, l, ing)
+          return texto ? [{ texto, leve: MOTIVOS_LEVES.includes(m) }] : []
+        })
+        const marcada = l.motivos.some((m) => !MOTIVOS_LEVES.includes(m))
+        const conferir = !marcada && l.motivos.length > 0
         return (
-          <div key={l.chave} className={`item-ficha${marcada ? ' item-marcado' : ''}`}>
+          <div key={l.chave} className={`item-ficha${marcada ? ' item-marcado' : conferir ? ' item-conferir' : ''}`}>
             {l.nomeLido && (
               <div className="pequeno suave">
                 Escrito: <strong>{l.nomeLido}</strong>
@@ -104,7 +116,7 @@ export function EditorFicha({
               </div>
             )}
             {avisos.map((a) => (
-              <div key={a} className="pequeno aviso-linha">{a}</div>
+              <div key={a.texto} className={`pequeno ${a.leve ? 'aviso-linha-leve' : 'aviso-linha'}`}>{a.texto}</div>
             ))}
             {!l.ingrediente && l.nomeLido && cadastrando !== l.chave && (
               <button type="button" className="botao botao-secundario botao-pequeno" onClick={() => setCadastrando(l.chave)}>

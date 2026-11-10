@@ -2,6 +2,7 @@
 
     python manage.py avaliar_ficha                # todas as frases de evals/fichas/frases.json
     python manage.py avaliar_ficha --frase f03
+    python manage.py avaliar_ficha --frases frases_revisao.json   # frases ambíguas de propósito
 """
 import json
 import time
@@ -25,23 +26,24 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--frase", help="id de uma única frase, ex.: f03")
+        parser.add_argument("--frases", default="frases.json", help="Arquivo de frases dentro da pasta (padrão: frases.json)")
         parser.add_argument("--pasta", help="Pasta com ingredientes.json e frases.json (padrão: evals/fichas)")
 
-    def handle(self, *args, frase=None, pasta=None, **opts):
+    def handle(self, *args, frase=None, frases="frases.json", pasta=None, **opts):
         pasta = Path(pasta) if pasta else Path(settings.BASE_DIR).parent / "evals" / "fichas"
         try:
             cadastro = json.loads((pasta / "ingredientes.json").read_text(encoding="utf-8"))
-            dados = json.loads((pasta / "frases.json").read_text(encoding="utf-8"))
+            dados = json.loads((pasta / frases).read_text(encoding="utf-8"))
         except FileNotFoundError as erro:
             raise CommandError(f"Arquivo não encontrado: {erro.filename}")
-        frases = dados["frases"]
+        arquivo, frases = frases, dados["frases"]
         if frase:
             frases = [f for f in frases if f["id"] == frase]
             if not frases:
                 raise CommandError(f"Frase '{frase}' não encontrada.")
 
         cfg = config()
-        self.stdout.write(f"Provedor: {cfg.provedor} | modelo: {cfg.modelo} | frases: {len(frases)}")
+        self.stdout.write(f"Provedor: {cfg.provedor} | modelo: {cfg.modelo} | {arquivo}: {len(frases)} frases")
         if dados.get("_origem"):
             self.stdout.write(self.style.WARNING(f"Respostas esperadas: {dados['_origem']}"))
 
@@ -79,7 +81,13 @@ class Command(BaseCommand):
             f"Quantidade certa (nos ingredientes acertados): {total.quantidade_ok}/{total.quantidades} "
             f"({_pct(total.quantidade_ok, total.quantidades)})\n"
             f"Ligados a ingrediente errado: {len(total.errados)} | itens a mais sem ingrediente: {len(total.sobrando)}\n"
-            f"Chamadas: {uso_total.chamadas} | tokens: {uso_total.entrada} entrada + {uso_total.saida} saída | "
+            + (
+                f"Pedido de conferência certo (precisa_confirmar): {total.revisao_ok}/{total.revisoes} "
+                f"({_pct(total.revisao_ok, total.revisoes)})\n"
+                if total.revisoes
+                else ""
+            )
+            + f"Chamadas: {uso_total.chamadas} | tokens: {uso_total.entrada} entrada + {uso_total.saida} saída | "
             f"tempo: {time.monotonic() - inicio_geral:.0f}s"
         )
         if falhas:
@@ -99,6 +107,9 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR(f"   ERRADO: {nome!r} ligado ao id {id_}"))
         for nome in r.sobrando:
             self.stdout.write(self.style.WARNING(f"   A MAIS: {nome!r}"))
+        for nome, esperado, veio, motivos in r.revisao_errada:
+            pedido = "pedir conferência" if esperado else "NÃO pedir conferência"
+            self.stdout.write(self.style.ERROR(f"   REVISÃO: {nome}: devia {pedido} (motivos: {motivos or 'nenhum'})"))
 
     def _esperar(self, segundos):
         self.stdout.write(f"   provedor recusou (429/503): esperando {segundos:.0f}s...")

@@ -1,0 +1,52 @@
+Provedor: gemini | modelo: gemini-3.5-flash-lite | frases_revisao.json: 6 frases
+Respostas esperadas: RASCUNHO escrito por IA (Claude) em 10/11/2026, AINDA NÃO revisado pelo dono. Mede quando o sistema pede conferência (campo confirmar).
+
+== r01 (nome mais curto que o cadastro (leite -> Leite integral) pede conferência; ovos -> Ovo não)
+   200 ml de leite, 2 ovos e 100 g de açúcar
+   lido: 'leite' -> Leite integral | 200.000 ml  [nome_diferente]
+   lido: 'ovos' -> Ovo | 2.000 un
+   lido: 'açúcar' -> Açúcar | 100.000 g
+
+== r02 (número sem unidade, pão sem número e fatia: tudo pede conferência)
+   pão, 150 de carne e queijo prato 2 fatias
+   lido: 'pão' -> Pão de hambúrguer | 1.000 un  [nome_diferente, sem_quantidade]
+   lido: 'carne' -> Blend bovino | -  [nome_diferente, sem_unidade]
+   lido: 'queijo prato' -> Queijo prato | -  [unidade_informal]
+
+== r03 (tudo exato e com o nome do cadastro: nada pede conferência)
+   120 g de arroz, 80 g de peito de frango e 30 g de cebola
+   lido: 'arroz' -> Arroz | 120.000 g
+   lido: 'peito de frango' -> Peito de frango | 80.000 g
+   lido: 'cebola' -> Cebola | 30.000 g
+
+== r04 (queijo genérico (3 queijos no cadastro) e massa sem número pedem conferência)
+   massa de pizza, 120 g de molho de tomate, 150 g de queijo e 80 g de calabresa
+   lido: 'massa de pizza' -> Massa de pizza | 1.000 un  [sem_quantidade]
+   lido: 'molho de tomate' -> Molho de tomate | 120.000 g
+   lido: 'queijo' -> null | 150.000 g  [sem_ingrediente]
+   lido: 'calabresa' -> Calabresa | 80.000 g
+
+== r05 (óleo em gramas (cadastro em ml) e batata -> Batata congelada pedem conferência)
+   400 g de batata e 50 g de óleo
+   lido: 'batata' -> Batata congelada | 400.000 g  [nome_diferente]
+   lido: 'óleo' -> Óleo de soja | -  [nome_diferente, unidade_incompativel]
+
+== r06 (ingrediente repetido: a segunda linha de bacon pede conferência)
+   180 g de blend bovino, 50 g de bacon e mais 20 g de bacon por cima
+   lido: 'blend bovino' -> Blend bovino | 180.000 g
+   lido: 'bacon' -> Bacon | 50.000 g
+   lido: 'bacon' -> Bacon | 20.000 g  [ingrediente_repetido]
+
+frase    ingr.    qtd.  errados  cham  tempo
+r01      3/3     3/3          0     1     2s
+r02      3/3     3/3          0     1     3s
+r03      3/3     3/3          0     1     1s
+r04      4/4     4/4          0     1     1s
+r05      2/2     2/2          0     1     5s
+r06      3/3     3/3          0     1     3s
+==================================================
+Ingrediente certo: 18/18 (100.0%)
+Quantidade certa (nos ingredientes acertados): 18/18 (100.0%)
+Ligados a ingrediente errado: 0 | itens a mais sem ingrediente: 0
+Pedido de conferência certo (precisa_confirmar): 18/18 (100.0%)
+Chamadas: 6 | tokens: 5756 entrada + 619 saída | tempo: 15s

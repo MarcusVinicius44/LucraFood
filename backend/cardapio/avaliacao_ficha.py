@@ -7,6 +7,8 @@ quantidade na unidade do cadastro, ou, fora do cadastro, na unidade-base da medi
 conferindo também "unidade" quando o esperado a informa. null esperado = medida informal
 ou ausente (ex.: "1 concha"), que o sistema não deve converter.
 Errados: itens ligados a um id que não era esperado (associação errada ou inventada).
+Revisão: quando o esperado traz "confirmar" (true/false), confere `precisa_confirmar` do item
+acertado. Mede se o sistema pede conferência quando deve (e só quando deve).
 """
 import unicodedata
 from dataclasses import dataclass, field
@@ -32,11 +34,14 @@ class ResultadoFicha:
     quantidade_errada: list = field(default_factory=list)  # (nome, esperado, extraído)
     errados: list = field(default_factory=list)  # (nome lido, id) ligados a id não esperado
     sobrando: list = field(default_factory=list)  # itens null a mais (não esperados)
+    revisoes: int = 0  # itens acertados com "confirmar" no esperado
+    revisao_ok: int = 0
+    revisao_errada: list = field(default_factory=list)  # (nome, esperado, veio, motivos)
 
     def somar(self, outro: "ResultadoFicha"):
-        for nome in ("esperados", "ingrediente_ok", "quantidades", "quantidade_ok"):
+        for nome in ("esperados", "ingrediente_ok", "quantidades", "quantidade_ok", "revisoes", "revisao_ok"):
             setattr(self, nome, getattr(self, nome) + getattr(outro, nome))
-        for nome in ("faltando", "quantidade_errada", "errados", "sobrando"):
+        for nome in ("faltando", "quantidade_errada", "errados", "sobrando", "revisao_errada"):
             getattr(self, nome).extend(getattr(outro, nome))
 
 
@@ -79,6 +84,13 @@ def comparar(esperado: list[dict], extraido: list[dict]) -> ResultadoFicha:
             esperado_txt = f"{esp['quantidade']} {esp.get('unidade') or ''}".strip()
             obtido_txt = f"{achado['quantidade']} {achado.get('unidade') or ''}".strip()
             r.quantidade_errada.append((esp["nome"], esperado_txt, obtido_txt))
+        if "confirmar" in esp:
+            r.revisoes += 1
+            veio = bool(achado.get("precisa_confirmar"))
+            if veio == esp["confirmar"]:
+                r.revisao_ok += 1
+            else:
+                r.revisao_errada.append((esp["nome"], esp["confirmar"], veio, achado.get("motivos", [])))
 
     for item in livres:
         if id_de(item) is None:

@@ -8,7 +8,9 @@ Mesmo padrão da foto do cardápio:
   (calculos.converter_unidade) e marca o que o dono precisa revisar. Nada é salvo aqui.
 """
 import json
+import re
 import time
+import unicodedata
 from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Optional
@@ -58,6 +60,46 @@ SEM_UNIDADE = "sem_unidade"  # número sem unidade para um ingrediente em g ou m
 UNIDADE_INFORMAL = "unidade_informal"  # fatia, colher...: sem conversão exata
 UNIDADE_INCOMPATIVEL = "unidade_incompativel"  # ex.: ml para um ingrediente cadastrado em g
 INGREDIENTE_REPETIDO = "ingrediente_repetido"  # mais de um item ligado ao mesmo ingrediente
+NOME_DIFERENTE = "nome_diferente"  # ligado a um cadastro de nome diferente ("leite" -> "Leite integral")
+
+
+PALAVRAS_DE_LIGACAO = {"de", "da", "do", "das", "dos", "e", "com", "em", "a", "o"}
+
+
+def _palavras(texto: str) -> set[str]:
+    """Palavras sem acento, minúsculas e no singular simples ("Ovos" -> "ovo")."""
+    sem_acento = unicodedata.normalize("NFKD", texto or "").encode("ascii", "ignore").decode().lower()
+    palavras = set()
+    for p in re.findall(r"[a-z0-9]+", sem_acento):
+        if p in PALAVRAS_DE_LIGACAO:
+            continue
+        if p.endswith(("oes", "aes")):  # pães, limões
+            p = p[:-3] + "ao"
+        elif p.endswith(("res", "zes")) and len(p) > 4:  # hambúrgueres, nozes
+            p = p[:-2]
+        elif len(p) > 3 and p.endswith("s"):
+            p = p[:-1]
+        palavras.add(p)
+    return palavras
+
+
+def nome_confere(nome_lido: str, nome_cadastro: str, cadastro: list[dict] = ()) -> bool:
+    """Regra C (versão branda, 10/11): o nome lido confere com o ingrediente ligado quando
+    - contém todas as palavras do cadastro ("peito de frango grelhado" -> "Peito de frango"); ou
+    - é um nome mais curto que só cabe nele ("batata" -> "Batata congelada", se não houver outra
+      batata no cadastro).
+    Sinônimo ("hambúrguer" -> "Blend bovino"), erro de digitação ("qeijo") ou nome curto com mais
+    de um candidato ("leite" com Leite integral e Leite condensado) continuam ligados, mas o dono
+    confirma."""
+    lido, alvo = _palavras(nome_lido), _palavras(nome_cadastro)
+    if not lido or not alvo:
+        return False
+    if alvo <= lido:
+        return True
+    if lido <= alvo:
+        candidatos = [c for c in cadastro if lido <= _palavras(c["nome"])]
+        return len(candidatos) <= 1
+    return False
 
 
 class TextoSemIngredientes(Exception):
@@ -141,6 +183,8 @@ def resolver(itens: list[ItemLido], cadastro: list[dict]) -> list[ItemExtraido]:
             motivos.append(INGREDIENTE_REPETIDO)
         else:
             vistos.add(ingrediente["id"])
+        if ingrediente is not None and not nome_confere(lido.nome_lido, ingrediente["nome"], cadastro):
+            motivos.append(NOME_DIFERENTE)
 
         quantidade = None
         canonica = _unidade_canonica(lido.unidade)

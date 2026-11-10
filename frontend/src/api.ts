@@ -96,6 +96,7 @@ export type MotivoRevisao =
   | 'unidade_informal'
   | 'unidade_incompativel'
   | 'ingrediente_repetido'
+  | 'nome_diferente'
 
 /** Item lido pela IA no texto da receita, já conferido pelo Python (ia/ficha.py). */
 export interface ItemLidoTexto {

@@ -1,0 +1,188 @@
+{
+  "_origem": "RASCUNHO escrito por IA (Claude) em 10/11/2026, AINDA NÃO revisado pelo dono. Mede quando o sistema pede conferência (campo confirmar). Ajustado para a Regra C branda no mesmo dia (r01, r05, r07).",
+  "frases": [
+    {
+      "id": "r01",
+      "caso": "nome mais curto com um único candidato (leite -> Leite integral, ovos -> Ovo) não pede conferência",
+      "prato": "Pudim",
+      "texto": "200 ml de leite, 2 ovos e 100 g de açúcar",
+      "esperado": [
+        {
+          "nome": "leite",
+          "ingrediente": 14,
+          "quantidade": "200",
+          "confirmar": false
+        },
+        {
+          "nome": "ovos",
+          "ingrediente": 13,
+          "quantidade": "2",
+          "confirmar": false
+        },
+        {
+          "nome": "açúcar",
+          "ingrediente": 15,
+          "quantidade": "100",
+          "confirmar": false
+        }
+      ]
+    },
+    {
+      "id": "r02",
+      "caso": "número sem unidade, pão sem número e fatia: tudo pede conferência",
+      "prato": "X-Burguer",
+      "texto": "pão, 150 de carne e queijo prato 2 fatias",
+      "esperado": [
+        {
+          "nome": "pão",
+          "ingrediente": 1,
+          "quantidade": "1",
+          "confirmar": true
+        },
+        {
+          "nome": "carne",
+          "ingrediente": 2,
+          "quantidade": null,
+          "confirmar": true
+        },
+        {
+          "nome": "queijo prato",
+          "ingrediente": 3,
+          "quantidade": null,
+          "confirmar": true
+        }
+      ]
+    },
+    {
+      "id": "r03",
+      "caso": "tudo exato e com o nome do cadastro: nada pede conferência",
+      "prato": "Arroz com frango",
+      "texto": "120 g de arroz, 80 g de peito de frango e 30 g de cebola",
+      "esperado": [
+        {
+          "nome": "arroz",
+          "ingrediente": 10,
+          "quantidade": "120",
+          "confirmar": false
+        },
+        {
+          "nome": "peito de frango",
+          "ingrediente": 12,
+          "quantidade": "80",
+          "confirmar": false
+        },
+        {
+          "nome": "cebola",
+          "ingrediente": 21,
+          "quantidade": "30",
+          "confirmar": false
+        }
+      ]
+    },
+    {
+      "id": "r04",
+      "caso": "queijo genérico (3 queijos no cadastro) e massa sem número pedem conferência",
+      "prato": "Pizza calabresa",
+      "texto": "massa de pizza, 120 g de molho de tomate, 150 g de queijo e 80 g de calabresa",
+      "esperado": [
+        {
+          "nome": "massa de pizza",
+          "ingrediente": 19,
+          "quantidade": "1",
+          "confirmar": true
+        },
+        {
+          "nome": "molho de tomate",
+          "ingrediente": 17,
+          "quantidade": "120",
+          "confirmar": false
+        },
+        {
+          "nome": "queijo",
+          "ingrediente": null,
+          "quantidade": "150",
+          "unidade": "g",
+          "confirmar": true
+        },
+        {
+          "nome": "calabresa",
+          "ingrediente": 18,
+          "quantidade": "80",
+          "confirmar": false
+        }
+      ]
+    },
+    {
+      "id": "r05",
+      "caso": "óleo em gramas (cadastro em ml) pede conferência; batata -> Batata congelada (único candidato) não",
+      "prato": "Porção de fritas",
+      "texto": "400 g de batata e 50 g de óleo",
+      "esperado": [
+        {
+          "nome": "batata",
+          "ingrediente": 8,
+          "quantidade": "400",
+          "confirmar": false
+        },
+        {
+          "nome": "óleo",
+          "ingrediente": 9,
+          "quantidade": null,
+          "confirmar": true
+        }
+      ]
+    },
+    {
+      "id": "r06",
+      "caso": "ingrediente repetido: a segunda linha de bacon pede conferência",
+      "prato": "X-Bacon duplo",
+      "texto": "180 g de blend bovino, 50 g de bacon e mais 20 g de bacon por cima",
+      "esperado": [
+        {
+          "nome": "blend bovino",
+          "ingrediente": 2,
+          "quantidade": "180",
+          "confirmar": false
+        },
+        {
+          "nome": "bacon",
+          "ingrediente": 4,
+          "quantidade": "50",
+          "confirmar": false
+        },
+        {
+          "nome": "bacon",
+          "ingrediente": 4,
+          "quantidade": "20",
+          "confirmar": true
+        }
+      ]
+    },
+    {
+      "id": "r07",
+      "caso": "erro de digitação (aroz) e sinônimo sem palavra em comum (hambúrguer -> Blend bovino) pedem conferência",
+      "prato": "Prato feito",
+      "texto": "200 g de aroz, 150 g de hamburguer e 30 g de cebola",
+      "esperado": [
+        {
+          "nome": "aroz",
+          "ingrediente": 10,
+          "quantidade": "200",
+          "confirmar": true
+        },
+        {
+          "nome": "hamburguer",
+          "ingrediente": 2,
+          "quantidade": "150",
+          "confirmar": true
+        },
+        {
+          "nome": "cebola",
+          "ingrediente": 21,
+          "quantidade": "30",
+          "confirmar": false
+        }
+      ]
+    }
+  ]
+}

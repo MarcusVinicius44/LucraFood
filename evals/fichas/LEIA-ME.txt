@@ -8,6 +8,8 @@ Arquivos:
                         têm preço só para documentar a regra do nome genérico: a IA recebe apenas
                         id, nome e unidade (ver _mensagem_usuario em cardapio/ia/ficha.py).
     frases.json         {"frases": [{"id", "caso", "prato", "texto", "esperado": [...]}]}
+    frases_revisao.json mesmo formato, frases ambíguas de propósito para medir os motivos de revisão.
+                        RASCUNHO escrito por IA (Claude) em 10/11/2026, ainda não revisado pelo dono.
 
 Cada item esperado: {"nome": str, "ingrediente": id|null, "quantidade": str|null, "unidade"?: str}
 - "ingrediente": id do cadastro, ou null quando o ingrediente não está cadastrado
@@ -25,6 +27,8 @@ Cada item esperado: {"nome": str, "ingrediente": id|null, "quantidade": str|null
 - Frase ambígua não serve para medir ingrediente e quantidade (ex.: "frango empanado na farinha
   (uns 30 g)": os 30 g podem ser do frango ou da farinha). Ambiguidade de propósito só quando
   formos medir os motivos de revisão, com "precisa_confirmar" como resposta certa.
+- "confirmar" (opcional, true/false): se o item deve vir com precisa_confirmar. Só é pontuado
+  onde aparece (hoje só em frases_revisao.json).
 - "nome" só serve para relatório e para achar os itens null (comparação por nome parecido).
 
 Pontuação (cardapio/avaliacao_ficha.py, testada sem API):
@@ -38,3 +42,4 @@ Regra: exemplos do prompt (cardapio/ia/ficha.py) NÃO podem vir destas frases.
 Rodar (da pasta backend/, com o .env preenchido; cada frase = 1 chamada na cota):
     python manage.py avaliar_ficha
     python manage.py avaliar_ficha --frase f03
+    python manage.py avaliar_ficha --frases frases_revisao.json
