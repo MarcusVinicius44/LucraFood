@@ -1,130 +1,116 @@
-# LucraFood
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="marca/lucrafood-logo-fundo-escuro.svg">
+    <img src="marca/lucrafood-logo.svg" alt="LucraFood" width="320">
+  </picture>
+</p>
 
-> O dono do restaurante tira uma foto do cardápio e descobre quais pratos dão lucro e quais dão prejuízo no delivery.
+<p align="center">
+  <strong>Tire uma foto do cardápio e descubra quais pratos dão lucro e quais dão prejuízo no delivery.</strong>
+</p>
 
-Pequenos restaurantes costumam precificar no "achismo". Quando entram em aplicativos de delivery, taxas e impostos comem a margem sem que o dono perceba. O LucraFood usa IA para tirar o trabalho chato do caminho (digitar cardápio, montar ficha técnica) e entrega um diagnóstico simples: 🟢 🟡 🔴 por prato.
+<p align="center">
+  Django · DRF · React · TypeScript · Gemini (visão + JSON) · Pydantic
+</p>
 
-## Como funciona
+---
 
-1. **Foto do cardápio → pratos estruturados** (modelo de visão, saída JSON validada).
-2. **Ficha técnica por texto** — o dono escreve o que vai no prato ("pão, hambúrguer de 150g, 2 fatias de queijo"), a IA liga cada item a um ingrediente cadastrado e o dono revisa antes de salvar. Medidas informais (fatia, concha) não viram gramas: o dono informa.
-3. **Diagnóstico** — custo por porção, margem no balcão, margem no delivery e preço sugerido. Receita que rende várias porções (bolo de 12 fatias) é dividida pelo rendimento; a embalagem é por porção e fica fora da divisão.
+## O problema
 
-## Decisões de engenharia
+No Brasil, a maioria dos restaurantes pequenos (lanchonete, marmitaria, pizzaria de bairro) é tocada pelo próprio dono, sem contador nem planilha. O preço sai do "achismo" ou da comparação com o concorrente.
 
-- **A IA não faz contas.** Ela extrai dados e conduz a conversa; toda a matemática está em [`calculos.py`](backend/cardapio/calculos.py), em Python puro com `Decimal`. LLMs erram aritmética, e preço errado custa dinheiro ao restaurante.
-- **Saída estruturada e validada.** A resposta do modelo passa por Pydantic. Se falhar, o erro volta para o modelo e há uma nova tentativa; se falhar de novo, o usuário recebe um erro claro em vez de dados inventados.
-- **Sem chute.** Preço ilegível vira `null`; ingrediente que não está no cadastro vira `null` (o id devolvido pela IA é conferido no Python); "2 fatias" não vira gramas. O dono confere antes de salvar: nada é gravado sem confirmação humana.
-- **Provedor trocável.** Usa a biblioteca `openai` com a API compatível do provedor: Gemini por padrão, Groq como alternativa. Mudar de modelo ou provedor é uma variável de ambiente (`LUCRAFOOD_PROVEDOR`).
-- **Avaliação medida, não "parece que funciona".** `evals/cardapios/` reúne fotos reais com gabarito, e `python manage.py avaliar_extracao` mede encontrados, faltando, inventados e preços errados. Resultado atual: 251 de 254 pratos e 251 de 251 preços em 8 fotos (ver [Evolução da extração](#evolução-da-extração)). A ficha por texto tem o seu conjunto em `evals/fichas/` e o comando `avaliar_ficha`.
+O problema aparece quando o restaurante entra no delivery. O aplicativo cobra comissão, há imposto e embalagem, e um prato que dava lucro no balcão pode estar **dando prejuízo a cada pedido**, sem que o dono perceba. Descobrir isso exige montar a ficha técnica de cada prato (quanto vai de cada ingrediente e quanto custa), e quase ninguém tem tempo para isso.
 
-## Evolução da extração
+## A solução
 
-Medida com `python manage.py avaliar_extracao` (dentro de `backend/`) sobre as 8 fotos de `evals/cardapios/` (254 pratos no gabarito). Um prato conta como "encontrado" se o nome bate com o gabarito; o preço é conferido só entre os encontrados. Cada rodada chama a API de verdade e gasta a cota do provedor.
+O LucraFood usa IA para fazer a parte chata e deixa as contas para um código que não erra conta:
 
-| Data | Provedor e modelo | Como lê a foto | Fotos completas | Pratos | Preços certos | Tempo |
-|---|---|---|---|---|---|---|
-| 08/11/2026 | Groq `qwen/qwen3.8-27b` | foto inteira | 3 de 8: as outras 5 cortaram no teto de 900 tokens de saída | 21 de 23 (nas 3 fotos) | 21 de 21 | 131 s |
-| 08/11/2026 | Gemini `gemini-3.5-flash-lite` | foto inteira | **8 de 8** | **251 de 254 (98,8%)** | **251 de 251** | 39 s (~5 s por foto) |
+1. **O dono fotografa o cardápio.** A IA lê a foto e devolve os pratos com nome, categoria e preço.
+2. **Ele confere o que a IA leu.** Nada é gravado sem confirmação humana.
+3. **Ele conta o que vai em cada prato, em texto livre:** *"pão, hambúrguer de 150 g, 2 fatias de queijo"*. A IA liga cada item a um ingrediente cadastrado e marca o que precisa de atenção ("fatia" não tem peso exato, "queijo" pode ser três produtos diferentes).
+4. **Ele recebe o diagnóstico de cada prato:** custo, margem no balcão, margem no delivery e um semáforo 🟢 🟡 🔴, com o preço sugerido para voltar à margem desejada.
 
-Comandos (a rodada do Groq usou `LUCRAFOOD_PROVEDOR=groq` só no comando; desde `c1bb967` o padrão é o Gemini):
+O painel guia o primeiro acesso passo a passo (cadastrar ingredientes, montar as fichas, ajustar taxas) até o restaurante ter o diagnóstico do cardápio inteiro.
 
-```bash
-cd backend
-LUCRAFOOD_PROVEDOR=groq python manage.py avaliar_extracao   # Groq, foto inteira
-python manage.py avaliar_extracao                           # Gemini (padrão)
+```mermaid
+flowchart LR
+    A[📷 Foto do cardápio] -->|IA lê| B[Pratos e preços]
+    B -->|dono confere| C[(Banco)]
+    D[✍️ Receita em texto] -->|IA liga ao cadastro| E[Ficha técnica]
+    E -->|dono confere| C
+    C -->|Python calcula| F[🟢🟡🔴 Diagnóstico por prato]
 ```
 
-- **Por que o Groq não serve no plano gratuito:** ele limita ~1.000 tokens de saída por minuto e recusa pedidos com `max_tokens` acima disso. Por isso o teto é 900, e o JSON de um cardápio grande (até ~4.700 tokens no Gemini) não cabe. Também testei dividir a foto em 3 faixas ([`a0fe275`](https://github.com/MarcusVinicius44/LucraFood/commit/a0fe275)): só 3 de 8 fotos completaram, por isso troquei de provedor.
-- **O Gemini varia entre rodadas.** Outra rodada do mesmo dia, com o mesmo prompt, deu **246 de 254** pratos (246 de 246 preços, 67 s): na foto 05, além dos caldinhos, os pastéis também vieram sem o tipo no nome ("Queijo" em vez de "Pastel de Queijo").
-- **Limitações conhecidas** (não corrigidas no prompt): na foto 05 os caldinhos vêm só com o sabor ("Sururu" em vez de "Caldinho de Sururu") em todas as rodadas; na foto 02 o título de seção "HAMBURGUER DE PICANHA" às vezes é lido como prato (1 de 2 rodadas).
-- **Sobre os gabaritos:** foram montados com ajuda de IA e conferidos ampliando a foto onde a extração discordava. Todos os "preços errados" encontrados até agora eram erro do gabarito ([`9e72ac4`](https://github.com/MarcusVinicius44/LucraFood/commit/9e72ac4)).
+## Como a IA é usada (e onde ela não entra)
 
-### Foto reduzida pelo navegador (JPEG)
+O princípio do projeto é **a IA lê e conversa; ela nunca faz conta.** Modelos de linguagem erram aritmética, e um preço errado custa dinheiro ao restaurante. Por isso:
 
-O frontend envia a foto como está se ela tiver até 4 MB e for JPG, PNG ou WEBP. Só a foto maior (comum em celular) ou em outro formato (HEIC) é reduzida para 2400 px no lado maior e recomprimida em JPEG. Para saber se essa recompressão atrapalha, as 8 fotos foram convertidas do jeito que o navegador faz (`evals/cardapios/gerar_jpeg.py`) e avaliadas. Como elas têm menos de 1000 px, nenhuma foi reduzida: **o teste mede só a troca de PNG por JPEG**. Gemini `gemini-3.5-flash-lite`, 09/11/2026, saídas em `evals/cardapios/resultados/`.
+| Tarefa | Quem faz |
+|---|---|
+| Ler a foto do cardápio (inclusive preço escrito à mão) | IA (modelo de visão, saída JSON) |
+| Entender "meio quilo de batata" e ligar "hambúrguer" a "Blend bovino" | IA (texto → JSON, com o cadastro do restaurante no contexto) |
+| Converter kg → g, conferir se o ingrediente existe, decidir o que o dono precisa revisar | Python |
+| Custo, margem, semáforo, preço sugerido | Python puro com `Decimal` ([`calculos.py`](backend/cardapio/calculos.py)) |
 
-| Rodada (8 fotos) | Pratos | Preços certos | Onde errou |
-|---|---|---|---|
-| PNG original | 251 de 254 | **251 de 251** | (só os caldinhos de sempre) |
-| JPEG 85%, rodada 1 | 251 de 254 | 218 de 251 | foto 06: 32 pizzas (41→47, 51→53); foto 05: 189→169 |
-| JPEG 85%, rodada 2 | 251 de 254 | 250 de 251 | foto 05: 189→169 |
-| JPEG 92% | 244 de 248 (foto 07 deu *timeout* do provedor) | 212 de 244 | foto 06: 32 pizzas |
+Outras decisões que tornam a IA confiável:
 
-Repetindo só a foto 06 (preços escritos à mão, foto com 513 px de largura): **PNG acertou 7 de 7 rodadas; JPEG errou as 32 pizzas em 4 de 8** (85%: 1 de 4; 92%: 3 de 4, mais 1 *timeout*). Os valores 47 e 53 não existem na foto.
+- **Saída estruturada e validada.** Toda resposta passa por Pydantic. Se vier inválida, o erro volta para o modelo numa segunda tentativa; se falhar de novo, o usuário vê um erro claro em vez de dados inventados.
+- **Sem chute.** Preço ilegível vira vazio, não um palpite. Um id de ingrediente que não existe no cadastro é descartado pelo Python. "2 fatias" não vira gramas: o dono informa.
+- **Ela marca o que tem dúvida.** Cada item da ficha volta com os motivos de revisão (sinônimo ou erro de digitação, medida caseira, unidade incompatível, ingrediente repetido). A tela destaca esses itens em dois níveis, "confira" e "preencha", para o dono não se acostumar a ignorar aviso.
+- **Provedor trocável.** A integração usa a biblioteca `openai` com a API compatível do provedor: Gemini por padrão, Groq como alternativa. Trocar de modelo é uma variável de ambiente.
+- **Erros do provedor tratados.** Limite de taxa (429) espera e tenta de novo; sobrecarga (503) tenta com espera crescente; foto ilegível vira um pedido de outra foto, não uma lista vazia.
 
-- **Conclusão:** nessas fotos pequenas, recomprimir em JPEG piora a leitura de dígitos manuscritos, e subir a qualidade de 85% para 92% não resolveu. Por isso o app só recomprime quando precisa (foto acima de 4 MB ou HEIC).
-- **O que ainda não foi medido:** o caso real da redução, foto de celular com 4000 px ou mais reduzida para 2400 px. Nela cada dígito tem 4 a 5 vezes mais pixels do que nas fotos de avaliação, então o efeito deve ser menor, mas falta conferir com fotos de cardápio em alta resolução e gabarito.
+## Resultados medidos
 
-### Ficha técnica por texto
+Em vez de "parece que funciona", a IA é avaliada com dados reais e gabarito, por comandos que chamam a API de verdade e guardam a saída de cada rodada.
 
-`python manage.py avaliar_ficha` sobre as 10 frases de `evals/fichas/` (42 ingredientes esperados, cadastro fictício de 21 itens), cada uma cobrindo um caso: sinônimo, pão sem número, kg e litro com vírgula, concha/xícara/fio, ingrediente fora do cadastro, queijo parecido mas diferente, erro de digitação e texto com ruído.
+| O que foi medido | Conjunto | Resultado |
+|---|---|---|
+| Leitura de cardápio por foto | 8 cardápios reais, 254 pratos (inclusive preço escrito à mão) | **251 de 254 pratos, 251 de 251 preços** (~5 s por foto) |
+| Foto tirada no celular | cardápio fotografado na tela, 17 pratos | 17 de 17 pratos e preços |
+| Ficha técnica por texto | 10 frases com sinônimos, kg/litro, medidas caseiras, erro de digitação | **42 de 42 ingredientes e quantidades, em 5 rodadas seguidas** |
+| Pedido de conferência ao dono | 7 frases ambíguas de propósito | 21 de 21 itens |
 
-| Data | Gabarito | Provedor e modelo | Ingrediente certo | Quantidade certa | Ligados ao ingrediente errado |
-|---|---|---|---|---|---|
-| 08/11/2026 | rascunho da IA | Gemini `gemini-3.5-flash-lite` | 40 de 42 (95,2%) | 33 de 33 (só itens do cadastro) | 0 |
-| 08/11/2026 | revisado em f06, f07 e f09 | Gemini `gemini-3.5-flash-lite` | 42 de 42 | 33 de 33 (só itens do cadastro) | 0 |
-| 08/11/2026 | revisado pelo dono (todas as frases) | Gemini `gemini-3.5-flash-lite` | 40 a 42 de 42 (5 rodadas: 42, 42, 41, 41, 40) | 100% em todas as rodadas (40 a 42 itens, inclusive fora do cadastro) | 0 ou 1 |
-| 08/11/2026 | revisado + Cheddar e Parmesão no cadastro | Gemini `gemini-3.5-flash-lite` | **42 de 42 nas 5 rodadas** | **42 de 42 nas 5 rodadas** | **0** |
-
-Cada rodada faz 10 chamadas (~1 s por frase; algumas rodadas levaram ~70 s por esperarem 503 do Gemini). **O prompt não mudou em nenhuma dessas rodadas**: mudaram o gabarito, a métrica e um defeito do Python. O motivo de cada ajuste:
-
-1. **"queijo" genérico vai para revisão** (f07 e f09, depois da primeira rodada). A IA deixou "queijo" sem ingrediente e o rascunho esperava "Queijo prato". O dono concordou com a IA: um custo errado é pior que uma pergunta a mais.
-2. **f09 reescrita** porque era ambígua ("frango empanado na farinha (uns 30 g)": os 30 g podiam ser do frango ou da farinha), e frase ambígua não mede acerto.
-3. **Regra dos nomes genéricos** (revisão completa): só fica sem ingrediente o nome genérico de produto com variações de preço bem diferentes (ex.: queijo). Genéricos com um candidato óbvio (pão, leite, óleo, farinha, frango) são ligados, como o gabarito já esperava.
-4. **Item fora do cadastro guarda a quantidade escrita.** "150 g de mussarela" deve voltar 150 g, para o dono cadastrar o ingrediente já sabendo quanto usa. O Python apagava essa quantidade quando o ingrediente ficava `null`. Isso foi corrigido em [`9b4c657`](https://github.com/MarcusVinicius44/LucraFood/commit/9b4c657), e esses itens passaram a contar na métrica de quantidade, conferindo também a unidade. Pela mesma regra, "2 cenouras" (f05) passou a esperar 2 un. Medida informal (concha, xícara, fio, bolas) continua sem quantidade.
-
-**Variação entre rodadas** (mesmo prompt, mesmo gabarito), toda na f07 ("2 ovos, um fio de óleo, 50 g de queijo, sal e pimenta"): em 2 de 5 rodadas a IA ligou "queijo" a Queijo prato, e uma vez juntou "sal e pimenta" num item só. Uma rodada de 41 não teve a saída guardada, então o item que faltou nela é desconhecido. O cadastro de avaliação tinha um único queijo, o que deixava esse caso no limite da regra 3.
-
-5. **Cheddar e Parmesão no cadastro de avaliação**, com preços bem diferentes do Queijo prato (R$ 65 e R$ 130/kg contra R$ 45/kg), para "queijo" ser de fato genérico como a regra 3 descreve. Os preços só documentam a regra: a IA recebe apenas id, nome e unidade. Com isso, a f07 ficou estável e as 5 rodadas deram 42 de 42 nos ingredientes e nas quantidades. A saída completa de cada rodada está em [`evals/fichas/resultados/`](evals/fichas/resultados/).
-
-Ainda não medido: se os motivos de revisão (`precisa_confirmar`) estão certos.
+A avaliação também orientou decisões de produto. Ela mostrou que o plano gratuito do Groq corta cardápios grandes (troquei para o Gemini) e que recomprimir a foto em JPEG no navegador faz o modelo errar dígitos escritos à mão (o app só recomprime quando precisa). O histórico completo, com cada rodada e o que mudou entre elas, está em [docs/AVALIACAO.md](docs/AVALIACAO.md).
 
 ## Stack
 
-Django + DRF · React + TypeScript *(em construção)* · Gemini 3.5 Flash-Lite (visão + JSON; Groq `qwen/qwen3.8-27b` como alternativa) · Pydantic
+| Camada | Tecnologias |
+|---|---|
+| Backend | Python, Django 5.2, Django REST Framework, SQLite |
+| Frontend | React 19, TypeScript, Vite, React Router, mobile-first (câmera do celular) |
+| IA | Gemini 3.5 Flash-Lite (visão + JSON) pela biblioteca `openai`; Groq como alternativa; Pydantic para validar a saída |
+| Qualidade | 138 testes no backend (IA simulada, sem rede), 43 no frontend (Vitest), conjuntos de avaliação com fotos e frases reais |
 
-## Rodando localmente
+## Arquitetura
 
-```bash
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env             # e cole sua GEMINI_API_KEY (aistudio.google.com)
+```
+backend/cardapio/
+├── calculos.py        toda a matemática (custo, margem, semáforo, preço sugerido), sem Django e sem IA
+├── ia/
+│   ├── cliente.py     provedor configurável (Gemini/Groq) e limites do plano gratuito
+│   ├── extracao.py    foto → pratos (JSON validado, nova tentativa, tratamento de 429/503)
+│   └── ficha.py       texto → itens da ficha, conferidos e convertidos pelo Python
+├── views*.py          API REST em duas etapas: a IA lê, o dono confirma, só então grava
+└── avaliacao*.py      comparação com o gabarito (testada sem API)
 
-cd backend
-python manage.py migrate
-python manage.py test cardapio   # testes não usam a API (IA mockada)
-
-# teste rápido com uma foto real:
-python manage.py extrair_cardapio caminho/da/foto.jpg
-
-python manage.py runserver
+frontend/src/telas/    Foto → Revisão → Painel → Prato (ficha) · Ingredientes · Ajustes
+evals/                 fotos de cardápio e frases com gabarito + saídas de cada rodada
 ```
 
-### API
+## Status e próximos passos
 
-| Método | Rota | O que faz |
-|---|---|---|
-| POST | `/api/cardapio/extrair/` | multipart com `imagem` → lista de pratos para conferência (não salva) |
-| POST | `/api/cardapio/confirmar/` | JSON `{restaurante, pratos[]}` já conferido → salva |
-| GET/PATCH | `/api/restaurantes/<id>/` | consulta/ajusta taxas, margem desejada (padrão 30) e margem mínima (padrão 10); mínima maior que desejada → 400 |
-| GET/POST | `/api/restaurantes/<id>/ingredientes/` | lista/cadastra ingredientes como o dono compra (preço e tamanho da embalagem) |
-| GET/PATCH/DELETE | `/api/ingredientes/<id>/` | edita/apaga; apagar ingrediente usado em ficha → 409 com os pratos |
-| GET/PATCH | `/api/pratos/<id>/` | corrige preço de venda (ex.: o que veio nulo da foto), custo da embalagem e rendimento (porções que a receita rende; padrão 1, zero → 400) |
-| GET/PUT | `/api/pratos/<id>/ficha/` | ficha com custo por item, custo da receita e diagnóstico; o PUT `{itens: [{ingrediente, quantidade}]}` troca a ficha inteira |
-| GET | `/api/pratos/<id>/diagnostico/` | custo, margem balcão, margem delivery, semáforo e preço sugerido; sem preço ou sem ficha → sem semáforo |
-| POST | `/api/pratos/<id>/ficha/extrair/` | JSON `{texto}` → itens lidos pela IA, com `precisa_confirmar` e motivos (não salva); texto sem ingredientes → 422 |
-| POST | `/api/pratos/<id>/ficha/confirmar/` | ficha revisada pelo dono → salva (mesma validação do PUT, substitui a anterior) |
-
-## Roadmap
-
-- [x] Extração de cardápio por foto com validação e retry
-- [x] Motor de cálculo de custo, margem e preço sugerido (com testes)
-- [x] Ficha técnica: ingredientes, ficha por prato, diagnóstico e extração por texto com revisão
-- [ ] **Próximo passo:** ligar e marcar para confirmar quando o nome lido é diferente do cadastrado ("leite" → "Leite integral"), em vez de ligar em silêncio ou deixar sem ingrediente
-- [ ] **Próximo passo:** medir os motivos de revisão, com frases ambíguas de propósito
-- [ ] Ficha em conversa de várias rodadas (a IA pergunta o que faltou: "quantos gramas tem a fatia de queijo?")
-- [ ] Painel com semáforo e simulador de preço (React)
-- [x] Conjunto de avaliação com fotos reais e métricas
+- [x] Extração do cardápio por foto, com revisão antes de salvar
+- [x] Motor de custo, margem, semáforo e preço sugerido (com testes)
+- [x] Ficha técnica: ingredientes, ficha à mão e por texto com revisão, rendimento da receita
+- [x] Frontend completo, com fluxo guiado para o primeiro acesso
+- [x] Conjuntos de avaliação com fotos e frases reais
+- [ ] Ficha em conversa: a IA pergunta o que faltou ("quantos gramas tem a fatia de queijo?")
+- [ ] Simulador de preço ("e se eu cobrar R$ 2 a mais?")
 - [ ] Teste com restaurantes de verdade
+
+## Autor
+
+Desenvolvido por **Marcus Vinicius** ([GitHub](https://github.com/MarcusVinicius44)).
+
+Para rodar o projeto localmente, ver [docs/DESENVOLVIMENTO.md](docs/DESENVOLVIMENTO.md).
