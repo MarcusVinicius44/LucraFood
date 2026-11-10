@@ -66,7 +66,8 @@ Regras: o prompt só muda com a avaliação rodada antes e depois, e os exemplos
 | GET | `/api/pratos/<id>/diagnostico/` | custo, margem balcão, margem delivery, semáforo e preço sugerido; sem preço ou sem ficha → sem semáforo |
 | POST | `/api/pratos/<id>/ficha/extrair/` | JSON `{texto}` → itens lidos pela IA, com `precisa_confirmar` e motivos (não salva); texto sem ingredientes → 422 |
 | POST | `/api/pratos/<id>/ficha/conversa/` | ficha em conversa: `{itens, pulados, pergunta?, resposta?}` → item atualizado e próxima pergunta (sem resposta, só a primeira pergunta e sem IA; não salva) |
-| POST | `/api/pratos/<id>/ficha/confirmar/` | ficha revisada pelo dono → salva (mesma validação do PUT, substitui a anterior) |
+| POST | `/api/pratos/<id>/ficha/confirmar/` | ficha revisada pelo dono → salva (mesma validação do PUT, substitui a anterior); `medidas` opcional (`[{ingrediente, medida, quantidade}]`, o que o dono ensinou na conversa) é gravado junto |
+| DELETE | `/api/medidas/<id>/` | esquece uma medida ensinada ("1 fatia = 18 g"); as medidas aparecem em `medidas` de cada ingrediente |
 
 ## Notas do dono
 

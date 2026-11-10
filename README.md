@@ -28,7 +28,7 @@ O LucraFood usa IA para fazer a parte chata e deixa as contas para um código qu
 1. **O dono fotografa o cardápio.** A IA lê a foto e devolve os pratos com nome, categoria e preço.
 2. **Ele confere o que a IA leu.** Nada é gravado sem confirmação humana.
 3. **Ele conta o que vai em cada prato, em texto livre:** *"pão, hambúrguer de 150 g, 2 fatias de queijo"*. A IA liga cada item a um ingrediente cadastrado e marca o que precisa de atenção ("fatia" não tem peso exato, "queijo" pode ser três produtos diferentes).
-4. **O sistema pergunta o que faltou.** *"Quanto dá mais ou menos 1 fatia de queijo prato, em gramas?"* → *"uns 18"* → anota 2 × 18 g = 36 g. A IA só entende a resposta; a conta é do sistema.
+4. **O sistema pergunta o que faltou.** *"Quanto dá mais ou menos 1 fatia de queijo prato, em gramas?"* → *"uns 18"* → anota 2 × 18 g = 36 g. A IA só entende a resposta; a conta é do sistema. Ao confirmar a ficha, o sistema lembra que 1 fatia de queijo prato dá 18 g: no próximo prato, "3 fatias" já vira 54 g, sem perguntar de novo (e o dono pode pedir para esquecer).
 5. **Ele recebe o diagnóstico de cada prato:** custo, margem no balcão, margem no delivery e um semáforo 🟢 🟡 🔴, com o preço sugerido para voltar à margem desejada.
 
 O painel guia o primeiro acesso passo a passo (cadastrar ingredientes, montar as fichas, ajustar taxas) até o restaurante ter o diagnóstico do cardápio inteiro.
@@ -84,7 +84,7 @@ A avaliação também orientou decisões de produto. Ela mostrou que o plano gra
 | Backend | Python, Django 5.2, Django REST Framework, SQLite |
 | Frontend | React 19, TypeScript, Vite, React Router, mobile-first (câmera do celular) |
 | IA | Gemini 3.5 Flash-Lite (visão + JSON) pela biblioteca `openai`; Groq como alternativa; Pydantic para validar a saída |
-| Qualidade | 164 testes no backend (IA simulada, sem rede), 43 no frontend (Vitest), conjuntos de avaliação com fotos e frases reais |
+| Qualidade | 178 testes no backend (IA simulada, sem rede), 44 no frontend (Vitest), conjuntos de avaliação com fotos e frases reais |
 
 ## Arquitetura
 
@@ -111,7 +111,7 @@ evals/                 fotos de cardápio e frases com gabarito + saídas de cad
 - [x] Frontend completo, com fluxo guiado para o primeiro acesso
 - [x] Conjuntos de avaliação com fotos e frases reais
 - [x] Ficha em conversa: o sistema pergunta o que faltou ("quanto dá 1 fatia de queijo?") e anota a resposta
-- [ ] Lembrar as medidas do restaurante ("1 fatia de queijo prato = 18 g") para não perguntar de novo
+- [x] Lembrar as medidas do restaurante ("1 fatia de queijo prato = 18 g") para não perguntar de novo
 - [ ] Simulador de preço ("e se eu cobrar R$ 2 a mais?")
 - [ ] Teste com restaurantes de verdade
 
