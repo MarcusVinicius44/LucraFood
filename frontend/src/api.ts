@@ -55,6 +55,14 @@ export interface Ingrediente {
   preco_embalagem: string
   quantidade_embalagem: string
   custo_por_unidade: string // só exibição (4 casas)
+  medidas?: MedidaCaseira[] // o que o dono ensinou na conversa ("1 fatia = 18 g")
+}
+
+/** Quanto dá 1 medida caseira ("fatia") deste ingrediente, na unidade do cadastro. */
+export interface MedidaCaseira {
+  id: number
+  medida: string
+  quantidade: string
 }
 
 export type IngredienteNovo = Pick<Ingrediente, 'nome' | 'unidade' | 'preco_embalagem' | 'quantidade_embalagem'>
@@ -97,6 +105,7 @@ export type MotivoRevisao =
   | 'unidade_incompativel'
   | 'ingrediente_repetido'
   | 'nome_diferente'
+  | 'medida_salva'
 
 /** Item lido pela IA no texto da receita, já conferido pelo Python (ia/ficha.py). */
 export interface ItemLidoTexto {
@@ -108,6 +117,7 @@ export interface ItemLidoTexto {
   unidade: Unidade | null
   precisa_confirmar: boolean
   motivos: MotivoRevisao[]
+  estimativa?: string | null // de onde veio a quantidade (ex.: medida que o dono ensinou)
 }
 
 export interface FichaLidaTexto {
@@ -220,6 +230,11 @@ export function atualizarIngrediente(id: number, dados: Partial<IngredienteNovo>
   return pedir(`/api/ingredientes/${id}/`, json('PATCH', dados))
 }
 
+/** Esquece uma medida ensinada: na próxima receita, o sistema volta a perguntar. */
+export function esquecerMedida(id: number): Promise<void> {
+  return pedir(`/api/medidas/${id}/`, { method: 'DELETE' })
+}
+
 /** 409 se o ingrediente está em alguma ficha (a resposta traz os pratos). */
 export function apagarIngrediente(id: number): Promise<void> {
   return pedir(`/api/ingredientes/${id}/`, { method: 'DELETE' })
@@ -270,7 +285,14 @@ export interface PerguntaConversa {
 }
 
 export interface RodadaConversa {
-  atualizado: { chave: number; quantidade: string; unidade: Unidade; motivos: MotivoRevisao[]; origem: string } | null
+  atualizado: {
+    chave: number
+    quantidade: string
+    unidade: Unidade
+    motivos: MotivoRevisao[]
+    origem: string
+    medida: { medida: string; quantidade: string; nome: string } | null // medida ensinada, gravada só ao confirmar
+  } | null
   aviso: string | null // não entendeu a resposta: a mesma pergunta volta
   pergunta: PerguntaConversa | null // null = não há mais o que perguntar
   pulados: number[]
@@ -285,6 +307,13 @@ export function conversarFicha(
   return pedir(`/api/pratos/${pratoId}/ficha/conversa/`, json('POST', corpo))
 }
 
-export function confirmarFichaTexto(pratoId: number, itens: ItemParaSalvar[]): Promise<FichaDoPrato> {
-  return pedir(`/api/pratos/${pratoId}/ficha/confirmar/`, json('POST', { itens }))
+export type MedidaParaSalvar = { ingrediente: number; medida: string; quantidade: string }
+
+/** Grava a ficha revisada e, junto, as medidas que o dono ensinou na conversa. */
+export function confirmarFichaTexto(
+  pratoId: number,
+  itens: ItemParaSalvar[],
+  medidas: MedidaParaSalvar[] = [],
+): Promise<FichaDoPrato> {
+  return pedir(`/api/pratos/${pratoId}/ficha/confirmar/`, json('POST', { itens, medidas }))
 }

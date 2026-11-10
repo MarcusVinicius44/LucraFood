@@ -28,6 +28,7 @@ from .ficha import (
     UNIDADE_INCOMPATIVEL,
     UNIDADE_INFORMAL,
     _normalizar_numero,
+    chave_medida,
     _unidade_canonica,
 )
 
@@ -158,6 +159,9 @@ class Atualizacao:
     unidade: str
     motivos: list[str]
     origem: str  # de onde veio o número, para a etiqueta no front
+    # Medida caseira que o dono ensinou ({"medida": "fatia", "quantidade": "18", "nome"}, na unidade do
+    # cadastro). O front devolve na confirmação da ficha, e só então ela é gravada.
+    medida: Optional[dict] = None
 
     def para_json(self):
         return {
@@ -166,6 +170,7 @@ class Atualizacao:
             "unidade": self.unidade,
             "motivos": self.motivos,
             "origem": self.origem,
+            "medida": self.medida,
         }
 
 
@@ -183,6 +188,7 @@ def aplicar_resposta(item: ItemConversa, tipo: str, lida: RespostaLida) -> Atual
         unidade = unidade or destino  # só o número: vale a unidade que a pergunta pediu
     if quantidade is None:
         raise RespostaInvalida(f"Não entendi o número. Quanto dá, em {NOME_UNIDADE[destino]}?")
+    medida = None
     try:
         if tipo == POR_MEDIDA:
             medidas = item.quantidade_lida or Decimal(1)
@@ -191,6 +197,13 @@ def aplicar_resposta(item: ItemConversa, tipo: str, lida: RespostaLida) -> Atual
                 f"{_numero(medidas)} × {_numero(quantidade)} {unidade} por {item.unidade_lida or 'medida'} "
                 f"= {_numero(total)} {destino} (você informou)"
             )
+            por_medida = calculos.converter_unidade(quantidade, unidade, destino)
+            if chave_medida(item.unidade_lida) and por_medida > 0:
+                medida = {
+                    "medida": chave_medida(item.unidade_lida),
+                    "quantidade": str(por_medida),
+                    "nome": item.ingrediente["nome"],  # só para a mensagem no front
+                }
         else:
             total = calculos.converter_unidade(quantidade, unidade, destino)
             origem = f"{_numero(total)} {destino} (você informou)"
@@ -198,7 +211,7 @@ def aplicar_resposta(item: ItemConversa, tipo: str, lida: RespostaLida) -> Atual
         raise RespostaInvalida(f"Preciso da quantidade em {NOME_UNIDADE[destino]}. Quanto dá?")
     resolvidos = {MOTIVO_DO_TIPO[tipo], SEM_QUANTIDADE, SEM_UNIDADE, UNIDADE_INFORMAL, UNIDADE_INCOMPATIVEL}
     motivos = [m for m in item.motivos if m not in resolvidos]
-    return Atualizacao(item.chave, total, destino, motivos, origem)
+    return Atualizacao(item.chave, total, destino, motivos, origem, medida)
 
 
 def interpretar_resposta(pergunta: str, resposta: str, cliente=None, esperar=time.sleep, uso=None) -> RespostaLida:

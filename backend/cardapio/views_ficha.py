@@ -16,7 +16,7 @@ from . import calculos
 from .ia import conversa as ia_conversa
 from .ia import ficha as ia_ficha
 from .ia.extracao import FalhaDeCota, ProvedorIndisponivel
-from .models import Ingrediente, ItemFichaTecnica, Prato, Restaurante
+from .models import Ingrediente, ItemFichaTecnica, MedidaCaseira, Prato, Restaurante
 from .views import resposta_erro_ia
 
 MSG_INGREDIENTE_REPETIDO = "Já existe um ingrediente com esse nome neste restaurante."
@@ -43,15 +43,23 @@ def _itens_que_usam(ingrediente):
 # --- Ingredientes ----------------------------------------------------------
 
 
+class MedidaCaseiraSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MedidaCaseira
+        fields = ["id", "medida", "quantidade"]
+
+
 class IngredienteSerializer(serializers.ModelSerializer):
     preco_embalagem = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal("0"))
     # Zero não pode: o custo por unidade é preço / quantidade da embalagem.
     quantidade_embalagem = serializers.DecimalField(max_digits=10, decimal_places=3, min_value=Decimal("0.001"))
     custo_por_unidade = serializers.SerializerMethodField()
+    # O que o dono ensinou na ficha em conversa ("1 fatia = 18 g"). Só leitura; esquecer é DELETE /medidas/<id>/.
+    medidas = MedidaCaseiraSerializer(many=True, read_only=True)
 
     class Meta:
         model = Ingrediente
-        fields = ["id", "nome", "unidade", "preco_embalagem", "quantidade_embalagem", "custo_por_unidade"]
+        fields = ["id", "nome", "unidade", "preco_embalagem", "quantidade_embalagem", "custo_por_unidade", "medidas"]
 
     def get_custo_por_unidade(self, ingrediente):
         # Só exibição (4 casas); o custo do prato usa o valor sem arredondar.
@@ -72,6 +80,12 @@ class IngredienteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(MSG_UNIDADE_EM_USO)
         return unidade
 
+    def update(self, instance, validated_data):
+        # "1 fatia = 18 g" não vale mais se o ingrediente passa a ser em ml ou un.
+        if "unidade" in validated_data and validated_data["unidade"] != instance.unidade:
+            instance.medidas.all().delete()
+        return super().update(instance, validated_data)
+
 
 class IngredientesDoRestaurante(generics.ListCreateAPIView):
     """Lista e cadastra os ingredientes de um restaurante, do jeito que o dono compra."""
@@ -84,7 +98,7 @@ class IngredientesDoRestaurante(generics.ListCreateAPIView):
         return self._restaurante
 
     def get_queryset(self):
-        return self.restaurante().ingredientes.order_by("nome")
+        return self.restaurante().ingredientes.prefetch_related("medidas").order_by("nome")
 
     def get_serializer_context(self):
         return {**super().get_serializer_context(), "restaurante": self.restaurante()}
@@ -104,6 +118,12 @@ class IngredienteDetalhe(generics.RetrieveUpdateDestroyAPIView):
             # 409: o pedido é válido, mas conflita com o estado atual (o ingrediente está em uso).
             return Response({"erro": MSG_INGREDIENTE_EM_USO, "pratos": pratos}, status=status.HTTP_409_CONFLICT)
         return super().destroy(request, *args, **kwargs)
+
+
+class MedidaCaseiraDetalhe(generics.DestroyAPIView):
+    """Esquecer uma medida ensinada (na próxima receita, o sistema volta a perguntar)."""
+
+    queryset = MedidaCaseira.objects.all()
 
 
 # --- Diagnóstico -----------------------------------------------------------
@@ -316,8 +336,12 @@ def extrair_ficha_texto(request, pk):
     if len(texto) > ia_ficha.TEXTO_MAX:
         return Response({"erro": f"Texto acima de {ia_ficha.TEXTO_MAX} caracteres."}, status=400)
     cadastro = list(prato.restaurante.ingredientes.order_by("nome").values("id", "nome", "unidade"))
+    medidas = {
+        (m.ingrediente_id, m.medida): m.quantidade
+        for m in MedidaCaseira.objects.filter(ingrediente__restaurante=prato.restaurante)
+    }
     try:
-        itens = ia_ficha.extrair_ficha(texto, cadastro, prato.nome)
+        itens = ia_ficha.extrair_ficha(texto, cadastro, prato.nome, medidas=medidas)
     except ia_ficha.TextoSemIngredientes:
         return Response(
             {"erro": MSG_SEM_INGREDIENTES, "codigo": "sem_ingredientes"}, status=status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -334,13 +358,50 @@ def extrair_ficha_texto(request, pk):
     )
 
 
+class MedidaEnsinadaSerializer(serializers.Serializer):
+    ingrediente = serializers.IntegerField()
+    medida = serializers.CharField(max_length=60)
+    # Quanto dá 1 medida, na unidade do cadastro do ingrediente.
+    quantidade = serializers.DecimalField(max_digits=10, decimal_places=3, min_value=Decimal("0.001"))
+
+    def validate_medida(self, medida):
+        chave = ia_ficha.chave_medida(medida)
+        if not chave:
+            raise serializers.ValidationError("Medida vazia.")
+        return chave
+
+
+class ConfirmarSerializer(serializers.Serializer):
+    medidas = MedidaEnsinadaSerializer(many=True, required=False, default=list, max_length=60)
+
+    def validate_medidas(self, medidas):
+        prato = self.context["prato"]
+        ids = {m["ingrediente"] for m in medidas}
+        do_restaurante = set(
+            Ingrediente.objects.filter(restaurante=prato.restaurante, pk__in=ids).values_list("pk", flat=True)
+        )
+        if ids - do_restaurante:
+            raise serializers.ValidationError(f"Ingrediente(s) {sorted(ids - do_restaurante)} não existe(m) neste restaurante.")
+        return medidas
+
+
 @api_view(["POST"])
 @parser_classes([JSONParser])
 def confirmar_ficha(request, pk):
     """Grava a ficha revisada pelo dono. Mesma validação e gravação do PUT /ficha/ (substitui a anterior):
-    cada item precisa de um ingrediente cadastrado e da quantidade na unidade do cadastro."""
+    cada item precisa de um ingrediente cadastrado e da quantidade na unidade do cadastro.
+    `medidas` (opcional): o que o dono ensinou na conversa ("1 fatia de Queijo prato = 18 g"),
+    gravado junto com a ficha para a próxima receita."""
     prato = get_object_or_404(_pratos(), pk=pk)
-    return Response(salvar_ficha(prato, request.data))
+    extras = ConfirmarSerializer(data=request.data, context={"prato": prato})
+    extras.is_valid(raise_exception=True)
+    with transaction.atomic():
+        ficha = salvar_ficha(prato, request.data)
+        for m in extras.validated_data["medidas"]:
+            MedidaCaseira.objects.update_or_create(
+                ingrediente_id=m["ingrediente"], medida=m["medida"], defaults={"quantidade": m["quantidade"]}
+            )
+    return Response(ficha)
 
 
 class ItemConversaSerializer(serializers.Serializer):

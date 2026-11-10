@@ -22,7 +22,7 @@ import { restauranteSalvo } from '../armazenamento'
 import { Carregando } from '../componentes/Carregando'
 import { ConversaFicha } from '../componentes/ConversaFicha'
 import { EditorFicha } from '../componentes/EditorFicha'
-import { novaChave, textoEscrito, validarLinhas, type LinhaFicha } from '../fichaLinhas'
+import { medidasEnsinadas, novaChave, textoEscrito, validarLinhas, type LinhaFicha } from '../fichaLinhas'
 import { NumerosDiagnostico } from '../componentes/NumerosDiagnostico'
 import { SemaforoSelo } from '../componentes/SemaforoSelo'
 import {
@@ -267,10 +267,12 @@ function FichaDoPratoCartao({
           unidadeLida: item.ingrediente ? null : item.unidade,
           motivos: item.motivos,
           // "pão" sem número: o Python assume 1 unidade e marca para conferir.
+          // "2 fatias" com medida já ensinada: o Python faz a conta e diz de onde veio.
           estimativa:
-            item.motivos.includes('sem_quantidade') && item.quantidade !== null
+            item.estimativa ??
+            (item.motivos.includes('sem_quantidade') && item.quantidade !== null
               ? `O texto não dizia quanto; o sistema assumiu ${formatarQuantidade(item.quantidade, item.unidade)}. Confira.`
-              : undefined,
+              : undefined),
         })),
       )
       iniciar('revisao')
@@ -287,7 +289,10 @@ function FichaDoPratoCartao({
     setEnviando(true)
     setErro(null)
     try {
-      const f = modo === 'revisao' ? await confirmarFichaTexto(pratoId, itens) : await salvarFicha(pratoId, itens)
+      const f =
+        modo === 'revisao'
+          ? await confirmarFichaTexto(pratoId, itens, medidasEnsinadas(linhas))
+          : await salvarFicha(pratoId, itens)
       onSalva(f)
       setModo('ver')
       setTexto('')

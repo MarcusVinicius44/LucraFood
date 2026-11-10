@@ -9,6 +9,7 @@ urlpatterns = [
     path("restaurantes/<int:pk>/pratos/", views_ficha.pratos_do_restaurante),
     path("restaurantes/<int:pk>/ingredientes/", views_ficha.IngredientesDoRestaurante.as_view()),
     path("ingredientes/<int:pk>/", views_ficha.IngredienteDetalhe.as_view()),
+    path("medidas/<int:pk>/", views_ficha.MedidaCaseiraDetalhe.as_view()),
     path("pratos/<int:pk>/", views_ficha.PratoDetalhe.as_view()),
     path("pratos/<int:pk>/ficha/", views_ficha.ficha_tecnica),
     path("pratos/<int:pk>/diagnostico/", views_ficha.diagnostico),

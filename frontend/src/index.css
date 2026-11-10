@@ -435,3 +435,10 @@ a { color: var(--verde); }
 .balao-dono { background: var(--sem-pendente-fundo); align-self: flex-end; border-bottom-right-radius: 4px; }
 .conversa-resposta { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 .conversa-resposta input { flex: 1 1 12rem; min-width: 0; font: 400 1rem var(--fonte-texto); padding: 0.55rem 0.7rem; border: 1px solid var(--borda); border-radius: var(--raio-pequeno); }
+
+/* Medida caseira lembrada ("1 fatia = 18 g") na lista de ingredientes. */
+.medida-caseira {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}

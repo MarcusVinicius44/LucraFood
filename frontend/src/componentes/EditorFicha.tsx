@@ -7,7 +7,7 @@ import { FormIngrediente } from './FormIngrediente'
 const UNIDADE_CURTA: Record<Unidade, string> = { g: 'g', ml: 'ml', un: 'un' }
 
 /** Motivos que só pedem um olhar (o item já está completo); os outros pedem que o dono preencha algo. */
-const MOTIVOS_LEVES: MotivoRevisao[] = ['nome_diferente']
+const MOTIVOS_LEVES: MotivoRevisao[] = ['nome_diferente', 'medida_salva']
 
 /** Por que o item foi marcado para conferência (ia/ficha.py devolve o código). */
 function textoDoMotivo(motivo: MotivoRevisao, linha: LinhaFicha, ingrediente?: Ingrediente): string | null {
@@ -28,6 +28,10 @@ function textoDoMotivo(motivo: MotivoRevisao, linha: LinhaFicha, ingrediente?: I
     case 'nome_diferente':
       return ingrediente
         ? `Você escreveu “${linha.nomeLido}” e liguei a “${ingrediente.nome}”. Confira se é o mesmo produto.`
+        : null
+    case 'medida_salva':
+      return linha.estimativa
+        ? 'Usei a medida que você me ensinou antes. Se mudou, corrija aqui; para eu esquecer, vá em Ingredientes.'
         : null
   }
 }

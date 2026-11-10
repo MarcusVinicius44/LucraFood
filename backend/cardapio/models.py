@@ -85,3 +85,22 @@ class ItemFichaTecnica(models.Model):
 
     def __str__(self):
         return f"{self.quantidade} {self.ingrediente.unidade} de {self.ingrediente.nome}"
+
+
+class MedidaCaseira(models.Model):
+    """O que o dono ensinou na ficha em conversa: "1 fatia de Queijo prato = 18 g".
+
+    Gravada só quando o dono confirma a ficha (nada grava sem confirmação). Na próxima receita,
+    "2 fatias de queijo prato" já vira 36 g, marcado para conferir."""
+
+    ingrediente = models.ForeignKey(Ingrediente, on_delete=models.CASCADE, related_name="medidas")
+    medida = models.CharField(max_length=30)  # ia.ficha.chave_medida: "fatia", "colher de sopa"
+    # Quanto dá 1 medida, na unidade do cadastro do ingrediente (g, ml ou un).
+    quantidade = models.DecimalField(max_digits=10, decimal_places=3, validators=[MinValueValidator(Decimal("0.001"))])
+    atualizada_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("ingrediente", "medida")
+
+    def __str__(self):
+        return f"1 {self.medida} de {self.ingrediente.nome} = {self.quantidade} {self.ingrediente.unidade}"

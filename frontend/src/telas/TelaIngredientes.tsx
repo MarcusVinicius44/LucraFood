@@ -5,8 +5,10 @@ import {
   apagarIngrediente,
   atualizarIngrediente,
   criarIngrediente,
+  esquecerMedida,
   listarIngredientes,
   type Ingrediente,
+  type MedidaCaseira,
 } from '../api'
 import { restauranteSalvo } from '../armazenamento'
 import { Carregando } from '../componentes/Carregando'
@@ -39,6 +41,18 @@ export function TelaIngredientes() {
   const filtrados = busca.trim()
     ? lista.filter((i) => i.nome.toLocaleLowerCase('pt-BR').includes(busca.trim().toLocaleLowerCase('pt-BR')))
     : lista
+
+  async function esquecer(ingrediente: Ingrediente, medida: MedidaCaseira) {
+    setAviso(null)
+    try {
+      await esquecerMedida(medida.id)
+      setLista((l) =>
+        (l ?? []).map((i) => (i.id === ingrediente.id ? { ...i, medidas: (i.medidas ?? []).filter((m) => m.id !== medida.id) } : i)),
+      )
+    } catch (e) {
+      setAviso({ id: ingrediente.id, texto: e instanceof ErroApi ? e.message : 'Erro inesperado ao esquecer a medida.' })
+    }
+  }
 
   async function apagar(ingrediente: Ingrediente) {
     setAviso(null)
@@ -115,6 +129,19 @@ export function TelaIngredientes() {
                   <div className="pequeno">
                     {formatarReaisUnitario(ing.custo_por_unidade)} {POR_UNIDADE[ing.unidade]}
                   </div>
+                  {(ing.medidas ?? []).map((m) => (
+                    <div key={m.id} className="pequeno suave medida-caseira">
+                      1 {m.medida} = {formatarQuantidade(m.quantidade, ing.unidade)}
+                      <button
+                        className="botao botao-texto botao-pequeno"
+                        aria-label={`Esquecer 1 ${m.medida} de ${ing.nome}`}
+                        title="Na próxima receita, o sistema volta a perguntar"
+                        onClick={() => esquecer(ing, m)}
+                      >
+                        Esquecer
+                      </button>
+                    </div>
+                  ))}
                 </div>
                 <div className="linha">
                   <button className="botao botao-texto" onClick={() => { setAviso(null); setEditando(ing.id) }}>Editar</button>

@@ -1,6 +1,6 @@
 // Linhas da ficha em edição (à mão ou revisando a leitura da IA) e a validação antes de salvar.
 // Só confere o que foi digitado; nenhuma conta de custo aqui.
-import type { ItemParaSalvar, MotivoRevisao, Unidade } from './api'
+import type { ItemParaSalvar, MedidaParaSalvar, MotivoRevisao, Unidade } from './api'
 import { formatarQuantidade, lerQuantidade } from './formato'
 
 /** Uma linha da ficha em edição: veio do cadastro (edição à mão) ou da leitura da IA (revisão). */
@@ -15,6 +15,12 @@ export interface LinhaFicha {
   unidadeLida?: Unidade | null // unidade-base do que foi escrito (para cadastrar item fora do cadastro)
   motivos: MotivoRevisao[]
   estimativa?: string // de onde veio a quantidade, quando o sistema assumiu algo
+  medidaEnsinada?: MedidaParaSalvar // "1 fatia = 18 g" respondido na conversa; gravado ao confirmar
+}
+
+/** Medidas ensinadas na conversa que ainda valem: a linha continua com o mesmo ingrediente. */
+export function medidasEnsinadas(linhas: LinhaFicha[]): MedidaParaSalvar[] {
+  return linhas.flatMap((l) => (l.medidaEnsinada && l.medidaEnsinada.ingrediente === l.ingrediente ? [l.medidaEnsinada] : []))
 }
 
 let proxima = 1

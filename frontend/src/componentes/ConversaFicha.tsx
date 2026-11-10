@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { ErroApi, conversarFicha, type ItemConversa, type PerguntaConversa, type RodadaConversa } from '../api'
 import type { LinhaFicha } from '../fichaLinhas'
-import { lerNumero, numeroParaCampo } from '../formato'
+import { formatarQuantidade, lerNumero, numeroParaCampo } from '../formato'
 
 // Ficha em conversa: o sistema pergunta o que faltou na leitura da receita ("quanto dá 1 fatia de
 // queijo?") e o dono responde do jeito dele. Quem escolhe a pergunta e faz a conta é o backend
@@ -94,10 +94,27 @@ export function ConversaFicha({
         const a = r.atualizado
         setLinhas((atual) =>
           atual.map((l) =>
-            l.chave === a.chave ? { ...l, quantidade: numeroParaCampo(a.quantidade), motivos: a.motivos, estimativa: a.origem } : l,
+            l.chave === a.chave
+              ? {
+                  ...l,
+                  quantidade: numeroParaCampo(a.quantidade),
+                  motivos: a.motivos,
+                  estimativa: a.origem,
+                  medidaEnsinada:
+                    a.medida && l.ingrediente
+                      ? { ingrediente: l.ingrediente, medida: a.medida.medida, quantidade: a.medida.quantidade }
+                      : l.medidaEnsinada,
+                }
+              : l,
           ),
         )
-        novas.push({ quem: 'sistema', texto: `Anotei: ${a.origem.replace(' (você informou)', '')}.` })
+        const anotei = `Anotei: ${a.origem.replace(' (você informou)', '')}.`
+        novas.push({
+          quem: 'sistema',
+          texto: a.medida
+            ? `${anotei} Quando você confirmar a ficha, vou lembrar que 1 ${a.medida.medida} de ${a.medida.nome} dá ${formatarQuantidade(a.medida.quantidade, a.unidade)}, para não perguntar de novo.`
+            : anotei,
+        })
       } else if (r.aviso) {
         novas.push({ quem: 'sistema', texto: r.aviso })
       } else if (r.pulados.includes(anterior.chave)) {

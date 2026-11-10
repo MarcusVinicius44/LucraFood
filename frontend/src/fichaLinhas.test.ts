@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { plural, textoEscrito, validarLinhas, type LinhaFicha } from './fichaLinhas'
+import { plural, textoEscrito, validarLinhas, type LinhaFicha, medidasEnsinadas } from './fichaLinhas'
 
 const linha = (chave: number, ingrediente: number | null, quantidade: string): LinhaFicha => ({
   chave,
@@ -46,5 +46,17 @@ describe('plural', () => {
     ['ml', 'ml'],
   ])('%s → %s', (singular, esperado) => {
     expect(plural(singular)).toBe(esperado)
+  })
+})
+
+describe('medidasEnsinadas', () => {
+  const fatia = { ingrediente: 3, medida: 'fatia', quantidade: '18.000' }
+  it('devolve a medida só se a linha continua com o mesmo ingrediente', () => {
+    const linhas = [
+      { chave: 1, ingrediente: 3, quantidade: '36', motivos: [], medidaEnsinada: fatia },
+      { chave: 2, ingrediente: 7, quantidade: '36', motivos: [], medidaEnsinada: fatia }, // trocou o ingrediente
+      { chave: 3, ingrediente: 3, quantidade: '10', motivos: [] },
+    ]
+    expect(medidasEnsinadas(linhas)).toEqual([fatia])
   })
 })

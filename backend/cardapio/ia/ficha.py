@@ -61,26 +61,36 @@ UNIDADE_INFORMAL = "unidade_informal"  # fatia, colher...: sem conversão exata
 UNIDADE_INCOMPATIVEL = "unidade_incompativel"  # ex.: ml para um ingrediente cadastrado em g
 INGREDIENTE_REPETIDO = "ingrediente_repetido"  # mais de um item ligado ao mesmo ingrediente
 NOME_DIFERENTE = "nome_diferente"  # ligado a um cadastro de nome diferente ("leite" -> "Leite integral")
+MEDIDA_SALVA = "medida_salva"  # medida caseira convertida com o que o dono ensinou ("1 fatia = 18 g")
 
 
 PALAVRAS_DE_LIGACAO = {"de", "da", "do", "das", "dos", "e", "com", "em", "a", "o"}
 
 
+def _sem_acento(texto: str) -> list[str]:
+    sem_acento = unicodedata.normalize("NFKD", texto or "").encode("ascii", "ignore").decode().lower()
+    return re.findall(r"[a-z0-9]+", sem_acento)
+
+
+def _singular(p: str) -> str:
+    if p.endswith(("oes", "aes")):  # pães, limões
+        return p[:-3] + "ao"
+    if p.endswith(("res", "zes")) and len(p) > 4:  # hambúrgueres, nozes, colheres
+        return p[:-2]
+    if len(p) > 3 and p.endswith("s"):
+        return p[:-1]
+    return p
+
+
 def _palavras(texto: str) -> set[str]:
     """Palavras sem acento, minúsculas e no singular simples ("Ovos" -> "ovo")."""
-    sem_acento = unicodedata.normalize("NFKD", texto or "").encode("ascii", "ignore").decode().lower()
-    palavras = set()
-    for p in re.findall(r"[a-z0-9]+", sem_acento):
-        if p in PALAVRAS_DE_LIGACAO:
-            continue
-        if p.endswith(("oes", "aes")):  # pães, limões
-            p = p[:-3] + "ao"
-        elif p.endswith(("res", "zes")) and len(p) > 4:  # hambúrgueres, nozes
-            p = p[:-2]
-        elif len(p) > 3 and p.endswith("s"):
-            p = p[:-1]
-        palavras.add(p)
-    return palavras
+    return {_singular(p) for p in _sem_acento(texto) if p not in PALAVRAS_DE_LIGACAO}
+
+
+def chave_medida(medida: Optional[str]) -> str:
+    """Forma única de guardar uma medida caseira: "Fatias" -> "fatia", "colheres de sopa" ->
+    "colher de sopa". Vazia ("") quando não há medida."""
+    return " ".join(_singular(p) for p in _sem_acento(medida))[:30]
 
 
 def nome_confere(nome_lido: str, nome_cadastro: str, cadastro: list[dict] = ()) -> bool:
@@ -145,6 +155,7 @@ class ItemExtraido:
     quantidade: Optional[Decimal]
     unidade: Optional[str] = None
     motivos: list[str] = field(default_factory=list)
+    estimativa: Optional[str] = None  # de onde veio a quantidade, quando não foi escrita direto
 
     @property
     def precisa_confirmar(self) -> bool:
@@ -160,6 +171,7 @@ class ItemExtraido:
             "unidade": self.unidade,
             "precisa_confirmar": self.precisa_confirmar,
             "motivos": self.motivos,
+            "estimativa": self.estimativa,
         }
 
 
@@ -169,8 +181,17 @@ def _unidade_canonica(unidade: Optional[str]) -> Optional[str]:
     return SINONIMOS_UNIDADE.get(unidade.strip().lower().rstrip("."))
 
 
-def resolver(itens: list[ItemLido], cadastro: list[dict]) -> list[ItemExtraido]:
-    """Confere o que a IA leu contra o cadastro e converte as quantidades (sem IA)."""
+def _numero(valor: Decimal) -> str:
+    return f"{valor.normalize():f}".replace(".", ",")
+
+
+def resolver(itens: list[ItemLido], cadastro: list[dict], medidas: Optional[dict] = None) -> list[ItemExtraido]:
+    """Confere o que a IA leu contra o cadastro e converte as quantidades (sem IA).
+
+    `medidas` = {(id do ingrediente, chave_medida): quantidade na unidade do cadastro}, o que o
+    dono já ensinou na conversa ("1 fatia de Queijo prato = 18 g"). Com ela, "2 fatias" vira 36 g,
+    marcado como `medida_salva` para o dono conferir."""
+    medidas = medidas or {}
     por_id = {c["id"]: c for c in cadastro}
     vistos = set()
     resultado = []
@@ -187,6 +208,7 @@ def resolver(itens: list[ItemLido], cadastro: list[dict]) -> list[ItemExtraido]:
             motivos.append(NOME_DIFERENTE)
 
         quantidade = None
+        estimativa = None
         canonica = _unidade_canonica(lido.unidade)
         # Unidade em que `quantidade` sai: a do cadastro; sem ingrediente, a unidade-base da
         # medida escrita (150 g de um item fora do cadastro continua 150 g, para o dono cadastrar).
@@ -202,7 +224,16 @@ def resolver(itens: list[ItemLido], cadastro: list[dict]) -> list[ItemExtraido]:
             else:
                 motivos.append(SEM_UNIDADE)
         elif canonica is None:
-            motivos.append(UNIDADE_INFORMAL)
+            por_medida = medidas.get((ingrediente["id"], chave_medida(lido.unidade))) if ingrediente else None
+            if por_medida is None:
+                motivos.append(UNIDADE_INFORMAL)
+            else:
+                quantidade = calculos.quantidade_de_medidas(lido.quantidade, por_medida, destino, destino)
+                motivos.append(MEDIDA_SALVA)
+                estimativa = (
+                    f"{_numero(lido.quantidade)} × {_numero(por_medida)} {destino} por {chave_medida(lido.unidade)} "
+                    f"= {_numero(quantidade)} {destino} (medida que você ensinou)"
+                )
         else:
             alvo = destino or calculos.FATORES_UNIDADE[canonica][0]
             try:
@@ -220,6 +251,7 @@ def resolver(itens: list[ItemLido], cadastro: list[dict]) -> list[ItemExtraido]:
                 quantidade=quantidade,
                 unidade=destino,
                 motivos=motivos,
+                estimativa=estimativa,
             )
         )
     return resultado
@@ -234,7 +266,9 @@ def _mensagem_usuario(texto: str, prato: str, cadastro: list[dict]) -> str:
     )
 
 
-def extrair_ficha(texto, cadastro, prato="", cliente=None, esperar=time.sleep, uso=None) -> list[ItemExtraido]:
+def extrair_ficha(
+    texto, cadastro, prato="", cliente=None, esperar=time.sleep, uso=None, medidas=None
+) -> list[ItemExtraido]:
     """Texto livre -> itens para o dono revisar. Levanta TextoSemIngredientes se nada foi lido,
     ValueError se a IA não devolver JSON válido nem na segunda tentativa."""
     uso = uso if uso is not None else Uso()
@@ -271,5 +305,5 @@ def extrair_ficha(texto, cadastro, prato="", cliente=None, esperar=time.sleep, u
             continue
         if not lida.itens:
             raise TextoSemIngredientes("nenhum ingrediente encontrado no texto")
-        return resolver(lida.itens, cadastro)
+        return resolver(lida.itens, cadastro, medidas)
     raise ValueError(f"A IA não devolveu uma ficha válida: {ultimo_erro}")
