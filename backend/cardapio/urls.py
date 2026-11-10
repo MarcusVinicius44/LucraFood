@@ -14,4 +14,5 @@ urlpatterns = [
     path("pratos/<int:pk>/diagnostico/", views_ficha.diagnostico),
     path("pratos/<int:pk>/ficha/extrair/", views_ficha.extrair_ficha_texto),
     path("pratos/<int:pk>/ficha/confirmar/", views_ficha.confirmar_ficha),
+    path("pratos/<int:pk>/ficha/conversa/", views_ficha.conversa_ficha),
 ]

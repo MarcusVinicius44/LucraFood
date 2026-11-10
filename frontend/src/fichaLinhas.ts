@@ -10,6 +10,8 @@ export interface LinhaFicha {
   quantidade: string // como o dono digita, na unidade do ingrediente escolhido
   nomeLido?: string // como estava escrito no texto
   escrito?: string // quantidade + unidade escritas ("2 fatias"), para referência
+  quantidadeLida?: string | null // número escrito ("2" de "2 fatias"), para a conversa
+  medidaLida?: string | null // unidade escrita ("fatia"), para a conversa
   unidadeLida?: Unidade | null // unidade-base do que foi escrito (para cadastrar item fora do cadastro)
   motivos: MotivoRevisao[]
   estimativa?: string // de onde veio a quantidade, quando o sistema assumiu algo

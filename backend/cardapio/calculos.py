@@ -110,3 +110,12 @@ def converter_unidade(quantidade, de: str, para: str) -> Decimal:
     if base != para:
         raise ValueError(f"Não dá para converter {de} em {para}.")
     return (Decimal(quantidade) * fator).quantize(MILESIMO, ROUND_HALF_UP)
+
+
+def quantidade_de_medidas(medidas, por_medida, de: str, para: str) -> Decimal:
+    """Medida caseira -> unidade do cadastro: 2 fatias de 20 g -> 40 g; 1 fio de 0,01 l -> 10 ml.
+    ValueError se `de` não converte para `para` ou se algum valor não for positivo."""
+    medidas, por_medida = Decimal(medidas), Decimal(por_medida)
+    if medidas <= 0 or por_medida <= 0:
+        raise ValueError("Quantidades precisam ser maiores que zero.")
+    return converter_unidade(medidas * por_medida, de, para)

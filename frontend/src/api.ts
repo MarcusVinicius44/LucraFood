@@ -252,6 +252,39 @@ export function lerFichaTexto(pratoId: number, texto: string): Promise<FichaLida
   return pedir(`/api/pratos/${pratoId}/ficha/extrair/`, json('POST', { texto }))
 }
 
+/** Uma linha da ficha em revisão, como a conversa precisa (ia/conversa.py). */
+export interface ItemConversa {
+  chave: number
+  nome_lido: string
+  ingrediente: number | null
+  quantidade: string | null // na unidade do cadastro; null = falta
+  quantidade_lida: string | null
+  unidade_lida: string | null
+  motivos: MotivoRevisao[]
+}
+
+export interface PerguntaConversa {
+  chave: number
+  tipo: 'por_medida' | 'total' | 'unidade' | 'converter'
+  texto: string
+}
+
+export interface RodadaConversa {
+  atualizado: { chave: number; quantidade: string; unidade: Unidade; motivos: MotivoRevisao[]; origem: string } | null
+  aviso: string | null // não entendeu a resposta: a mesma pergunta volta
+  pergunta: PerguntaConversa | null // null = não há mais o que perguntar
+  pulados: number[]
+  sem_cadastro: number
+}
+
+/** Uma rodada da ficha em conversa. Sem resposta, só devolve a primeira pergunta (não usa IA). Não salva. */
+export function conversarFicha(
+  pratoId: number,
+  corpo: { itens: ItemConversa[]; pulados: number[]; pergunta?: { chave: number } | null; resposta?: string | null },
+): Promise<RodadaConversa> {
+  return pedir(`/api/pratos/${pratoId}/ficha/conversa/`, json('POST', corpo))
+}
+
 export function confirmarFichaTexto(pratoId: number, itens: ItemParaSalvar[]): Promise<FichaDoPrato> {
   return pedir(`/api/pratos/${pratoId}/ficha/confirmar/`, json('POST', { itens }))
 }

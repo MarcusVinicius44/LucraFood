@@ -13,6 +13,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 
 from . import calculos
+from .ia import conversa as ia_conversa
 from .ia import ficha as ia_ficha
 from .ia.extracao import FalhaDeCota, ProvedorIndisponivel
 from .models import Ingrediente, ItemFichaTecnica, Prato, Restaurante
@@ -340,3 +341,88 @@ def confirmar_ficha(request, pk):
     cada item precisa de um ingrediente cadastrado e da quantidade na unidade do cadastro."""
     prato = get_object_or_404(_pratos(), pk=pk)
     return Response(salvar_ficha(prato, request.data))
+
+
+class ItemConversaSerializer(serializers.Serializer):
+    chave = serializers.IntegerField()
+    nome_lido = serializers.CharField(max_length=120, allow_blank=True, required=False, default="")
+    ingrediente = serializers.IntegerField(allow_null=True)
+    quantidade = serializers.DecimalField(max_digits=10, decimal_places=3, allow_null=True, min_value=Decimal("0.001"))
+    quantidade_lida = serializers.DecimalField(
+        max_digits=10, decimal_places=3, allow_null=True, required=False, default=None, min_value=Decimal("0.001")
+    )
+    unidade_lida = serializers.CharField(max_length=30, allow_null=True, allow_blank=True, required=False, default=None)
+    motivos = serializers.ListField(child=serializers.CharField(max_length=40), required=False, default=list)
+
+
+class PerguntaFeitaSerializer(serializers.Serializer):
+    chave = serializers.IntegerField()
+
+
+class ConversaSerializer(serializers.Serializer):
+    itens = ItemConversaSerializer(many=True, allow_empty=False, max_length=60)
+    pulados = serializers.ListField(child=serializers.IntegerField(), required=False, default=list)
+    pergunta = PerguntaFeitaSerializer(required=False, allow_null=True, default=None)
+    resposta = serializers.CharField(
+        max_length=ia_conversa.RESPOSTA_MAX, required=False, allow_null=True, allow_blank=True, default=None
+    )
+
+
+@api_view(["POST"])
+@parser_classes([JSONParser])
+def conversa_ficha(request, pk):
+    """Uma rodada da ficha em conversa. Sem resposta: só devolve a primeira pergunta (sem IA).
+    Com resposta: a IA lê o número e a unidade ditos, o Python faz a conta e devolve o item
+    atualizado e a próxima pergunta. Nada é salvo: o dono confirma a ficha no fim."""
+    prato = get_object_or_404(Prato.objects.select_related("restaurante"), pk=pk)
+    entrada = ConversaSerializer(data=request.data)
+    entrada.is_valid(raise_exception=True)
+    dados = entrada.validated_data
+    cadastro = {
+        c["id"]: c for c in prato.restaurante.ingredientes.values("id", "nome", "unidade")
+    }
+    itens = [
+        ia_conversa.ItemConversa(
+            chave=i["chave"],
+            nome_lido=i["nome_lido"],
+            ingrediente=cadastro.get(i["ingrediente"]),  # id de outro restaurante vira None
+            quantidade=i["quantidade"],
+            quantidade_lida=i["quantidade_lida"],
+            unidade_lida=i["unidade_lida"] or None,
+            motivos=i["motivos"],
+        )
+        for i in dados["itens"]
+    ]
+    pulados = list(dict.fromkeys(dados["pulados"]))
+    atualizado, aviso = None, None
+    resposta = (dados["resposta"] or "").strip()
+    if dados["pergunta"] and resposta:
+        pergunta = ia_conversa.proxima_pergunta([i for i in itens if i.chave == dados["pergunta"]["chave"]])
+        if pergunta is None:
+            return Response({"erro": "Esse item não tem mais o que perguntar."}, status=400)
+        try:
+            lida = ia_conversa.interpretar_resposta(pergunta.texto, resposta)
+        except (FalhaDeCota, ProvedorIndisponivel, ValueError) as erro:
+            return resposta_erro_ia(erro)
+        if lida.nao_sabe:
+            pulados.append(pergunta.chave)
+        elif not lida.entendeu:
+            aviso = "Não entendi. Pode responder com um número, por exemplo \"20 g\"?"
+        else:
+            item = next(i for i in itens if i.chave == pergunta.chave)
+            try:
+                atualizado = ia_conversa.aplicar_resposta(item, pergunta.tipo, lida)
+                item.quantidade = atualizado.quantidade
+            except ia_conversa.RespostaInvalida as erro:
+                aviso = str(erro)
+    proxima = ia_conversa.proxima_pergunta(itens, pulados)
+    return Response(
+        {
+            "atualizado": atualizado.para_json() if atualizado else None,
+            "aviso": aviso,
+            "pergunta": proxima.para_json() if proxima else None,
+            "pulados": pulados,
+            "sem_cadastro": sum(1 for i in itens if i.ingrediente is None),
+        }
+    )
+

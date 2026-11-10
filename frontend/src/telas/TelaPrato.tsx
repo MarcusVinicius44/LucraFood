@@ -20,6 +20,7 @@ import {
 } from '../api'
 import { restauranteSalvo } from '../armazenamento'
 import { Carregando } from '../componentes/Carregando'
+import { ConversaFicha } from '../componentes/ConversaFicha'
 import { EditorFicha } from '../componentes/EditorFicha'
 import { novaChave, textoEscrito, validarLinhas, type LinhaFicha } from '../fichaLinhas'
 import { NumerosDiagnostico } from '../componentes/NumerosDiagnostico'
@@ -261,6 +262,8 @@ function FichaDoPratoCartao({
           quantidade: numeroParaCampo(item.quantidade),
           nomeLido: item.nome_lido,
           escrito: textoEscrito(item.quantidade_lida, item.unidade_lida),
+          quantidadeLida: item.quantidade_lida,
+          medidaLida: item.unidade_lida,
           unidadeLida: item.ingrediente ? null : item.unidade,
           motivos: item.motivos,
           // "pão" sem número: o Python assume 1 unidade e marca para conferir.
@@ -388,6 +391,7 @@ function FichaDoPratoCartao({
               Confira o que a IA leu. {marcadas > 0 ? `${marcadas} ${marcadas === 1 ? 'item precisa' : 'itens precisam'} da sua atenção (destacados).` : 'Nada ficou em dúvida.'}
             </p>
           )}
+          {modo === 'revisao' && <ConversaFicha pratoId={pratoId} linhas={linhas} setLinhas={setLinhas} />}
           <EditorFicha
             linhas={linhas}
             setLinhas={setLinhas}

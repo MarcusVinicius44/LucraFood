@@ -426,3 +426,12 @@ a { color: var(--verde); }
   .cabecalho nav a { padding: 0.4rem 0.55rem; }
 }
 .botao-pequeno { align-self: flex-start; }
+
+/* Ficha em conversa */
+.conversa { border: 1px solid var(--borda); border-radius: var(--raio-pequeno); padding: 0.75rem; background: var(--superficie); }
+.conversa-titulo { font-weight: 600; }
+.balao { padding: 0.5rem 0.75rem; border-radius: 12px; max-width: 85%; font-size: 0.95rem; }
+.balao-sistema { background: var(--verde-claro); align-self: flex-start; border-bottom-left-radius: 4px; }
+.balao-dono { background: var(--sem-pendente-fundo); align-self: flex-end; border-bottom-right-radius: 4px; }
+.conversa-resposta { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.conversa-resposta input { flex: 1 1 12rem; min-width: 0; font: 400 1rem var(--fonte-texto); padding: 0.55rem 0.7rem; border: 1px solid var(--borda); border-radius: var(--raio-pequeno); }
