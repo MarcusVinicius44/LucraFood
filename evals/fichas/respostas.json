@@ -1,0 +1,173 @@
+{
+  "_origem": "RASCUNHO escrito por IA (Claude) em 10/11/2026, AINDA NÃO revisado pelo dono. Mede só a leitura da resposta (ia/conversa.py); a conta é do Python e está nos testes.",
+  "respostas": [
+    {
+      "id": "c01",
+      "caso": "peso de uma fatia",
+      "pergunta": "Quanto dá mais ou menos 1 fatia de Queijo prato, em gramas?",
+      "resposta": "acho que uns 25g",
+      "esperado": {
+        "entendeu": true,
+        "nao_sabe": false,
+        "quantidade": "25",
+        "unidade": "g"
+      }
+    },
+    {
+      "id": "c02",
+      "caso": "medida caseira na resposta (o Python recusa depois)",
+      "pergunta": "Quanto dá mais ou menos 1 fio de Óleo de soja, em ml?",
+      "resposta": "uma colher de sopa mais ou menos",
+      "esperado": {
+        "entendeu": true,
+        "nao_sabe": false,
+        "quantidade": "1",
+        "unidade": "colher"
+      }
+    },
+    {
+      "id": "c03",
+      "caso": "total em kg, com comentário",
+      "pergunta": "Quanto vai de Feijão carioca nesta receita? (em gramas)",
+      "resposta": "uns 2 quilos pra panela toda",
+      "esperado": {
+        "entendeu": true,
+        "nao_sabe": false,
+        "quantidade": "2",
+        "unidade": "kg"
+      }
+    },
+    {
+      "id": "c04",
+      "caso": "confirma a unidade sugerida",
+      "pergunta": "Você escreveu 150 de Blend bovino. São gramas?",
+      "resposta": "exatamente",
+      "esperado": {
+        "entendeu": true,
+        "nao_sabe": false,
+        "quantidade": null,
+        "unidade": "g"
+      }
+    },
+    {
+      "id": "c05",
+      "caso": "corrige a unidade sugerida, com vírgula",
+      "pergunta": "Você escreveu 250 de Leite integral. São ml?",
+      "resposta": "não, é 0,25 litro",
+      "esperado": {
+        "entendeu": true,
+        "nao_sabe": false,
+        "quantidade": "0.25",
+        "unidade": "l"
+      }
+    },
+    {
+      "id": "c06",
+      "caso": "converte g em ml",
+      "pergunta": "Óleo de soja está cadastrado em ml. Quanto dá 50 g, em ml?",
+      "resposta": "põe 55 ml",
+      "esperado": {
+        "entendeu": true,
+        "nao_sabe": false,
+        "quantidade": "55",
+        "unidade": "ml"
+      }
+    },
+    {
+      "id": "c07",
+      "caso": "não sabe",
+      "pergunta": "Quanto vai de Molho de tomate nesta receita? (em gramas)",
+      "resposta": "não faço ideia",
+      "esperado": {
+        "entendeu": true,
+        "nao_sabe": true,
+        "quantidade": null,
+        "unidade": null
+      }
+    },
+    {
+      "id": "c08",
+      "caso": "resposta sem quantidade",
+      "pergunta": "Quanto vai de Arroz nesta receita? (em gramas)",
+      "resposta": "depende do dia",
+      "esperado": {
+        "entendeu": false,
+        "nao_sabe": false,
+        "quantidade": null,
+        "unidade": null
+      }
+    },
+    {
+      "id": "c09",
+      "caso": "peso de uma medida própria (rodela)",
+      "pergunta": "Quanto dá mais ou menos 1 rodela de Calabresa, em gramas?",
+      "resposta": "cada rodela uns 5 gramas",
+      "esperado": {
+        "entendeu": true,
+        "nao_sabe": false,
+        "quantidade": "5",
+        "unidade": "g"
+      }
+    },
+    {
+      "id": "c10",
+      "caso": "número por extenso",
+      "pergunta": "Quanto vai de Arroz nesta receita? (em gramas)",
+      "resposta": "trezentos e cinquenta gramas",
+      "esperado": {
+        "entendeu": true,
+        "nao_sabe": false,
+        "quantidade": "350",
+        "unidade": "g"
+      }
+    },
+    {
+      "id": "c11",
+      "caso": "dois números: vale o que responde a pergunta",
+      "pergunta": "Quanto vai de Cebola nesta receita? (em gramas)",
+      "resposta": "meia cebola, uns 60 g",
+      "esperado": {
+        "entendeu": true,
+        "nao_sabe": false,
+        "quantidade": "60",
+        "unidade": "g"
+      }
+    },
+    {
+      "id": "c12",
+      "caso": "xícara convertida pelo dono",
+      "pergunta": "Quanto dá mais ou menos 1 xícara de Açúcar, em gramas?",
+      "resposta": "a xícara dá uns 180 g",
+      "esperado": {
+        "entendeu": true,
+        "nao_sabe": false,
+        "quantidade": "180",
+        "unidade": "g"
+      }
+    },
+    {
+      "id": "c13",
+      "caso": "quer pular",
+      "pergunta": "Quanto vai de Bacon nesta receita? (em gramas)",
+      "resposta": "pula essa",
+      "esperado": {
+        "entendeu": true,
+        "nao_sabe": true,
+        "quantidade": null,
+        "unidade": null
+      }
+    },
+    {
+      "id": "c14",
+      "caso": "só o número",
+      "pergunta": "Quanto vai de Bacon nesta receita? (em gramas)",
+      "resposta": "3",
+      "esperado": {
+        "entendeu": true,
+        "nao_sabe": false,
+        "quantidade": "3",
+        "unidade": null
+      }
+    }
+  ]
+}

@@ -31,6 +31,12 @@ Cada item esperado: {"nome": str, "ingrediente": id|null, "quantidade": str|null
   onde aparece (hoje só em frases_revisao.json).
 - "nome" só serve para relatório e para achar os itens null (comparação por nome parecido).
 
+respostas.json (ficha em conversa): {"respostas": [{"id", "caso", "pergunta", "resposta", "esperado"}]}
+    esperado = {"entendeu", "nao_sabe", "quantidade": str|null, "unidade": str|null}, a leitura da
+    resposta como foi dita (sem conversão; a conta é do Python). RASCUNHO escrito por IA (Claude) em
+    10/11/2026, ainda não revisado pelo dono. Rodar: python manage.py avaliar_conversa [--resposta c03]
+    (1 chamada por resposta). Comparação em cardapio/avaliacao_conversa.py.
+
 Pontuação (cardapio/avaliacao_ficha.py, testada sem API):
 - ingrediente: item esperado ligado ao id certo (ou null certo).
 - quantidade: em todo item com ingrediente acertado (inclusive null), quantidade igual à

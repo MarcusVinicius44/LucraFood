@@ -1,0 +1,22 @@
+Provedor: gemini | modelo: gemini-3.5-flash-lite | respostas: 14
+Esperado: RASCUNHO escrito por IA (Claude) em 10/11/2026, AINDA NÃO revisado pelo dono. Mede só a leitura da resposta (ia/conversa.py); a conta é do Python e está nos testes.
+   provedor recusou (429/503): esperando 10s...
+ok   c01 (peso de uma fatia): 'acho que uns 25g' -> {'entendeu': True, 'nao_sabe': False, 'quantidade': '25', 'unidade': 'g'}
+ERRO c02 (medida caseira na resposta (o Python recusa depois)): 'uma colher de sopa mais ou menos' -> {'entendeu': True, 'nao_sabe': False, 'quantidade': None, 'unidade': 'colher de sopa'} | esperado {'entendeu': True, 'nao_sabe': False, 'quantidade': '1', 'unidade': 'colher'}
+ok   c03 (total em kg, com comentário): 'uns 2 quilos pra panela toda' -> {'entendeu': True, 'nao_sabe': False, 'quantidade': '2', 'unidade': 'kg'}
+ok   c04 (confirma a unidade sugerida): 'exatamente' -> {'entendeu': True, 'nao_sabe': False, 'quantidade': None, 'unidade': 'g'}
+ok   c05 (corrige a unidade sugerida, com vírgula): 'não, é 0,25 litro' -> {'entendeu': True, 'nao_sabe': False, 'quantidade': '0.25', 'unidade': 'l'}
+ok   c06 (converte g em ml): 'põe 55 ml' -> {'entendeu': True, 'nao_sabe': False, 'quantidade': '55', 'unidade': 'ml'}
+ok   c07 (não sabe): 'não faço ideia' -> {'entendeu': True, 'nao_sabe': True, 'quantidade': None, 'unidade': None}
+ok   c08 (resposta sem quantidade): 'depende do dia' -> {'entendeu': False, 'nao_sabe': False, 'quantidade': None, 'unidade': None}
+   provedor recusou (429/503): esperando 10s...
+ok   c09 (peso de uma medida própria (rodela)): 'cada rodela uns 5 gramas' -> {'entendeu': True, 'nao_sabe': False, 'quantidade': '5', 'unidade': 'g'}
+ok   c10 (número por extenso): 'trezentos e cinquenta gramas' -> {'entendeu': True, 'nao_sabe': False, 'quantidade': '350', 'unidade': 'gramas'}
+ok   c11 (dois números: vale o que responde a pergunta): 'meia cebola, uns 60 g' -> {'entendeu': True, 'nao_sabe': False, 'quantidade': '60', 'unidade': 'g'}
+   provedor recusou (429/503): esperando 10s...
+ok   c12 (xícara convertida pelo dono): 'a xícara dá uns 180 g' -> {'entendeu': True, 'nao_sabe': False, 'quantidade': '180', 'unidade': 'g'}
+ok   c13 (quer pular): 'pula essa' -> {'entendeu': True, 'nao_sabe': True, 'quantidade': None, 'unidade': None}
+ok   c14 (só o número): '3' -> {'entendeu': True, 'nao_sabe': False, 'quantidade': '3', 'unidade': None}
+==================================================
+Respostas lidas certo: 13/14
+Chamadas: 17 | tokens: 5662 entrada + 440 saída | tempo: 100s
