@@ -68,7 +68,7 @@ export function TelaPrato() {
       .catch((e: unknown) => setErro(msgErro(e, 'Erro inesperado ao carregar o prato.')))
   }, [pratoId, salvo?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!salvo) return <Navigate to="/foto" replace />
+  if (!salvo) return <Navigate to="/app/foto" replace />
   if (erro) return <div className="aviso aviso-erro" role="alert">{erro}</div>
   if (!prato || !ficha || !restaurante) return <Carregando titulo="Carregando o prato…" />
 
@@ -84,7 +84,7 @@ export function TelaPrato() {
 
   return (
     <div className="pilha">
-      <Link className="voltar" to="/painel">← Painel</Link>
+      <Link className="voltar" to="/app/painel">← Painel</Link>
       <div className="prato-painel-topo">
         <div>
           <h1 style={{ marginBottom: '0.25rem' }}>{prato.nome}</h1>
@@ -319,7 +319,7 @@ function FichaDoPratoCartao({
             <div className="aviso aviso-sucesso pilha-curta" role="status">
               <span>Ficha salva. O diagnóstico acima já está atualizado.</span>
               {proximo && (
-                <Link className="botao botao-primario botao-pequeno" to={`/pratos/${proximo.id}`}>
+                <Link className="botao botao-primario botao-pequeno" to={`/app/pratos/${proximo.id}`}>
                   Próximo prato sem ficha: {proximo.nome} →
                 </Link>
               )}

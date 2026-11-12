@@ -86,7 +86,7 @@ export function TelaFoto() {
     try {
       const cardapio = await extrairCardapio(foto.arquivo, foto.nome)
       salvarRascunho(cardapio.pratos)
-      navegar('/revisao')
+      navegar('/app/revisao')
     } catch (erro) {
       const e = erro instanceof ErroApi ? erro : new ErroApi(0, 'Erro inesperado ao ler a foto.')
       setFalha({

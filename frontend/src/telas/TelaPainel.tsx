@@ -47,7 +47,7 @@ export function TelaPainel() {
       .catch((e: unknown) => setErro(e instanceof ErroApi ? e : new ErroApi(0, 'Erro inesperado ao carregar o painel.')))
   }, [salvo?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!salvo) return <Navigate to="/foto" replace />
+  if (!salvo) return <Navigate to="/app/foto" replace />
   if (erro?.status === 404) {
     // O navegador lembra um restaurante que não existe mais no banco (ex.: banco recriado).
     return (
@@ -58,7 +58,7 @@ export function TelaPainel() {
           className="botao botao-primario"
           onClick={() => {
             esquecerRestaurante()
-            navegar('/foto', { replace: true })
+            navegar('/app/foto', { replace: true })
           }}
         >
           Começar de novo
@@ -74,7 +74,7 @@ export function TelaPainel() {
       <div className="cartao pilha">
         <h1>{restaurante.nome}</h1>
         <p className="suave">Ainda não há pratos salvos. Fotografe o cardápio para começar.</p>
-        <Link className="botao botao-primario" to="/foto">Fotografar cardápio</Link>
+        <Link className="botao botao-primario" to="/app/foto">Fotografar cardápio</Link>
       </div>
     )
   }
@@ -129,7 +129,7 @@ export function TelaPainel() {
       <p className="suave pequeno">
         Calculado pelo sistema com a sua ficha técnica e as taxas do restaurante: delivery {formatarPct(restaurante.taxa_delivery_pct)},
         impostos {formatarPct(restaurante.impostos_pct)}, margem desejada {formatarPct(restaurante.margem_desejada_pct)},
-        mínima {formatarPct(restaurante.margem_minima_pct)}. A IA não faz nenhuma conta. <Link to="/ajustes">Mudar taxas</Link>
+        mínima {formatarPct(restaurante.margem_minima_pct)}. A IA não faz nenhuma conta. <Link to="/app/ajustes">Mudar taxas</Link>
       </p>
 
       {visiveis.length === 0 && <p className="suave">Nenhum prato neste filtro.</p>}
@@ -145,7 +145,7 @@ export function TelaPainel() {
         </section>
       ))}
 
-      <Link className="botao botao-secundario" to="/foto">Adicionar pratos por foto</Link>
+      <Link className="botao botao-secundario" to="/app/foto">Adicionar pratos por foto</Link>
     </div>
   )
 }
@@ -158,7 +158,7 @@ const ACAO_PENDENTE: Record<string, string> = {
 
 function CartaoPrato({ prato, margemDesejada }: { prato: PratoPainel; margemDesejada: string }) {
   return (
-    <Link to={`/pratos/${prato.id}`} className="cartao prato-painel cartao-link">
+    <Link to={`/app/pratos/${prato.id}`} className="cartao prato-painel cartao-link">
       <div className="prato-painel-topo">
         <div>
           <div className="prato-painel-nome">{prato.nome}</div>

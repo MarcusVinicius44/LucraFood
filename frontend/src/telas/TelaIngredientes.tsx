@@ -33,7 +33,7 @@ export function TelaIngredientes() {
       .catch((e: Error) => setErro(e.message))
   }, [salvo?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!salvo) return <Navigate to="/foto" replace />
+  if (!salvo) return <Navigate to="/app/foto" replace />
   if (erro) return <div className="aviso aviso-erro" role="alert">{erro}</div>
   if (!lista) return <Carregando titulo="Carregando ingredientes…" />
 

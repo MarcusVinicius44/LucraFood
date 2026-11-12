@@ -92,7 +92,7 @@ export function TelaRevisao() {
       const r = await confirmarCardapio(restaurante.trim(), pratos)
       salvarRestaurante({ id: r.restaurante_id, nome: restaurante.trim() })
       salvarRascunho(null)
-      navegar('/painel', { replace: true }) // "voltar" não reabre a revisão já salva
+      navegar('/app/painel', { replace: true }) // "voltar" não reabre a revisão já salva
     } catch (e) {
       const falha = e instanceof ErroApi ? e : new ErroApi(0, 'Erro inesperado ao salvar.')
       if (falha.status === 409) {
@@ -113,7 +113,7 @@ export function TelaRevisao() {
       <div className="cartao pilha">
         <h1>Nada para revisar</h1>
         <p className="suave">Fotografe um cardápio para a IA ler os pratos.</p>
-        <Link className="botao botao-primario" to="/foto">Fotografar cardápio</Link>
+        <Link className="botao botao-primario" to="/app/foto">Fotografar cardápio</Link>
       </div>
     )
   }
@@ -156,7 +156,7 @@ export function TelaRevisao() {
           {conflito.pratos.length > 0 && <p><strong>{conflito.pratos.join(', ')}</strong></p>}
           <div className="linha">
             <button className="botao botao-secundario" onClick={tirarJaSalvos}>Tirar estes da lista</button>
-            <Link className="botao botao-texto" to="/painel">Ver o painel</Link>
+            <Link className="botao botao-texto" to="/app/painel">Ver o painel</Link>
           </div>
         </div>
       )}
@@ -203,7 +203,7 @@ export function TelaRevisao() {
 
       <div className="barra-fixa">
         <div className="barra-fixa-conteudo">
-          <Link className="botao botao-texto" to="/foto">Outra foto</Link>
+          <Link className="botao botao-texto" to="/app/foto">Outra foto</Link>
           <button
             className="botao botao-primario"
             onClick={confirmar}

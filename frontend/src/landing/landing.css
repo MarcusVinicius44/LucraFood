@@ -1,0 +1,182 @@
+/* Landing: mesmas cores, fontes e componentes do app (index.css). Celular primeiro.
+   Animações só em CSS, desligadas para quem pede menos movimento. */
+
+.lp { overflow-x: clip; }
+.lp-conteudo { max-width: 1120px; margin: 0 auto; padding: 0 1rem; }
+
+.lp-pular {
+  position: absolute; left: 1rem; top: -100px; z-index: 50;
+  background: var(--verde); color: #fff; padding: 0.6rem 1rem; border-radius: var(--raio-pequeno);
+}
+.lp-pular:focus { top: 0.75rem; }
+
+/* Cabeçalho */
+.lp-cabecalho {
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(247, 246, 241, 0.92); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--borda);
+}
+.lp-cabecalho-conteudo {
+  max-width: 1120px; margin: 0 auto; padding: 0.6rem 1rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.lp-cabecalho img { display: block; height: 28px; width: auto; }
+.lp-cabecalho nav { display: flex; gap: 0.15rem; }
+.lp-cabecalho nav a {
+  text-decoration: none; color: var(--texto-suave); font-weight: 500; font-size: 0.88rem;
+  padding: 0.4rem 0.6rem; border-radius: 999px;
+}
+.lp-cabecalho nav a:hover { color: var(--verde); background: var(--verde-claro); }
+@media (max-width: 420px) {
+  .lp-cabecalho nav a:first-child { display: none; }
+}
+
+/* Tipografia da landing */
+.lp h1 { font-size: clamp(2rem, 7vw, 3.4rem); line-height: 1.08; letter-spacing: -0.02em; margin-bottom: 1rem; }
+.lp h2 { font-size: clamp(1.45rem, 4.5vw, 2.2rem); letter-spacing: -0.015em; margin-bottom: 1.25rem; }
+.lp h3 { font-size: 1.05rem; }
+.lp-sobretitulo {
+  font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--laranja); margin-bottom: 0.5rem;
+}
+.lp-subtitulo { font-size: 1.12rem; color: var(--texto-suave); max-width: 34rem; }
+.lp-acoes { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.25rem; }
+
+/* Seções */
+.lp-secao { padding: 4rem 0; }
+.lp-secao-clara { background: var(--superficie); border-block: 1px solid var(--borda); }
+section[id], .lp-secao { scroll-margin-top: 64px; }
+
+/* Topo */
+.lp-topo { padding: 3rem 0 3.5rem; }
+.lp-topo-grade { display: grid; gap: 2.5rem; align-items: center; }
+@media (min-width: 900px) {
+  .lp-topo { padding: 5rem 0; }
+  .lp-topo-grade { grid-template-columns: 1.1fr 0.9fr; }
+}
+.lp-topo-texto { animation: lp-subir 0.6s ease-out both; }
+
+/* Vitrine (painel de exemplo) */
+.lp-vitrine { margin: 0; animation: lp-subir 0.7s 0.15s ease-out both; }
+.lp-vitrine-tela {
+  background: var(--superficie); border: 1px solid var(--borda); border-radius: 18px;
+  box-shadow: 0 2px 4px rgba(19, 34, 27, 0.05), 0 18px 48px rgba(19, 34, 27, 0.10);
+  padding: 1rem; position: relative;
+}
+.lp-vitrine-tela::before {
+  /* toque de laranja da marca, igual ao hero do app */
+  content: ''; position: absolute; right: -14px; top: -14px; width: 56px; height: 56px;
+  border-radius: 50%; background: var(--laranja); opacity: 0.16; z-index: -1;
+}
+.lp-vitrine-topo { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; padding-bottom: 0.75rem; border-bottom: 1px solid var(--borda); }
+.lp-vitrine-lista { list-style: none; margin: 0; padding: 0; }
+.lp-vitrine-lista li {
+  display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;
+  padding: 0.75rem 0; border-bottom: 1px solid var(--borda);
+}
+.lp-vitrine-lista li:last-child { border-bottom: 0; padding-bottom: 0.25rem; }
+.lp-vitrine-lista li > div:first-child { display: flex; flex-direction: column; }
+.lp-vitrine-nome { font-weight: 600; }
+.lp-vitrine-dir { display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; text-align: right; }
+.lp-vitrine figcaption { margin-top: 0.6rem; text-align: center; }
+
+/* O problema */
+.lp-grade-numeros { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+@media (min-width: 640px) { .lp-grade-numeros { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1000px) { .lp-grade-numeros { grid-template-columns: repeat(3, 1fr); } }
+.lp-numero-mercado {
+  background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio);
+  padding: 1.25rem; display: flex; flex-direction: column;
+}
+.lp-numero-mercado p { margin-bottom: 0.75rem; }
+.lp-numero-valor { font-family: var(--fonte-titulo); font-weight: 700; font-size: 2.1rem; color: var(--verde); line-height: 1.1; margin-bottom: 0.4rem; }
+.lp-fonte { font-size: 0.75rem; color: var(--texto-suave); margin: auto 0 0; }
+.lp-fonte a { color: var(--texto-suave); }
+.lp-fechamento {
+  margin-top: 2rem; font-family: var(--fonte-titulo); font-weight: 600; font-size: clamp(1.1rem, 3vw, 1.35rem);
+  border-left: 4px solid var(--laranja); padding-left: 1rem; max-width: 46rem;
+}
+
+/* Como funciona */
+.lp-passos { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; counter-reset: passo; }
+@media (min-width: 800px) { .lp-passos { grid-template-columns: repeat(3, 1fr); } }
+.lp-passos li { position: relative; padding: 1.25rem; border: 1px solid var(--borda); border-radius: var(--raio); background: var(--fundo); }
+.lp-passo-num {
+  position: absolute; top: 1rem; right: 1rem; font-family: var(--fonte-titulo); font-weight: 700;
+  color: var(--borda); font-size: 2rem; line-height: 1;
+}
+.lp-icone { width: 36px; height: 36px; color: var(--verde); background: var(--verde-claro); border-radius: 10px; padding: 6px; margin-bottom: 0.75rem; }
+
+/* Demo */
+.lp-secao-demo { background: var(--verde-claro); border-block: 1px solid #cfe3d7; }
+
+/* Benefícios */
+.lp-lista-beneficios { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.75rem; max-width: 48rem; }
+.lp-lista-beneficios li { padding: 0.9rem 1rem 0.9rem 2.6rem; position: relative; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-pequeno); }
+.lp-lista-beneficios li::before {
+  content: ''; position: absolute; left: 1rem; top: 1.25rem; width: 12px; height: 7px;
+  border-left: 2.5px solid var(--verde); border-bottom: 2.5px solid var(--verde); transform: rotate(-45deg);
+}
+
+/* Por que confiar */
+.lp-confianca { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+@media (min-width: 800px) { .lp-confianca { grid-template-columns: repeat(3, 1fr); } }
+.lp-confianca li { display: flex; flex-direction: column; }
+
+/* O que vem por aí */
+.lp-grade-breve { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+@media (min-width: 800px) { .lp-grade-breve { grid-template-columns: repeat(3, 1fr); } }
+.lp-grade-breve h3 { margin-top: 0.75rem; }
+.lp-grade-breve p { margin: 0; color: var(--texto-suave); }
+
+/* Planos */
+.lp-planos { max-width: 40rem; margin: 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center; padding: 2rem 1.25rem; }
+.lp-planos h2 { margin: 0.75rem 0; }
+.lp-planos .lp-acoes { justify-content: center; }
+
+/* Por dentro (técnico) */
+.lp-tecnico { background: var(--verde-escuro); color: #e9f3ee; }
+.lp-tecnico h2, .lp-tecnico h3 { color: #fff; }
+.lp-tecnico .lp-sobretitulo { color: #ffb48f; }
+.lp-tecnico a { color: #ffd2bd; }
+.lp-tecnico code { font-size: 0.9em; background: rgba(255, 255, 255, 0.1); padding: 0.05rem 0.3rem; border-radius: 4px; }
+.lp-tecnico-grade { display: grid; gap: 2rem; margin-bottom: 2.5rem; }
+@media (min-width: 900px) { .lp-tecnico-grade { grid-template-columns: 1fr 1.3fr; } }
+.lp-diagrama { width: 100%; max-width: 300px; height: auto; display: block; color: #9cc8b1; }
+.lp-dg-caixa { fill: rgba(255, 255, 255, 0.06); stroke: rgba(255, 255, 255, 0.25); stroke-width: 1.2; }
+.lp-dg-ia { stroke: #ffb48f; }
+.lp-dg-humano { fill: rgba(255, 255, 255, 0.14); stroke: #fff; }
+.lp-dg-titulo { fill: #fff; font: 600 14px var(--fonte-titulo); }
+.lp-dg-detalhe { fill: #b9d6c6; font: 400 11.5px var(--fonte-texto); }
+.lp-dg-seta { stroke: currentColor; stroke-width: 1.6; }
+.lp-numeros-projeto { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.lp-tecnico a.botao-claro { color: var(--verde); }
+.lp-tecnico a.lp-botao-contorno { color: #fff; }
+.lp-numeros-projeto li { display: grid; grid-template-columns: 7.5rem 1fr; gap: 0.75rem; align-items: baseline; padding: 0.5rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+.lp-numeros-projeto strong { font-family: var(--fonte-titulo); color: #fff; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.lp-nota { font-size: 0.85rem; color: #b9d6c6; margin-top: 0.75rem; }
+.lp-lista-tecnica { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.5rem; }
+.lp-botao-contorno { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.5); }
+.lp-botao-contorno:hover { border-color: #fff; }
+.lp-tecnico :focus-visible { outline-color: #ffb48f; }
+
+/* Rodapé */
+.lp-rodape { background: #0d1c15; color: #c9d6cf; padding: 2.5rem 0 3rem; font-size: 0.9rem; }
+.lp-rodape a { color: #fff; }
+.lp-rodape .linha { gap: 1rem; }
+.lp-rodape-titulo { font-size: 0.85rem !important; text-transform: uppercase; letter-spacing: 0.06em; color: #fff; margin: 1.5rem 0 0.5rem !important; }
+.lp-rodape-fontes { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.35rem; font-size: 0.8rem; }
+
+/* Entrada suave */
+.lp-revelar { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+.lp-revelar.lp-visivel { opacity: 1; transform: none; }
+@keyframes lp-subir { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-revelar { opacity: 1; transform: none; transition: none; }
+  .lp-topo-texto, .lp-vitrine { animation: none; }
+  html { scroll-behavior: auto; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}

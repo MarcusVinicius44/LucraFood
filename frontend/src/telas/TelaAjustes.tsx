@@ -32,7 +32,7 @@ export function TelaAjustes() {
       .catch((e: Error) => setErro(e.message))
   }, [salvo?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!salvo) return <Navigate to="/foto" replace />
+  if (!salvo) return <Navigate to="/app/foto" replace />
   if (!restaurante || !valores) return erro ? <div className="aviso aviso-erro">{erro}</div> : <Carregando titulo="Carregando…" />
 
   const lidos = Object.fromEntries(CAMPOS.map(({ campo }) => [campo, lerPercentual(valores[campo])])) as Record<Campo, ReturnType<typeof lerPercentual>>
@@ -89,7 +89,7 @@ export function TelaAjustes() {
       {erro && <div className="aviso aviso-erro" role="alert">{erro}</div>}
       {ok && (
         <div className="aviso aviso-sucesso" role="status">
-          Salvo. <Link to="/painel">Ver o painel atualizado</Link>
+          Salvo. <Link to="/app/painel">Ver o painel atualizado</Link>
         </div>
       )}
       <button className="botao botao-primario" type="submit" disabled={enviando || temErro}>

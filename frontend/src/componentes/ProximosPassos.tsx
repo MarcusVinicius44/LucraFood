@@ -40,7 +40,7 @@ export function ProximosPassos({
         ? 'informadas'
         : 'Quanto o app de delivery cobra e quanto vai de imposto. Sem isso a margem do delivery fica otimista.',
       feito: taxasInformadas,
-      link: { para: '/ajustes', texto: 'Informar taxas' },
+      link: { para: '/app/ajustes', texto: 'Informar taxas' },
     },
     {
       titulo: 'Ingredientes que você compra',
@@ -48,19 +48,19 @@ export function ProximosPassos({
         ? `${totalIngredientes} cadastrados (cadastre mais quando precisar)`
         : 'Cadastre o preço e o tamanho da embalagem de cada ingrediente. Dá para cadastrar também enquanto monta a ficha.',
       feito: totalIngredientes > 0,
-      link: { para: '/ingredientes', texto: 'Cadastrar ingredientes' },
+      link: { para: '/app/ingredientes', texto: 'Cadastrar ingredientes' },
     },
     {
       titulo: 'Preço de venda de cada prato',
       detalhe: `${comPreco} de ${pratos.length} com preço`,
       feito: comPreco === pratos.length,
-      link: proximoSemPreco ? { para: `/pratos/${proximoSemPreco.id}`, texto: `Informar preço: ${proximoSemPreco.nome}` } : undefined,
+      link: proximoSemPreco ? { para: `/app/pratos/${proximoSemPreco.id}`, texto: `Informar preço: ${proximoSemPreco.nome}` } : undefined,
     },
     {
       titulo: 'Ficha técnica de cada prato',
       detalhe: `${comFicha} de ${pratos.length} com ficha. Escreva a receita em texto que a IA monta, você só confere.`,
       feito: comFicha === pratos.length,
-      link: proximoSemFicha ? { para: `/pratos/${proximoSemFicha.id}`, texto: `Montar ficha: ${proximoSemFicha.nome}` } : undefined,
+      link: proximoSemFicha ? { para: `/app/pratos/${proximoSemFicha.id}`, texto: `Montar ficha: ${proximoSemFicha.nome}` } : undefined,
     },
     {
       titulo: 'Diagnóstico de lucro',
