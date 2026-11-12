@@ -29,7 +29,7 @@ O LucraFood usa IA para fazer a parte chata e deixa as contas para um código qu
 2. **Ele confere o que a IA leu.** Nada é gravado sem confirmação humana.
 3. **Ele conta o que vai em cada prato, em texto livre:** *"pão, hambúrguer de 150 g, 2 fatias de queijo"*. A IA liga cada item a um ingrediente cadastrado e marca o que precisa de atenção ("fatia" não tem peso exato, "queijo" pode ser três produtos diferentes).
 4. **O sistema pergunta o que faltou.** *"Quanto dá mais ou menos 1 fatia de queijo prato, em gramas?"* → *"uns 18"* → anota 2 × 18 g = 36 g. A IA só entende a resposta; a conta é do sistema. Ao confirmar a ficha, o sistema lembra que 1 fatia de queijo prato dá 18 g: no próximo prato, "3 fatias" já vira 54 g, sem perguntar de novo (e o dono pode pedir para esquecer).
-5. **Ele recebe o diagnóstico de cada prato:** custo, margem no balcão, margem no delivery e um semáforo 🟢 🟡 🔴, com o preço sugerido para voltar à margem desejada.
+5. **Ele recebe o diagnóstico de cada prato:** custo, margem no balcão, margem no delivery, a conta de um pedido no delivery linha por linha (preço − ingredientes − embalagem − impostos − taxa do app = o que sobra) e um semáforo 🟢 🟡 🔴, com o preço sugerido para voltar à margem desejada.
 
 O painel guia o primeiro acesso passo a passo (cadastrar ingredientes, montar as fichas, ajustar taxas) até o restaurante ter o diagnóstico do cardápio inteiro.
 
@@ -41,6 +41,17 @@ flowchart LR
     E -->|dono confere| C
     C -->|Python calcula| F[🟢🟡🔴 Diagnóstico por prato]
 ```
+
+## Landing e demo interativa
+
+<!-- Link do site: preencher depois do deploy na Vercel. -->
+
+A página inicial do frontend (`/`) apresenta o projeto e tem uma **demo interativa** que roda sem back-end: o visitante lê o cardápio de uma lanchonete fictícia, corrige os pratos, monta a receita de um lanche e chega ao diagnóstico em menos de um minuto. O app completo fica em `/app`.
+
+- **As respostas da IA na demo são reais, gravadas.** O comando `gravar_demo` roda o Gemini de verdade na foto e nas frases da demo e salva as respostas em [`frontend/src/demo/fixtures/`](frontend/src/demo/fixtures/); a demo só as reproduz, sem gastar cota. Na gravação de 12/11/2026: 11 de 11 pratos e preços.
+- **As contas da demo são uma cópia testada do Python.** Sem servidor, a demo precisa calcular no navegador: [`calculosDemo.ts`](frontend/src/demo/calculosDemo.ts) usa frações exatas e o mesmo arredondamento do `calculos.py`, e um teste exige o mesmo resultado em 37 casos gerados pelo Python, centavo por centavo. **O app real continua sem nenhuma conta no frontend**: tudo vem pronto da API.
+- **O que ainda está em desenvolvimento aparece marcado assim.** Na demo dá para testar um preço novo, ver o impacto de um ingrediente mais caro e o aviso de preço antigo, cada um com a etiqueta "Em desenvolvimento"; no app real eles são os próximos passos (abaixo).
+- Os números de mercado da landing têm fonte com link, ano e recorte (por exemplo, "no RS, em janeiro de 2026").
 
 ## Como a IA é usada (e onde ela não entra)
 
@@ -84,7 +95,7 @@ A avaliação também orientou decisões de produto. Ela mostrou que o plano gra
 | Backend | Python, Django 5.2, Django REST Framework, SQLite |
 | Frontend | React 19, TypeScript, Vite, React Router, mobile-first (câmera do celular) |
 | IA | Gemini 3.5 Flash-Lite (visão + JSON) pela biblioteca `openai`; Groq como alternativa; Pydantic para validar a saída |
-| Qualidade | 178 testes no backend (IA simulada, sem rede), 44 no frontend (Vitest), conjuntos de avaliação com fotos e frases reais |
+| Qualidade | 185 testes no backend (IA simulada, sem rede), 85 no frontend (Vitest e Testing Library, incluindo as contas da demo contra o Python e o fluxo da demo de ponta a ponta), conjuntos de avaliação com fotos e frases reais |
 
 ## Arquitetura
 
@@ -99,7 +110,9 @@ backend/cardapio/
 ├── views*.py          API REST em duas etapas: a IA lê, o dono confirma, só então grava
 └── avaliacao*.py      comparação com o gabarito (testada sem API)
 
-frontend/src/telas/    Foto → Revisão → Painel → Prato (ficha) · Ingredientes · Ajustes
+frontend/src/telas/    Foto → Revisão → Painel → Prato (ficha) · Ingredientes · Ajustes  (em /app)
+frontend/src/landing/  a página de apresentação (/)
+frontend/src/demo/     a demo sem back-end: respostas gravadas da IA + calculosDemo.ts testado contra o Python
 evals/                 fotos de cardápio e frases com gabarito + saídas de cada rodada
 ```
 
@@ -112,8 +125,13 @@ evals/                 fotos de cardápio e frases com gabarito + saídas de cad
 - [x] Conjuntos de avaliação com fotos e frases reais
 - [x] Ficha em conversa: o sistema pergunta o que faltou ("quanto dá 1 fatia de queijo?") e anota a resposta
 - [x] Lembrar as medidas do restaurante ("1 fatia de queijo prato = 18 g") para não perguntar de novo
-- [ ] Simulador de preço ("e se eu cobrar R$ 2 a mais?")
+- [x] A conta do pedido no delivery, linha por linha, na tela do prato
+- [x] Landing com demo interativa sem back-end (respostas reais gravadas)
+- [ ] Simulador de preço no app real ("e se eu cobrar R$ 2 a mais?"): parâmetro no endpoint de diagnóstico, conta no Python (já na demo)
+- [ ] Histórico de preço do ingrediente, com o aviso dos pratos afetados quando um ingrediente sobe (já na demo)
+- [ ] Aviso de preço de ingrediente antigo, sem atualizar há mais de 30 dias (já na demo)
 - [ ] Teste com restaurantes de verdade
+- [ ] Publicar o app completo, com back-end
 
 ## Autor
 

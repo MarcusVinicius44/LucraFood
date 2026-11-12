@@ -22,7 +22,7 @@ python manage.py runserver       # http://localhost:8000
 # frontend (em outro terminal)
 cd frontend
 npm install
-npm run dev                      # http://localhost:5173 (o /api é repassado ao Django)
+npm run dev                      # http://localhost:5173 = landing; o app fica em /app (o /api é repassado ao Django)
 ```
 
 Para usar o Groq no lugar do Gemini: `LUCRAFOOD_PROVEDOR=groq` e `GROQ_API_KEY` no `.env`.
@@ -51,6 +51,28 @@ python manage.py avaliar_conversa [--resposta c03]                 # respostas d
 ```
 
 Regras: o prompt só muda com a avaliação rodada antes e depois, e os exemplos do prompt não podem vir das fotos ou frases de avaliação. Guarde a saída de cada rodada em `evals/*/resultados/`.
+
+## Landing, demo e publicação
+
+O frontend tem duas partes: a landing com a demo em `/` (`src/landing/`, `src/demo/`) e o app em `/app` (`src/telas/`). A demo nunca chama `/api`: ela usa respostas gravadas da IA e as contas de `src/demo/calculosDemo.ts`.
+
+```bash
+cd backend
+python manage.py gravar_demo [--so-fichas]   # CHAMA A API: regrava as respostas da demo (1 chamada da foto + 1 por frase)
+python manage.py gerar_casos_demo            # sem IA: regenera os casos que comparam calculosDemo.ts com calculos.py
+```
+
+- Entradas da demo (fictícias): `frontend/src/demo/fixtures/cardapio-sabor-da-esquina.html` (gera o PNG; o comando está no comentário do arquivo) e `entrada-demo.json` (cadastro, taxas e frases). Saídas: `gravado-extracao.json` e `gravado-fichas.json`.
+- Mudou `calculos.py`? Mude `calculosDemo.ts` igual, rode `gerar_casos_demo` e `npm test`.
+- Imagem de prévia (LinkedIn/WhatsApp): `marca/og-lucrafood.html` → `frontend/public/og-lucrafood.png` (comando no comentário do HTML).
+
+**Publicar na Vercel (só o frontend):**
+
+1. Na Vercel, *Add New → Project* e importe o repositório.
+2. Em *Root Directory*, escolha `frontend`. O resto vem do `frontend/vercel.json`: build com `VITE_SEM_BACKEND=1` (o `/app` mostra o aviso "O app completo roda com o back-end") e o fallback de rotas do SPA (abrir `/app/painel` direto funciona).
+3. *Deploy*. As meta tags de prévia usam o domínio de produção da Vercel; com domínio próprio, defina `VITE_SITE_URL=https://seu-dominio` nas variáveis de ambiente do projeto.
+
+Para ver a versão publicada localmente: `cd frontend && VITE_SEM_BACKEND=1 npm run build && npx vite preview`.
 
 ## API
 
