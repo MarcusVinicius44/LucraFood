@@ -1,0 +1,33 @@
+{
+  "_origem": "Dados FICTÍCIOS da demo, escritos por IA (Claude) em 12/11/2026 para a Lanchonete Sabor da Esquina, que não existe. Preços de ingrediente plausíveis, não pesquisados. É a ENTRADA do comando gravar_demo; as saídas da IA ficam em gravado-*.json.",
+  "restaurante": {
+    "nome": "Lanchonete Sabor da Esquina",
+    "taxa_delivery_pct": "26",
+    "impostos_pct": "6",
+    "margem_desejada_pct": "30",
+    "margem_minima_pct": "10"
+  },
+  "ingredientes": [
+    {"id": 1, "nome": "Pão de hambúrguer", "unidade": "un", "preco_embalagem": "15.60", "quantidade_embalagem": "12", "atualizado_em": "2026-11-05"},
+    {"id": 2, "nome": "Blend bovino", "unidade": "g", "preco_embalagem": "37.00", "quantidade_embalagem": "1000", "atualizado_em": "2026-11-05"},
+    {"id": 3, "nome": "Queijo prato", "unidade": "g", "preco_embalagem": "45.00", "quantidade_embalagem": "1000", "atualizado_em": "2026-11-05"},
+    {"id": 4, "nome": "Cheddar fatiado", "unidade": "g", "preco_embalagem": "62.00", "quantidade_embalagem": "1000", "atualizado_em": "2026-11-05"},
+    {"id": 5, "nome": "Bacon", "unidade": "g", "preco_embalagem": "49.90", "quantidade_embalagem": "1000", "atualizado_em": "2026-11-05"},
+    {"id": 6, "nome": "Presunto", "unidade": "g", "preco_embalagem": "34.90", "quantidade_embalagem": "1000", "atualizado_em": "2026-09-20"},
+    {"id": 7, "nome": "Ovo", "unidade": "un", "preco_embalagem": "18.00", "quantidade_embalagem": "30", "atualizado_em": "2026-11-05"},
+    {"id": 8, "nome": "Alface", "unidade": "g", "preco_embalagem": "12.00", "quantidade_embalagem": "1000", "atualizado_em": "2026-11-05"},
+    {"id": 9, "nome": "Tomate", "unidade": "g", "preco_embalagem": "7.99", "quantidade_embalagem": "1000", "atualizado_em": "2026-11-05"},
+    {"id": 10, "nome": "Maionese", "unidade": "g", "preco_embalagem": "19.90", "quantidade_embalagem": "1000", "atualizado_em": "2026-09-20"},
+    {"id": 11, "nome": "Batata congelada", "unidade": "g", "preco_embalagem": "32.90", "quantidade_embalagem": "2000", "atualizado_em": "2026-11-05"},
+    {"id": 12, "nome": "Óleo de soja", "unidade": "ml", "preco_embalagem": "8.49", "quantidade_embalagem": "900", "atualizado_em": "2026-11-05"},
+    {"id": 13, "nome": "Cebola", "unidade": "g", "preco_embalagem": "5.99", "quantidade_embalagem": "1000", "atualizado_em": "2026-11-05"},
+    {"id": 14, "nome": "Embalagem para lanche", "unidade": "un", "preco_embalagem": "45.00", "quantidade_embalagem": "50", "atualizado_em": "2026-11-05"},
+    {"id": 15, "nome": "Embalagem para porção", "unidade": "un", "preco_embalagem": "60.00", "quantidade_embalagem": "50", "atualizado_em": "2026-11-05"},
+    {"id": 16, "nome": "Queijo muçarela", "unidade": "g", "preco_embalagem": "52.00", "quantidade_embalagem": "1000", "atualizado_em": "2026-11-05"}
+  ],
+  "fichas": [
+    {"prato": "X-Burger", "texto": "pão, hambúrguer de 150g, 2 fatias de queijo e a embalagem"},
+    {"prato": "X-Bacon", "texto": "1 pão, 150 g de blend, 40 g de bacon, 2 fatias de cheddar, uma colher de maionese e a embalagem de lanche"},
+    {"prato": "Batata Frita", "texto": "300g de batata congelada, 80 ml de óleo e a embalagem de porção"}
+  ]
+}

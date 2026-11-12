@@ -1,0 +1,241 @@
+{
+  "_origem": "Respostas REAIS da IA para as frases de entrada-demo.json, gravadas pelo comando gravar_demo. Não editar à mão.",
+  "provedor": "gemini",
+  "modelo": "gemini-3.5-flash-lite",
+  "gravado_em": "2026-11-12T10:21:26",
+  "fichas": [
+    {
+      "prato": "X-Burger",
+      "texto": "pão, hambúrguer de 150g, 2 fatias de queijo e a embalagem",
+      "segundos": 15.6,
+      "chamadas": 2,
+      "itens": [
+        {
+          "nome_lido": "pão",
+          "ingrediente": {
+            "id": 1,
+            "nome": "Pão de hambúrguer",
+            "unidade": "un"
+          },
+          "quantidade_lida": null,
+          "unidade_lida": null,
+          "quantidade": "1.000",
+          "unidade": "un",
+          "precisa_confirmar": true,
+          "motivos": [
+            "sem_quantidade"
+          ],
+          "estimativa": null
+        },
+        {
+          "nome_lido": "hambúrguer",
+          "ingrediente": {
+            "id": 2,
+            "nome": "Blend bovino",
+            "unidade": "g"
+          },
+          "quantidade_lida": "150",
+          "unidade_lida": "g",
+          "quantidade": "150.000",
+          "unidade": "g",
+          "precisa_confirmar": true,
+          "motivos": [
+            "nome_diferente"
+          ],
+          "estimativa": null
+        },
+        {
+          "nome_lido": "fatias de queijo",
+          "ingrediente": {
+            "id": 3,
+            "nome": "Queijo prato",
+            "unidade": "g"
+          },
+          "quantidade_lida": "2",
+          "unidade_lida": "fatia",
+          "quantidade": null,
+          "unidade": "g",
+          "precisa_confirmar": true,
+          "motivos": [
+            "nome_diferente",
+            "unidade_informal"
+          ],
+          "estimativa": null
+        },
+        {
+          "nome_lido": "embalagem",
+          "ingrediente": {
+            "id": 14,
+            "nome": "Embalagem para lanche",
+            "unidade": "un"
+          },
+          "quantidade_lida": null,
+          "unidade_lida": null,
+          "quantidade": "1.000",
+          "unidade": "un",
+          "precisa_confirmar": true,
+          "motivos": [
+            "nome_diferente",
+            "sem_quantidade"
+          ],
+          "estimativa": null
+        }
+      ]
+    },
+    {
+      "prato": "X-Bacon",
+      "texto": "1 pão, 150 g de blend, 40 g de bacon, 2 fatias de cheddar, uma colher de maionese e a embalagem de lanche",
+      "segundos": 57.2,
+      "chamadas": 3,
+      "itens": [
+        {
+          "nome_lido": "pão",
+          "ingrediente": {
+            "id": 1,
+            "nome": "Pão de hambúrguer",
+            "unidade": "un"
+          },
+          "quantidade_lida": "1",
+          "unidade_lida": "un",
+          "quantidade": "1.000",
+          "unidade": "un",
+          "precisa_confirmar": false,
+          "motivos": [],
+          "estimativa": null
+        },
+        {
+          "nome_lido": "blend",
+          "ingrediente": {
+            "id": 2,
+            "nome": "Blend bovino",
+            "unidade": "g"
+          },
+          "quantidade_lida": "150",
+          "unidade_lida": "g",
+          "quantidade": "150.000",
+          "unidade": "g",
+          "precisa_confirmar": false,
+          "motivos": [],
+          "estimativa": null
+        },
+        {
+          "nome_lido": "bacon",
+          "ingrediente": {
+            "id": 5,
+            "nome": "Bacon",
+            "unidade": "g"
+          },
+          "quantidade_lida": "40",
+          "unidade_lida": "g",
+          "quantidade": "40.000",
+          "unidade": "g",
+          "precisa_confirmar": false,
+          "motivos": [],
+          "estimativa": null
+        },
+        {
+          "nome_lido": "cheddar",
+          "ingrediente": {
+            "id": 4,
+            "nome": "Cheddar fatiado",
+            "unidade": "g"
+          },
+          "quantidade_lida": "2",
+          "unidade_lida": "fatia",
+          "quantidade": null,
+          "unidade": "g",
+          "precisa_confirmar": true,
+          "motivos": [
+            "unidade_informal"
+          ],
+          "estimativa": null
+        },
+        {
+          "nome_lido": "maionese",
+          "ingrediente": {
+            "id": 10,
+            "nome": "Maionese",
+            "unidade": "g"
+          },
+          "quantidade_lida": "1",
+          "unidade_lida": "colher",
+          "quantidade": null,
+          "unidade": "g",
+          "precisa_confirmar": true,
+          "motivos": [
+            "unidade_informal"
+          ],
+          "estimativa": null
+        },
+        {
+          "nome_lido": "embalagem de lanche",
+          "ingrediente": {
+            "id": 14,
+            "nome": "Embalagem para lanche",
+            "unidade": "un"
+          },
+          "quantidade_lida": "1",
+          "unidade_lida": "un",
+          "quantidade": "1.000",
+          "unidade": "un",
+          "precisa_confirmar": false,
+          "motivos": [],
+          "estimativa": null
+        }
+      ]
+    },
+    {
+      "prato": "Batata Frita",
+      "texto": "300g de batata congelada, 80 ml de óleo e a embalagem de porção",
+      "segundos": 1.6,
+      "chamadas": 1,
+      "itens": [
+        {
+          "nome_lido": "batata congelada",
+          "ingrediente": {
+            "id": 11,
+            "nome": "Batata congelada",
+            "unidade": "g"
+          },
+          "quantidade_lida": "300",
+          "unidade_lida": "g",
+          "quantidade": "300.000",
+          "unidade": "g",
+          "precisa_confirmar": false,
+          "motivos": [],
+          "estimativa": null
+        },
+        {
+          "nome_lido": "óleo",
+          "ingrediente": {
+            "id": 12,
+            "nome": "Óleo de soja",
+            "unidade": "ml"
+          },
+          "quantidade_lida": "80",
+          "unidade_lida": "ml",
+          "quantidade": "80.000",
+          "unidade": "ml",
+          "precisa_confirmar": false,
+          "motivos": [],
+          "estimativa": null
+        },
+        {
+          "nome_lido": "embalagem de porção",
+          "ingrediente": {
+            "id": 15,
+            "nome": "Embalagem para porção",
+            "unidade": "un"
+          },
+          "quantidade_lida": "1",
+          "unidade_lida": "un",
+          "quantidade": "1.000",
+          "unidade": "un",
+          "precisa_confirmar": false,
+          "motivos": [],
+          "estimativa": null
+        }
+      ]
+    }
+  ]
+}

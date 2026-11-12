@@ -1,0 +1,93 @@
+{
+  "_origem": "Resposta REAL da IA para cardapio-sabor-da-esquina.png, gravada pelo comando gravar_demo. Não editar à mão.",
+  "provedor": "gemini",
+  "modelo": "gemini-3.5-flash-lite",
+  "gravado_em": "2026-11-12T10:20:19",
+  "segundos": 12.4,
+  "chamadas": 1,
+  "tokens_entrada": 1859,
+  "tokens_saida": 518,
+  "resposta": {
+    "pratos": [
+      {
+        "nome": "X-Burger",
+        "descricao": "Pão, hambúrguer artesanal 150 g e queijo",
+        "categoria": "LANCHES",
+        "preco": "24.9",
+        "precos": null
+      },
+      {
+        "nome": "X-Salada",
+        "descricao": "Pão, hambúrguer 150 g, queijo, alface e tomate",
+        "categoria": "LANCHES",
+        "preco": "26.9",
+        "precos": null
+      },
+      {
+        "nome": "X-Bacon",
+        "descricao": "Pão, hambúrguer 150 g, cheddar e bacon crocante",
+        "categoria": "LANCHES",
+        "preco": "29.9",
+        "precos": null
+      },
+      {
+        "nome": "X-Tudo",
+        "descricao": "Hambúrguer, bacon, ovo, presunto, queijo e salada",
+        "categoria": "LANCHES",
+        "preco": "34.9",
+        "precos": null
+      },
+      {
+        "nome": "Misto Quente",
+        "descricao": null,
+        "categoria": "LANCHES",
+        "preco": "14.9",
+        "precos": null
+      },
+      {
+        "nome": "Batata Frita",
+        "descricao": null,
+        "categoria": "PORÇÕES",
+        "preco": "22.0",
+        "precos": null
+      },
+      {
+        "nome": "Batata com Cheddar e Bacon",
+        "descricao": null,
+        "categoria": "PORÇÕES",
+        "preco": "32.0",
+        "precos": null
+      },
+      {
+        "nome": "Anéis de Cebola",
+        "descricao": null,
+        "categoria": "PORÇÕES",
+        "preco": "24.0",
+        "precos": null
+      },
+      {
+        "nome": "Refrigerante Lata",
+        "descricao": null,
+        "categoria": "BEBIDAS",
+        "preco": "6.5",
+        "precos": null
+      },
+      {
+        "nome": "Suco Natural (500 ml)",
+        "descricao": null,
+        "categoria": "BEBIDAS",
+        "preco": "9.0",
+        "precos": null
+      },
+      {
+        "nome": "Água Mineral",
+        "descricao": null,
+        "categoria": "BEBIDAS",
+        "preco": "4.0",
+        "precos": null
+      }
+    ],
+    "colunas_preco": null,
+    "foto_ilegivel": null
+  }
+}

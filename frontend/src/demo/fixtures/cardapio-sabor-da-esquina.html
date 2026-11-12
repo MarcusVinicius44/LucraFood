@@ -1,0 +1,78 @@
+<!doctype html>
+<!--
+  Cardápio FICTÍCIO para a demo da landing. A lanchonete não existe.
+  Gerar o PNG (1080 x 1440):
+    chrome --headless=new --hide-scrollbars --window-size=1080,1440 --screenshot=cardapio-sabor-da-esquina.png cardapio-sabor-da-esquina.html
+  (o comando gravar_demo do backend lê o PNG; se mudar este HTML, gere o PNG e regrave a demo)
+-->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Lanchonete Sabor da Esquina</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1440px; }
+  body {
+    background: #FBF3E4;
+    color: #2B1A10;
+    font-family: Georgia, "Times New Roman", serif;
+    padding: 64px 80px;
+  }
+  .moldura { border: 4px double #7A3B1D; height: 100%; padding: 48px 56px; }
+  header { text-align: center; margin-bottom: 40px; }
+  .nome-casa { font-size: 30px; letter-spacing: 6px; text-transform: uppercase; color: #7A3B1D; }
+  h1 { font-size: 64px; line-height: 1.05; margin: 6px 0 10px; }
+  .slogan { font-style: italic; font-size: 22px; color: #6B4E3A; }
+  section { margin-top: 34px; }
+  h2 {
+    font-family: Arial, Helvetica, sans-serif; font-size: 26px; letter-spacing: 4px;
+    text-transform: uppercase; color: #FBF3E4; background: #7A3B1D;
+    display: inline-block; padding: 6px 18px; margin-bottom: 18px;
+  }
+  .item { display: flex; align-items: baseline; gap: 12px; margin: 14px 0; }
+  .item .nome { font-size: 28px; font-weight: bold; white-space: nowrap; }
+  .item .pontos { flex: 1; border-bottom: 3px dotted #B08A6E; transform: translateY(-6px); }
+  .item .preco { font-family: Arial, Helvetica, sans-serif; font-size: 28px; font-weight: bold; white-space: nowrap; }
+  .desc { font-size: 19px; color: #6B4E3A; margin-top: -8px; margin-bottom: 6px; }
+  footer { margin-top: 36px; text-align: center; font-size: 18px; color: #6B4E3A; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="moldura">
+  <header>
+    <div class="nome-casa">Lanchonete</div>
+    <h1>Sabor da Esquina</h1>
+    <div class="slogan">Lanches na chapa desde a primeira esquina</div>
+  </header>
+
+  <section>
+    <h2>Lanches</h2>
+    <div class="item"><span class="nome">X-Burger</span><span class="pontos"></span><span class="preco">R$ 24,90</span></div>
+    <div class="desc">Pão, hambúrguer artesanal 150 g e queijo</div>
+    <div class="item"><span class="nome">X-Salada</span><span class="pontos"></span><span class="preco">R$ 26,90</span></div>
+    <div class="desc">Pão, hambúrguer 150 g, queijo, alface e tomate</div>
+    <div class="item"><span class="nome">X-Bacon</span><span class="pontos"></span><span class="preco">R$ 29,90</span></div>
+    <div class="desc">Pão, hambúrguer 150 g, cheddar e bacon crocante</div>
+    <div class="item"><span class="nome">X-Tudo</span><span class="pontos"></span><span class="preco">R$ 34,90</span></div>
+    <div class="desc">Hambúrguer, bacon, ovo, presunto, queijo e salada</div>
+    <div class="item"><span class="nome">Misto Quente</span><span class="pontos"></span><span class="preco">R$ 14,90</span></div>
+  </section>
+
+  <section>
+    <h2>Porções</h2>
+    <div class="item"><span class="nome">Batata Frita</span><span class="pontos"></span><span class="preco">R$ 22,00</span></div>
+    <div class="item"><span class="nome">Batata com Cheddar e Bacon</span><span class="pontos"></span><span class="preco">R$ 32,00</span></div>
+    <div class="item"><span class="nome">Anéis de Cebola</span><span class="pontos"></span><span class="preco">R$ 24,00</span></div>
+  </section>
+
+  <section>
+    <h2>Bebidas</h2>
+    <div class="item"><span class="nome">Refrigerante Lata</span><span class="pontos"></span><span class="preco">R$ 6,50</span></div>
+    <div class="item"><span class="nome">Suco Natural 500 ml</span><span class="pontos"></span><span class="preco">R$ 9,00</span></div>
+    <div class="item"><span class="nome">Água Mineral</span><span class="pontos"></span><span class="preco">R$ 4,00</span></div>
+  </section>
+
+  <footer>Pedidos pelo balcão ou pelo app de delivery</footer>
+</div>
+</body>
+</html>
