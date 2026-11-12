@@ -62,7 +62,12 @@ export function DemoPainel({
               </p>
             ) : null}
             {temGravacao(p) ? (
-              <button type="button" className="botao botao-secundario botao-pequeno" onClick={() => onAbrir(p.origem)}>
+              <button
+                type="button"
+                className="botao botao-secundario botao-pequeno"
+                data-guia={!r && p.origem === 0 && Object.keys(fichas).length === 0 ? '' : undefined}
+                onClick={() => onAbrir(p.origem)}
+              >
                 {r ? `Ver a conta: ${p.nome}` : `Montar receita: ${p.nome}`}
               </button>
             ) : (

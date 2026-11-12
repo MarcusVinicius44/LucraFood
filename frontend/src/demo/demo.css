@@ -1,8 +1,9 @@
 /* Demo: uma "moldura" de app dentro da landing, com o visual do app (index.css). */
 .demo {
   background: var(--fundo); border: 1px solid #cfe3d7; border-radius: 18px;
-  box-shadow: 0 2px 4px rgba(19, 34, 27, 0.05), 0 18px 48px rgba(19, 34, 27, 0.08);
-  overflow: hidden; max-width: 760px; margin: 1.25rem auto 0;
+  box-shadow: 0 2px 4px rgba(19, 34, 27, 0.05), 0 30px 70px rgba(4, 30, 19, 0.28);
+  overflow: hidden; max-width: 820px; margin: 1rem auto 0;
+  transition: max-width 0.45s ease, border-radius 0.45s ease, border-width 0.45s ease;
 }
 .demo-barra {
   display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
@@ -12,8 +13,6 @@
   font: 700 0.7rem var(--fonte-texto); letter-spacing: 0.08em; color: #fff; background: var(--laranja);
   padding: 0.2rem 0.5rem; border-radius: 6px;
 }
-.demo-etapas { list-style: none; display: flex; gap: 0.25rem 0.75rem; flex-wrap: wrap; margin: 0; padding: 0; font-size: 0.8rem; color: var(--texto-suave); flex: 1; }
-.demo-etapas li[aria-current='step'] { color: var(--verde); font-weight: 700; }
 .demo-tela { padding: 1rem; min-height: 320px; }
 @media (min-width: 640px) { .demo-tela { padding: 1.5rem; } }
 .demo h3 { font-size: 1.15rem; }
@@ -39,3 +38,64 @@
 .demo-impacto li { display: flex; flex-direction: column; gap: 0.25rem; padding: 0.6rem 0; border-top: 1px solid var(--borda); }
 .demo-queda { color: var(--erro); font-weight: 600; }
 .demo-voltar { align-self: flex-start; padding-left: 0; }
+
+/* Palco: chave Computador/Celular, guia passo a passo e moldura do aparelho */
+.demo-palco { max-width: 820px; margin: 0 auto; }
+.demo-controles { display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; align-items: center; justify-content: space-between; }
+.demo-aparelhos { display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.18); }
+.demo-aparelhos button {
+  font: 600 0.85rem var(--fonte-texto); border: 0; background: transparent; color: #d7e8de;
+  padding: 0.45rem 0.95rem; border-radius: 999px; cursor: pointer; min-height: 36px;
+}
+.demo-aparelhos button[aria-pressed='true'] { background: #fff; color: var(--verde-escuro); }
+.demo-aparelhos button:focus-visible { outline: 2px solid #ffb48f; outline-offset: 2px; }
+.demo-guia { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 0.4rem; color: #e9f3ee; font-size: 0.92rem; }
+.demo-guia strong { color: #ffb48f; }
+.demo-progresso { height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.14); overflow: hidden; }
+.demo-progresso span { display: block; height: 100%; background: linear-gradient(90deg, #3ecf8e, #ffb48f); border-radius: 999px; transition: width 0.5s ease; }
+
+.demo-pontos { display: inline-flex; gap: 5px; }
+.demo-pontos span { width: 10px; height: 10px; border-radius: 50%; background: #e3e1d8; }
+.demo-pontos span:first-child { background: #f0a58a; }
+.demo-endereco {
+  flex: 1; min-width: 0; font-size: 0.78rem; color: var(--texto-suave); background: var(--fundo);
+  border-radius: 999px; padding: 0.2rem 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.demo-recomecar { min-height: 32px; padding: 0.2rem 0.4rem; font-size: 0.85rem; }
+
+.demo-celular { max-width: 390px; border: 10px solid #10251b; border-radius: 38px; }
+.demo-celular .demo-barra { padding-top: 0.9rem; }
+.demo-celular .demo-pontos { display: none; }
+.demo-celular .demo-tela { padding: 1rem; max-height: 700px; overflow-y: auto; overscroll-behavior: contain; }
+@media (max-width: 639px) {
+  /* quem já está no celular não precisa da chave */
+  .demo-aparelhos { display: none; }
+  .demo-celular { max-width: none; border: 1px solid #cfe3d7; border-radius: 18px; }
+  .demo-celular .demo-tela { max-height: none; }
+}
+.demo-celular .demo-foto,
+.demo-celular .demo-pratos,
+.demo-celular .demo-revisao .prato-revisao-campos,
+.demo-celular .prato-revisao-campos,
+.demo-celular .item-ficha-campos,
+.demo-celular .grade-2,
+.demo-celular .grade-3 { grid-template-columns: 1fr; }
+.demo-celular .resumo { grid-template-columns: repeat(2, 1fr); }
+
+/* O próximo botão pulsa (anel), até a demo terminar */
+.demo-guiada [data-guia] { position: relative; animation: demo-anel 1.8s ease-out infinite; }
+@keyframes demo-anel {
+  0% { box-shadow: 0 0 0 0 rgba(239, 106, 46, 0.55); }
+  70% { box-shadow: 0 0 0 12px rgba(239, 106, 46, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 106, 46, 0); }
+}
+.demo-guiada label[data-guia] { border-radius: 8px; padding: 0.3rem 0.4rem; }
+
+.demo-fechamento { margin-top: 1.25rem; animation: demo-subir 0.5s ease-out both; }
+@keyframes demo-subir { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-guiada [data-guia] { animation: none; box-shadow: 0 0 0 3px rgba(239, 106, 46, 0.6); }
+  .demo, .demo-progresso span { transition: none; }
+  .demo-fechamento { animation: none; }
+}

@@ -64,7 +64,7 @@ export function DemoRevisao({ pratos, onConfirmar }: { pratos: PratoNaDemo[]; on
       {tentou && invalidos > 0 && (
         <div className="aviso aviso-erro" role="alert">Corrija os campos marcados.</div>
       )}
-      <button type="button" className="botao botao-primario" onClick={confirmar}>
+      <button type="button" className="botao botao-primario" data-guia="" onClick={confirmar}>
         Confirmar e ver o painel
       </button>
     </div>

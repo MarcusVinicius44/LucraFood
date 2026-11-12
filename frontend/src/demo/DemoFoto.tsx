@@ -41,7 +41,7 @@ export function DemoFoto({ atrasoMs, onLido }: { atrasoMs: number; onLido: () =>
         <p className="suave">
           No app, o dono tira a foto pelo celular. Aqui, a foto é de uma lanchonete inventada para a demo.
         </p>
-        <button type="button" className="botao botao-primario" onClick={() => setLendo(true)}>
+        <button type="button" className="botao botao-primario" data-guia="" onClick={() => setLendo(true)}>
           Ler cardápio
         </button>
       </div>

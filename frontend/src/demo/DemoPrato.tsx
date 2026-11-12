@@ -34,7 +34,7 @@ const CADASTRO: Ingrediente[] = INGREDIENTES_DEMO.map((i) => ({
   custo_por_unidade: custoPorUnidade(i.preco_embalagem, i.quantidade_embalagem).texto(4),
 }))
 
-type Modo = 'texto' | 'lendo' | 'revisao' | 'pronto'
+export type Modo = 'texto' | 'lendo' | 'revisao' | 'pronto'
 
 /** Diagnóstico da demo no formato que o NumerosDiagnostico do app já sabe mostrar. */
 function comoDiagnostico(r: ResultadoDemo): Diagnostico {
@@ -56,12 +56,14 @@ export function DemoPrato({
   atrasoMs,
   onSalvar,
   onVoltar,
+  onModo,
 }: {
   prato: PratoNaDemo
   fichaSalva: LinhaFicha[] | null
   atrasoMs: number
   onSalvar: (linhas: LinhaFicha[]) => void
   onVoltar: () => void
+  onModo?: (modo: Modo) => void
 }) {
   const gravada = FICHAS_GRAVADAS.find((f) => f.prato === PRATOS_LIDOS[prato.origem].nome)!
   const [modo, setModo] = useState<Modo>(fichaSalva ? 'pronto' : 'texto')
@@ -94,7 +96,12 @@ export function DemoPrato({
     return () => clearTimeout(t)
   }, [modo, atrasoMs, gravada])
 
+  useEffect(() => {
+    onModo?.(modo)
+  }, [modo, onModo])
+
   const { problemas, itens } = validarLinhas(linhas)
+  const faltaMedida = linhas.some((l) => !l.quantidade && l.ingrediente !== null && MEDIDAS_EXEMPLO[l.ingrediente])
   const marcadas = linhas.filter((l) => l.motivos.some((m) => m !== 'nome_diferente' && m !== 'medida_salva')).length
 
   function preencherExemplo() {
@@ -132,7 +139,7 @@ export function DemoPrato({
             <textarea id="demo-texto" rows={3} readOnly value={gravada.texto} />
             <span className="suave pequeno">Na demo o texto é fixo, porque a resposta da IA foi gravada para ele.</span>
           </div>
-          <button type="button" className="botao botao-primario" onClick={() => setModo('lendo')}>
+          <button type="button" className="botao botao-primario" data-guia="" onClick={() => setModo('lendo')}>
             Organizar com a IA
           </button>
         </>
@@ -161,11 +168,11 @@ export function DemoPrato({
             problemas={problemas}
             onCadastrar={() => Promise.reject(new Error('Na demo o cadastro de ingredientes é fixo.'))}
           />
-          <button type="button" className="botao botao-texto" onClick={preencherExemplo}>
+          <button type="button" className="botao botao-texto" data-guia={faltaMedida ? '' : undefined} onClick={preencherExemplo}>
             Sem tempo? Preencher as medidas com o exemplo (1 fatia de queijo prato = 18 g)
           </button>
           {marcadas > 0 && (
-            <label className="confirmacao">
+            <label className="confirmacao" data-guia={!faltaMedida && !conferi ? '' : undefined}>
               <input type="checkbox" checked={conferi} onChange={(e) => setConferi(e.target.checked)} />
               Conferi os itens destacados
             </label>
@@ -175,7 +182,7 @@ export function DemoPrato({
               {!itens ? 'Corrija as linhas marcadas antes de salvar.' : 'Marque que conferiu os itens destacados.'}
             </div>
           )}
-          <button type="button" className="botao botao-primario" onClick={confirmar}>
+          <button type="button" className="botao botao-primario" data-guia={!faltaMedida && (marcadas === 0 || conferi) ? '' : undefined} onClick={confirmar}>
             Confirmar receita
           </button>
         </>
