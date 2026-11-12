@@ -3,6 +3,7 @@
 Percentuais entram como número de 0 a 100 (ex.: 23 = 23%).
 """
 from dataclasses import dataclass
+from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Optional
 
@@ -87,6 +88,68 @@ def diagnosticar(
     if semaforo != "verde":
         sugerido = preco_sugerido(custo, desejada, taxa_app_pct, impostos_pct)
     return Diagnostico(Decimal(custo), m_balcao, m_delivery, semaforo, sugerido)
+
+
+@dataclass
+class Conta:
+    """A conta de um pedido, em reais, linha por linha: preco - ingredientes - embalagem - impostos - taxa = sobra."""
+
+    preco: Decimal
+    ingredientes: Decimal  # da porção (receita / rendimento)
+    embalagem: Decimal
+    impostos: Decimal
+    taxa_app: Decimal
+    sobra: Decimal
+
+
+def decompor(
+    preco,
+    itens: list[tuple[Decimal, Decimal]],
+    custo_embalagem=Decimal("0"),
+    rendimento=Decimal("1"),
+    taxa_app_pct=0,
+    impostos_pct=0,
+) -> Conta:
+    """Cada linha é arredondada no centavo e a sobra sai das linhas, para a conta fechar na tela.
+    Balcão = mesma conta com taxa_app_pct=0. Pode diferir 1 centavo de preco - custo_prato(...)."""
+    preco = Decimal(preco)
+    if preco <= 0:
+        raise ValueError("Preço precisa ser maior que zero.")
+    rendimento = Decimal(rendimento)
+    if rendimento <= 0:
+        raise ValueError("O rendimento precisa ser maior que zero.")
+    soma = sum((Decimal(q) * Decimal(c) for q, c in itens), Decimal("0"))
+    ingredientes = (soma / rendimento).quantize(CENTAVO, ROUND_HALF_UP)
+    embalagem = Decimal(custo_embalagem).quantize(CENTAVO, ROUND_HALF_UP)
+    impostos = (preco * _pct(impostos_pct)).quantize(CENTAVO, ROUND_HALF_UP)
+    taxa = (preco * _pct(taxa_app_pct)).quantize(CENTAVO, ROUND_HALF_UP)
+    sobra = preco - ingredientes - embalagem - impostos - taxa
+    return Conta(preco.quantize(CENTAVO, ROUND_HALF_UP), ingredientes, embalagem, impostos, taxa, sobra)
+
+
+@dataclass
+class VariacaoSobra:
+    antes: Decimal
+    depois: Decimal
+    diferenca: Decimal  # depois - antes (negativa quando a sobra caiu)
+
+
+def variacao_sobra(
+    preco, itens_antes, itens_depois, custo_embalagem=Decimal("0"), rendimento=Decimal("1"), taxa_app_pct=0, impostos_pct=0
+) -> VariacaoSobra:
+    """Sobra do delivery antes e depois de um ingrediente mudar de preço (itens = [(quantidade, custo_por_unidade)]).
+    Ainda só na demo da landing ("Em desenvolvimento"); o app real vai precisar do histórico de preço."""
+    antes = decompor(preco, itens_antes, custo_embalagem, rendimento, taxa_app_pct, impostos_pct).sobra
+    depois = decompor(preco, itens_depois, custo_embalagem, rendimento, taxa_app_pct, impostos_pct).sobra
+    return VariacaoSobra(antes, depois, depois - antes)
+
+
+PRECO_ANTIGO_DIAS = 30
+
+
+def preco_antigo(atualizado_em: date, hoje: date, limite_dias: int = PRECO_ANTIGO_DIAS) -> bool:
+    """Preço de ingrediente sem atualizar há MAIS de `limite_dias` dias: a conta pode estar desatualizada."""
+    return (hoje - atualizado_em).days > limite_dias
 
 
 # Unidade de medida -> (unidade do cadastro, fator). Só medidas exatas: "fatia" ou "colher"

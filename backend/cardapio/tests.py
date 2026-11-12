@@ -38,6 +38,41 @@ class CalculosTest(TestCase):
         itens = [(Decimal("150"), Decimal("0.042")), (Decimal("1"), Decimal("1.20"))]
         self.assertEqual(calculos.custo_prato(itens, Decimal("0.80")), Decimal("8.30"))
 
+    def test_decompor_fecha_a_conta(self):
+        # R$ 25, 150 g a 0,042 + 1 pão a 1,20 = 7,50, embalagem 0,80, taxa 23% = 5,75, imposto 6% = 1,50
+        itens = [(Decimal("150"), Decimal("0.042")), (Decimal("1"), Decimal("1.20"))]
+        c = calculos.decompor(Decimal("25"), itens, Decimal("0.80"), 1, 23, 6)
+        self.assertEqual(
+            (c.preco, c.ingredientes, c.embalagem, c.impostos, c.taxa_app, c.sobra),
+            (Decimal("25.00"), Decimal("7.50"), Decimal("0.80"), Decimal("1.50"), Decimal("5.75"), Decimal("9.45")),
+        )
+        self.assertEqual(c.preco - c.ingredientes - c.embalagem - c.impostos - c.taxa_app, c.sobra)
+
+    def test_decompor_divide_so_os_ingredientes_pelo_rendimento(self):
+        c = calculos.decompor(Decimal("10"), [(Decimal("1"), Decimal("12"))], Decimal("0.50"), Decimal("12"))
+        self.assertEqual((c.ingredientes, c.embalagem, c.sobra), (Decimal("1.00"), Decimal("0.50"), Decimal("8.50")))
+
+    def test_decompor_sobra_pode_ser_negativa_e_recusa_preco_zero(self):
+        c = calculos.decompor(Decimal("10"), [(Decimal("1"), Decimal("9"))], 0, 1, 30, 6)
+        self.assertEqual(c.sobra, Decimal("-2.60"))
+        with self.assertRaises(ValueError):
+            calculos.decompor(Decimal("0"), [])
+
+    def test_variacao_sobra_quando_ingrediente_sobe(self):
+        # 150 g de blend: R$ 37/kg -> R$ 42/kg = +0,75 de custo; sobra cai 0,75
+        antes = [(Decimal("150"), Decimal("0.037"))]
+        depois = [(Decimal("150"), Decimal("0.042"))]
+        v = calculos.variacao_sobra(Decimal("24.90"), antes, depois, Decimal("0"), 1, 26, 6)
+        self.assertEqual(v.diferenca, Decimal("-0.75"))
+        self.assertEqual(v.depois, v.antes - Decimal("0.75"))
+
+    def test_preco_antigo_passa_de_30_dias(self):
+        from datetime import date
+
+        hoje = date(2026, 11, 12)
+        self.assertFalse(calculos.preco_antigo(date(2026, 10, 13), hoje))  # 30 dias: ainda vale
+        self.assertTrue(calculos.preco_antigo(date(2026, 10, 12), hoje))  # 31 dias
+
     def test_margem_delivery_menor_que_balcao(self):
         d = calculos.diagnosticar(preco=Decimal("25"), custo=Decimal("12"), taxa_app_pct=23,
                                   impostos_pct=6, margem_desejada_pct=30)

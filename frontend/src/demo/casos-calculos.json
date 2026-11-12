@@ -1,0 +1,765 @@
+{
+  "_origem": "Gerado por `python manage.py gerar_casos_demo` a partir de backend/cardapio/calculos.py. Não editar à mão.",
+  "casos": [
+    {
+      "funcao": "custo_prato",
+      "entrada": {
+        "itens": [
+          [
+            "150",
+            "0.042",
+            "1"
+          ],
+          [
+            "1",
+            "1.20",
+            "1"
+          ]
+        ],
+        "embalagem": "0.80",
+        "rendimento": "1"
+      },
+      "saida": {
+        "custo": "8.30"
+      }
+    },
+    {
+      "funcao": "custo_prato",
+      "entrada": {
+        "itens": [
+          [
+            "1",
+            "15.60",
+            "12"
+          ],
+          [
+            "150",
+            "37.00",
+            "1000"
+          ],
+          [
+            "36",
+            "45.00",
+            "1000"
+          ],
+          [
+            "1",
+            "45.00",
+            "50"
+          ]
+        ],
+        "embalagem": "0",
+        "rendimento": "1"
+      },
+      "saida": {
+        "custo": "9.37"
+      }
+    },
+    {
+      "funcao": "custo_prato",
+      "entrada": {
+        "itens": [
+          [
+            "300",
+            "32.90",
+            "2000"
+          ],
+          [
+            "80",
+            "8.49",
+            "900"
+          ],
+          [
+            "1",
+            "60.00",
+            "50"
+          ]
+        ],
+        "embalagem": "0",
+        "rendimento": "1"
+      },
+      "saida": {
+        "custo": "6.89"
+      }
+    },
+    {
+      "funcao": "custo_prato",
+      "entrada": {
+        "itens": [
+          [
+            "1",
+            "12",
+            "1"
+          ]
+        ],
+        "embalagem": "0.50",
+        "rendimento": "12"
+      },
+      "saida": {
+        "custo": "1.50"
+      }
+    },
+    {
+      "funcao": "custo_prato",
+      "entrada": {
+        "itens": [
+          [
+            "1",
+            "10",
+            "3"
+          ]
+        ],
+        "embalagem": "0",
+        "rendimento": "1"
+      },
+      "saida": {
+        "custo": "3.33"
+      }
+    },
+    {
+      "funcao": "custo_prato",
+      "entrada": {
+        "itens": [
+          [
+            "1",
+            "0.005",
+            "1"
+          ]
+        ],
+        "embalagem": "0",
+        "rendimento": "1"
+      },
+      "saida": {
+        "custo": "0.01"
+      }
+    },
+    {
+      "funcao": "custo_prato",
+      "entrada": {
+        "itens": [
+          [
+            "2",
+            "0.0125",
+            "1"
+          ]
+        ],
+        "embalagem": "1.10",
+        "rendimento": "0.5"
+      },
+      "saida": {
+        "custo": "1.15"
+      }
+    },
+    {
+      "funcao": "custo_prato",
+      "entrada": {
+        "itens": [
+          [
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        "embalagem": "0",
+        "rendimento": "0"
+      },
+      "saida": {
+        "erro": true
+      }
+    },
+    {
+      "funcao": "margem",
+      "entrada": {
+        "preco": "25",
+        "custo": "12",
+        "taxa": "23",
+        "impostos": "6"
+      },
+      "saida": {
+        "margem": "23.0"
+      }
+    },
+    {
+      "funcao": "margem",
+      "entrada": {
+        "preco": "24.90",
+        "custo": "8.44",
+        "taxa": "26",
+        "impostos": "6"
+      },
+      "saida": {
+        "margem": "34.1"
+      }
+    },
+    {
+      "funcao": "margem",
+      "entrada": {
+        "preco": "10",
+        "custo": "9.99",
+        "taxa": "0",
+        "impostos": "0"
+      },
+      "saida": {
+        "margem": "0.1"
+      }
+    },
+    {
+      "funcao": "margem",
+      "entrada": {
+        "preco": "10",
+        "custo": "10.004",
+        "taxa": "0",
+        "impostos": "0"
+      },
+      "saida": {
+        "margem": "0.0"
+      }
+    },
+    {
+      "funcao": "margem",
+      "entrada": {
+        "preco": "0",
+        "custo": "1",
+        "taxa": "0",
+        "impostos": "0"
+      },
+      "saida": {
+        "erro": true
+      }
+    },
+    {
+      "funcao": "preco_sugerido",
+      "entrada": {
+        "custo": "8.44",
+        "desejada": "30",
+        "taxa": "26",
+        "impostos": "6"
+      },
+      "saida": {
+        "preco": "22.21"
+      }
+    },
+    {
+      "funcao": "preco_sugerido",
+      "entrada": {
+        "custo": "5",
+        "desejada": "30",
+        "taxa": "0",
+        "impostos": "0"
+      },
+      "saida": {
+        "preco": "7.14"
+      }
+    },
+    {
+      "funcao": "preco_sugerido",
+      "entrada": {
+        "custo": "5",
+        "desejada": "60",
+        "taxa": "35",
+        "impostos": "6"
+      },
+      "saida": {
+        "erro": true
+      }
+    },
+    {
+      "funcao": "diagnosticar",
+      "entrada": {
+        "preco": "25",
+        "custo": "12",
+        "taxa": "23",
+        "impostos": "6",
+        "desejada": "30",
+        "minima": "10"
+      },
+      "saida": {
+        "custo": "12",
+        "margem_balcao": "46.0",
+        "margem_delivery": "23.0",
+        "semaforo": "amarelo",
+        "preco_sugerido_delivery": "29.27"
+      }
+    },
+    {
+      "funcao": "diagnosticar",
+      "entrada": {
+        "preco": "34.90",
+        "custo": "8",
+        "taxa": "26",
+        "impostos": "6",
+        "desejada": "30",
+        "minima": "10"
+      },
+      "saida": {
+        "custo": "8",
+        "margem_balcao": "71.1",
+        "margem_delivery": "45.1",
+        "semaforo": "verde",
+        "preco_sugerido_delivery": null
+      }
+    },
+    {
+      "funcao": "diagnosticar",
+      "entrada": {
+        "preco": "14.90",
+        "custo": "6.20",
+        "taxa": "26",
+        "impostos": "6",
+        "desejada": null,
+        "minima": null
+      },
+      "saida": {
+        "custo": "6.20",
+        "margem_balcao": "52.4",
+        "margem_delivery": "26.4",
+        "semaforo": "amarelo",
+        "preco_sugerido_delivery": "16.32"
+      }
+    },
+    {
+      "funcao": "diagnosticar",
+      "entrada": {
+        "preco": "20",
+        "custo": "6.4",
+        "taxa": "0",
+        "impostos": "0",
+        "desejada": "68",
+        "minima": "10"
+      },
+      "saida": {
+        "custo": "6.4",
+        "margem_balcao": "68.0",
+        "margem_delivery": "68.0",
+        "semaforo": "verde",
+        "preco_sugerido_delivery": null
+      }
+    },
+    {
+      "funcao": "diagnosticar",
+      "entrada": {
+        "preco": "20",
+        "custo": "6",
+        "taxa": "26",
+        "impostos": "6",
+        "desejada": "10",
+        "minima": "30"
+      },
+      "saida": {
+        "erro": true
+      }
+    },
+    {
+      "funcao": "decompor",
+      "entrada": {
+        "preco": "24.90",
+        "itens": [
+          [
+            "1",
+            "15.60",
+            "12"
+          ],
+          [
+            "150",
+            "37.00",
+            "1000"
+          ],
+          [
+            "36",
+            "45.00",
+            "1000"
+          ],
+          [
+            "1",
+            "45.00",
+            "50"
+          ]
+        ],
+        "embalagem": "0",
+        "rendimento": "1",
+        "taxa": "26",
+        "impostos": "6"
+      },
+      "saida": {
+        "preco": "24.90",
+        "ingredientes": "9.37",
+        "embalagem": "0.00",
+        "impostos": "1.49",
+        "taxa_app": "6.47",
+        "sobra": "7.57"
+      }
+    },
+    {
+      "funcao": "decompor",
+      "entrada": {
+        "preco": "29.90",
+        "itens": [
+          [
+            "1",
+            "15.60",
+            "12"
+          ],
+          [
+            "150",
+            "37.00",
+            "1000"
+          ],
+          [
+            "40",
+            "49.90",
+            "1000"
+          ],
+          [
+            "30",
+            "62.00",
+            "1000"
+          ],
+          [
+            "15",
+            "19.90",
+            "1000"
+          ],
+          [
+            "1",
+            "45.00",
+            "50"
+          ]
+        ],
+        "embalagem": "0",
+        "rendimento": "1",
+        "taxa": "26",
+        "impostos": "6"
+      },
+      "saida": {
+        "preco": "29.90",
+        "ingredientes": "11.90",
+        "embalagem": "0.00",
+        "impostos": "1.79",
+        "taxa_app": "7.77",
+        "sobra": "8.44"
+      }
+    },
+    {
+      "funcao": "decompor",
+      "entrada": {
+        "preco": "22.00",
+        "itens": [
+          [
+            "300",
+            "32.90",
+            "2000"
+          ],
+          [
+            "80",
+            "8.49",
+            "900"
+          ],
+          [
+            "1",
+            "60.00",
+            "50"
+          ]
+        ],
+        "embalagem": "0",
+        "rendimento": "1",
+        "taxa": "0",
+        "impostos": "6"
+      },
+      "saida": {
+        "preco": "22.00",
+        "ingredientes": "6.89",
+        "embalagem": "0.00",
+        "impostos": "1.32",
+        "taxa_app": "0.00",
+        "sobra": "13.79"
+      }
+    },
+    {
+      "funcao": "decompor",
+      "entrada": {
+        "preco": "10",
+        "itens": [
+          [
+            "1",
+            "12",
+            "1"
+          ]
+        ],
+        "embalagem": "0.50",
+        "rendimento": "12",
+        "taxa": "0",
+        "impostos": "0"
+      },
+      "saida": {
+        "preco": "10.00",
+        "ingredientes": "1.00",
+        "embalagem": "0.50",
+        "impostos": "0.00",
+        "taxa_app": "0.00",
+        "sobra": "8.50"
+      }
+    },
+    {
+      "funcao": "decompor",
+      "entrada": {
+        "preco": "10.05",
+        "itens": [
+          [
+            "1",
+            "9",
+            "1"
+          ]
+        ],
+        "embalagem": "0.333",
+        "rendimento": "1",
+        "taxa": "30",
+        "impostos": "6"
+      },
+      "saida": {
+        "preco": "10.05",
+        "ingredientes": "9.00",
+        "embalagem": "0.33",
+        "impostos": "0.60",
+        "taxa_app": "3.02",
+        "sobra": "-2.90"
+      }
+    },
+    {
+      "funcao": "variacao_sobra",
+      "entrada": {
+        "preco": "24.90",
+        "antes": [
+          [
+            "1",
+            "15.60",
+            "12"
+          ],
+          [
+            "150",
+            "37.00",
+            "1000"
+          ],
+          [
+            "36",
+            "45.00",
+            "1000"
+          ],
+          [
+            "1",
+            "45.00",
+            "50"
+          ]
+        ],
+        "depois": [
+          [
+            "1",
+            "15.60",
+            "12"
+          ],
+          [
+            "150",
+            "42.00",
+            "1000"
+          ],
+          [
+            "36",
+            "45.00",
+            "1000"
+          ],
+          [
+            "1",
+            "45.00",
+            "50"
+          ]
+        ],
+        "embalagem": "0",
+        "rendimento": "1",
+        "taxa": "26",
+        "impostos": "6"
+      },
+      "saida": {
+        "antes": "7.57",
+        "depois": "6.82",
+        "diferenca": "-0.75"
+      }
+    },
+    {
+      "funcao": "variacao_sobra",
+      "entrada": {
+        "preco": "29.90",
+        "antes": [
+          [
+            "1",
+            "15.60",
+            "12"
+          ],
+          [
+            "150",
+            "37.00",
+            "1000"
+          ],
+          [
+            "40",
+            "49.90",
+            "1000"
+          ],
+          [
+            "30",
+            "62.00",
+            "1000"
+          ],
+          [
+            "15",
+            "19.90",
+            "1000"
+          ],
+          [
+            "1",
+            "45.00",
+            "50"
+          ]
+        ],
+        "depois": [
+          [
+            "1",
+            "15.60",
+            "12"
+          ],
+          [
+            "150",
+            "42.00",
+            "1000"
+          ],
+          [
+            "40",
+            "49.90",
+            "1000"
+          ],
+          [
+            "30",
+            "62.00",
+            "1000"
+          ],
+          [
+            "15",
+            "19.90",
+            "1000"
+          ],
+          [
+            "1",
+            "45.00",
+            "50"
+          ]
+        ],
+        "embalagem": "0",
+        "rendimento": "1",
+        "taxa": "26",
+        "impostos": "6"
+      },
+      "saida": {
+        "antes": "8.44",
+        "depois": "7.69",
+        "diferenca": "-0.75"
+      }
+    },
+    {
+      "funcao": "preco_antigo",
+      "entrada": {
+        "atualizado_em": "2026-10-13",
+        "hoje": "2026-11-12"
+      },
+      "saida": {
+        "antigo": false
+      }
+    },
+    {
+      "funcao": "preco_antigo",
+      "entrada": {
+        "atualizado_em": "2026-10-12",
+        "hoje": "2026-11-12"
+      },
+      "saida": {
+        "antigo": true
+      }
+    },
+    {
+      "funcao": "preco_antigo",
+      "entrada": {
+        "atualizado_em": "2026-09-20",
+        "hoje": "2026-11-12"
+      },
+      "saida": {
+        "antigo": true
+      }
+    },
+    {
+      "funcao": "converter_unidade",
+      "entrada": {
+        "quantidade": "0.2",
+        "de": "kg",
+        "para": "g"
+      },
+      "saida": {
+        "quantidade": "200.000"
+      }
+    },
+    {
+      "funcao": "converter_unidade",
+      "entrada": {
+        "quantidade": "1.5",
+        "de": "l",
+        "para": "ml"
+      },
+      "saida": {
+        "quantidade": "1500.000"
+      }
+    },
+    {
+      "funcao": "converter_unidade",
+      "entrada": {
+        "quantidade": "2",
+        "de": "fatia",
+        "para": "g"
+      },
+      "saida": {
+        "erro": true
+      }
+    },
+    {
+      "funcao": "quantidade_de_medidas",
+      "entrada": {
+        "medidas": "2",
+        "por_medida": "18",
+        "de": "g",
+        "para": "g"
+      },
+      "saida": {
+        "quantidade": "36.000"
+      }
+    },
+    {
+      "funcao": "quantidade_de_medidas",
+      "entrada": {
+        "medidas": "3",
+        "por_medida": "0.0125",
+        "de": "kg",
+        "para": "g"
+      },
+      "saida": {
+        "quantidade": "37.500"
+      }
+    },
+    {
+      "funcao": "quantidade_de_medidas",
+      "entrada": {
+        "medidas": "0",
+        "por_medida": "18",
+        "de": "g",
+        "para": "g"
+      },
+      "saida": {
+        "erro": true
+      }
+    }
+  ]
+}
