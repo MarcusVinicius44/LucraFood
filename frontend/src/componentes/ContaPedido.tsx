@@ -10,11 +10,23 @@ export interface ContaPedidoValores {
   sobra: string
 }
 
-export function ContaPedido({ conta, titulo = 'Num pedido pelo app de delivery' }: { conta: ContaPedidoValores; titulo?: string }) {
+export function ContaPedido({
+  conta,
+  titulo = 'Num pedido pelo app de delivery',
+  embalagemNaReceita = false,
+}: {
+  conta: ContaPedidoValores
+  titulo?: string
+  embalagemNaReceita?: boolean // a embalagem foi cadastrada como item da receita (soma junto dos ingredientes)
+}) {
   const negativa = Number(conta.sobra) < 0
   const linhas: [string, string][] = [
-    ['Ingredientes', conta.ingredientes],
-    ['Embalagem', conta.embalagem],
+    ...(embalagemNaReceita
+      ? ([['Ingredientes e embalagem', conta.ingredientes]] as [string, string][])
+      : ([
+          ['Ingredientes', conta.ingredientes],
+          ['Embalagem', conta.embalagem],
+        ] as [string, string][])),
     ['Impostos', conta.impostos],
     ['Taxa do app', conta.taxa_app],
   ]

@@ -1,0 +1,41 @@
+/* Demo: uma "moldura" de app dentro da landing, com o visual do app (index.css). */
+.demo {
+  background: var(--fundo); border: 1px solid #cfe3d7; border-radius: 18px;
+  box-shadow: 0 2px 4px rgba(19, 34, 27, 0.05), 0 18px 48px rgba(19, 34, 27, 0.08);
+  overflow: hidden; max-width: 760px; margin: 1.25rem auto 0;
+}
+.demo-barra {
+  display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+  padding: 0.6rem 0.9rem; background: var(--superficie); border-bottom: 1px solid var(--borda);
+}
+.demo-selo {
+  font: 700 0.7rem var(--fonte-texto); letter-spacing: 0.08em; color: #fff; background: var(--laranja);
+  padding: 0.2rem 0.5rem; border-radius: 6px;
+}
+.demo-etapas { list-style: none; display: flex; gap: 0.25rem 0.75rem; flex-wrap: wrap; margin: 0; padding: 0; font-size: 0.8rem; color: var(--texto-suave); flex: 1; }
+.demo-etapas li[aria-current='step'] { color: var(--verde); font-weight: 700; }
+.demo-tela { padding: 1rem; min-height: 320px; }
+@media (min-width: 640px) { .demo-tela { padding: 1.5rem; } }
+.demo h3 { font-size: 1.15rem; }
+.demo h4 { font-family: var(--fonte-titulo); font-size: 1rem; margin: 0; }
+.demo-centro { text-align: center; margin: 0; }
+.demo-centro .etiqueta, .demo .etiqueta { white-space: normal; }
+
+.demo-foto { display: grid; gap: 1.25rem; align-items: center; }
+@media (min-width: 640px) { .demo-foto { grid-template-columns: 1fr 1fr; } }
+.demo-foto .previa { max-height: 420px; height: auto; background: #fbf3e4; }
+
+.demo-revisao { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+@media (min-width: 560px) {
+  .demo-revisao .prato-revisao-campos { grid-template-columns: 2fr 1fr; }
+}
+
+.demo-resumo { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: center; font-weight: 600; }
+.demo-pratos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+@media (min-width: 640px) { .demo-pratos { grid-template-columns: 1fr 1fr; } }
+
+.demo-em-dev { border-style: dashed; border-color: #f3c3a8; }
+.demo-impacto { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.demo-impacto li { display: flex; flex-direction: column; gap: 0.25rem; padding: 0.6rem 0; border-top: 1px solid var(--borda); }
+.demo-queda { color: var(--erro); font-weight: 600; }
+.demo-voltar { align-self: flex-start; padding-left: 0; }

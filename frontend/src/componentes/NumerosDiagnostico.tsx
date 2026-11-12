@@ -12,10 +12,12 @@ export function NumerosDiagnostico({
   diagnostico,
   margemDesejada,
   mostrarConta = false,
+  embalagemNaReceita = false,
 }: {
   diagnostico: Diagnostico
   margemDesejada: string
   mostrarConta?: boolean // a conta linha por linha aparece na tela do prato, não em cada cartão do painel
+  embalagemNaReceita?: boolean
 }) {
   if (!diagnostico.semaforo) {
     return <p className="suave pequeno" style={{ margin: 0 }}>{diagnostico.mensagem}</p>
@@ -36,7 +38,7 @@ export function NumerosDiagnostico({
           <span className="numero-valor">{formatarReais(diagnostico.custo)}</span>
         </div>
       </div>
-      {mostrarConta && diagnostico.conta && <ContaPedido conta={diagnostico.conta} />}
+      {mostrarConta && diagnostico.conta && <ContaPedido conta={diagnostico.conta} embalagemNaReceita={embalagemNaReceita} />}
       {diagnostico.preco_sugerido_delivery && (
         <div className="sugestao">
           <Etiqueta origem={`Custo da sua ficha + taxas do restaurante, para chegar a ${formatarPct(margemDesejada)} de margem no delivery.`}>
