@@ -1,5 +1,6 @@
 import type { Diagnostico } from '../api'
 import { formatarPct, formatarReais } from '../formato'
+import { ContaPedido } from './ContaPedido'
 import { Etiqueta } from './Etiqueta'
 
 /**
@@ -7,7 +8,15 @@ import { Etiqueta } from './Etiqueta'
  * Prato pendente (sem preço, sem ficha, taxas impossíveis) mostra só a explicação, nenhum número:
  * custo zero daria um falso "saudável".
  */
-export function NumerosDiagnostico({ diagnostico, margemDesejada }: { diagnostico: Diagnostico; margemDesejada: string }) {
+export function NumerosDiagnostico({
+  diagnostico,
+  margemDesejada,
+  mostrarConta = false,
+}: {
+  diagnostico: Diagnostico
+  margemDesejada: string
+  mostrarConta?: boolean // a conta linha por linha aparece na tela do prato, não em cada cartão do painel
+}) {
   if (!diagnostico.semaforo) {
     return <p className="suave pequeno" style={{ margin: 0 }}>{diagnostico.mensagem}</p>
   }
@@ -27,6 +36,7 @@ export function NumerosDiagnostico({ diagnostico, margemDesejada }: { diagnostic
           <span className="numero-valor">{formatarReais(diagnostico.custo)}</span>
         </div>
       </div>
+      {mostrarConta && diagnostico.conta && <ContaPedido conta={diagnostico.conta} />}
       {diagnostico.preco_sugerido_delivery && (
         <div className="sugestao">
           <Etiqueta origem={`Custo da sua ficha + taxas do restaurante, para chegar a ${formatarPct(margemDesejada)} de margem no delivery.`}>

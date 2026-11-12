@@ -63,6 +63,18 @@ class FichaTecnicaTest(BaseFicha):
         d = self.client.get(f"/api/pratos/{self.prato.id}/diagnostico/").json()
         self.assertEqual((d["nome"], d["semaforo"], d["custo"]), ("X-Burger", "amarelo", "10.35"))
 
+    def test_diagnostico_traz_a_conta_do_delivery_linha_por_linha(self):
+        # R$ 20: pão 1,50 + carne 6,30 + queijo 1,35 = 9,15; embalagem 1,20; imposto 6% = 1,20; taxa 23% = 4,60
+        self.ficha_xburger()
+        conta = self.client.get(f"/api/pratos/{self.prato.id}/diagnostico/").json()["conta"]
+        self.assertEqual(
+            conta,
+            {"preco": "20.00", "ingredientes": "9.15", "embalagem": "1.20", "impostos": "1.20", "taxa_app": "4.60", "sobra": "3.85"},
+        )
+
+    def test_sem_ficha_nao_tem_conta(self):
+        self.assertIsNone(self.client.get(f"/api/pratos/{self.prato.id}/diagnostico/").json()["conta"])
+
     def test_put_substitui_a_ficha_inteira(self):
         self.ficha_xburger()
         self.put_ficha([{"ingrediente": self.carne.id, "quantidade": 200}])

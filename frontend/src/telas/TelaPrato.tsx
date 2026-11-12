@@ -98,7 +98,7 @@ export function TelaPrato() {
 
       <section className="cartao pilha-curta">
         <h2>Diagnóstico</h2>
-        <NumerosDiagnostico diagnostico={ficha.diagnostico} margemDesejada={restaurante.margem_desejada_pct} />
+        <NumerosDiagnostico diagnostico={ficha.diagnostico} margemDesejada={restaurante.margem_desejada_pct} mostrarConta />
       </section>
 
       <DadosDoPrato

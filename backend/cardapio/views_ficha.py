@@ -142,6 +142,7 @@ def diagnostico_do_prato(prato):
         "margem_balcao_pct": None,
         "margem_delivery_pct": None,
         "preco_sugerido_delivery": None,
+        "conta": None,  # o pedido no delivery em reais, linha por linha (calculos.decompor)
     }
     itens = list(prato.itens.all())
     if prato.preco_venda is None or prato.preco_venda <= 0:
@@ -160,8 +161,24 @@ def diagnostico_do_prato(prato):
         )
     except ValueError as erro:  # ex.: taxa + impostos + margem desejada passam de 100%
         return {**resultado, "pendente": "configuracao", "mensagem": str(erro), "custo": str(custo)}
+    conta = calculos.decompor(
+        prato.preco_venda,
+        [(item.quantidade, item.ingrediente.custo_por_unidade) for item in itens],
+        prato.custo_embalagem,
+        prato.rendimento,
+        r.taxa_delivery_pct,
+        r.impostos_pct,
+    )
     return {
         **resultado,
+        "conta": {
+            "preco": str(conta.preco),
+            "ingredientes": str(conta.ingredientes),
+            "embalagem": str(conta.embalagem),
+            "impostos": str(conta.impostos),
+            "taxa_app": str(conta.taxa_app),
+            "sobra": str(conta.sobra),
+        },
         "semaforo": d.semaforo,
         "custo": str(d.custo),
         "margem_balcao_pct": str(d.margem_balcao),

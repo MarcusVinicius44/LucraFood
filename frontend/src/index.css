@@ -442,3 +442,14 @@ a { color: var(--verde); }
   align-items: center;
   gap: 0.25rem;
 }
+
+/* Conta do pedido no delivery, linha por linha (preço − ... = sobra) */
+.conta-pedido { border-top: 1px dashed var(--borda); padding-top: 0.5rem; font-size: 0.9rem; }
+.conta-titulo { font-size: 0.72rem; color: var(--texto-suave); margin: 0 0 0.25rem; }
+.conta-pedido dl { margin: 0; display: grid; gap: 0.15rem; }
+.conta-pedido dl > div { display: flex; justify-content: space-between; gap: 1rem; }
+.conta-pedido dt { color: var(--texto-suave); }
+.conta-pedido dd { margin: 0; font-variant-numeric: tabular-nums; }
+.conta-sobra { border-top: 1px solid var(--borda); margin-top: 0.2rem; padding-top: 0.25rem; font-weight: 600; }
+.conta-sobra dt { color: var(--texto); }
+.conta-sobra-negativa, .conta-sobra-negativa dt { color: var(--erro); }

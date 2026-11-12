@@ -1,6 +1,8 @@
 // Todas as chamadas ao backend Django. Os tipos espelham as respostas da API.
 // Decimais chegam como texto ("20.00"), do jeito que o DRF devolve, para não perder centavos.
 
+import type { ContaPedidoValores } from './componentes/ContaPedido'
+
 export type Semaforo = 'verde' | 'amarelo' | 'vermelho'
 export type Pendencia = 'sem_preco' | 'sem_ficha' | 'configuracao'
 
@@ -33,6 +35,7 @@ export interface Diagnostico {
   margem_balcao_pct: string | null
   margem_delivery_pct: string | null
   preco_sugerido_delivery: string | null
+  conta?: ContaPedidoValores | null // pedido no delivery em reais, linha por linha (calculos.decompor)
 }
 
 export interface PratoPainel extends Diagnostico {
