@@ -1,10 +1,11 @@
 import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { Landing } from './landing/Landing'
+import { PorDentro } from './landing/PorDentro'
 import { REPOSITORIO } from './landing/conteudo'
 import simbolo from './assets/lucrafood-simbolo.svg'
 
-// "/" = landing com a demo (sem back-end). "/app" = o app real, que fala com o Django.
+// "/" = landing com a demo (sem back-end). "/por-dentro" = a parte técnica. "/app" = o app real, que fala com o Django.
 // O app só é baixado quando alguém abre /app, para a landing carregar leve.
 const App = lazy(() => import('./App'))
 
@@ -38,6 +39,7 @@ export function Raiz() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/por-dentro" element={<PorDentro />} />
       <Route
         path="/app/*"
         element={

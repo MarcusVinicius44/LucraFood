@@ -81,3 +81,80 @@ export const NUMEROS_PROJETO = [
   { valor: '21 de 21', texto: 'itens ambíguos que o sistema pediu para o dono conferir' },
   { valor: '13 de 14', texto: 'respostas da conversa lidas certo ("uns 2 quilos", "pula essa")' },
 ]
+
+// ---- Página de venda (redesenho de 12/11) ----
+
+export const CONTATO_PILOTO = `https://wa.me/5579999757907?text=${encodeURIComponent('Olá, vi o LucraFood e quero participar do piloto gratuito')}`
+
+/** Palavras que giram no título: "Quanto sobra [do seu X-Burger] depois da taxa do app?" */
+export const PRATOS_GIRO = ['do seu X-Burger', 'da sua marmita', 'da sua pizza', 'do seu açaí', 'do seu prato feito']
+
+/** Faixa rolando. `breve` = ainda não está no app real (só na demo). */
+export const RECURSOS_FAIXA: { texto: string; breve?: boolean }[] = [
+  { texto: 'Cardápio lido por foto' },
+  { texto: 'Nada salva sem você conferir' },
+  { texto: 'Receita escrita do seu jeito' },
+  { texto: 'Conta do pedido linha por linha' },
+  { texto: 'Farol por prato' },
+  { texto: 'Receita que rende várias porções' },
+  { texto: 'Preço sugerido' },
+  { texto: 'Testar um preço novo', breve: true },
+  { texto: 'Ingrediente ficou mais caro', breve: true },
+]
+
+/** Números do problema que contam até o valor: prefixo + número + sufixo (o texto final é `valor`). */
+export const CONTAGEM_MERCADO: Record<string, { antes?: string; numero: number; casas: number; depois: string }> = {
+  '1,6 milhão': { numero: 1.6, casas: 1, depois: ' milhão' },
+  '~380 mil': { antes: '~', numero: 380, casas: 0, depois: ' mil' },
+  '71%': { numero: 71, casas: 0, depois: '%' },
+  '16% a 25%': { antes: '16% a ', numero: 25, casas: 0, depois: '%' },
+  '43%': { numero: 43, casas: 0, depois: '%' },
+}
+
+export const SEM_COM = {
+  sem: [
+    'Preço no chute, ou copiado do concorrente',
+    'A taxa do app aparece só no extrato do fim do mês',
+    'Planilha de custo que ninguém atualiza',
+    'Não dá para saber qual prato vende muito e sobra pouco',
+  ],
+  com: [
+    'Cardápio lido pela foto, em segundos, e você confere',
+    'A conta de cada pedido: preço, ingredientes, imposto, taxa e o que sobra',
+    'Receita escrita do seu jeito ("2 fatias de queijo"); a IA organiza',
+    'Farol por prato: saudável, atenção ou crítico no delivery',
+  ],
+}
+
+export const PERGUNTAS: { pergunta: string; resposta: string }[] = [
+  {
+    pergunta: 'Quanto custa?',
+    resposta:
+      'Nada, por enquanto. O LucraFood está em piloto gratuito com restaurantes, e ainda não existe plano pago.',
+  },
+  {
+    pergunta: 'Como funciona o piloto?',
+    resposta:
+      'Você chama no WhatsApp, manda a foto do cardápio e as receitas dos pratos que mais vende, e a gente monta o painel junto com você. Ainda não há app para baixar.',
+  },
+  {
+    pergunta: 'A IA pode errar?',
+    resposta:
+      'Pode, e por isso nada é salvo antes de você conferir. Preço que ela não consegue ler fica em branco, nunca é chutado. Nos testes com 8 cardápios reais, ela leu 251 de 254 pratos e acertou todos os preços que leu.',
+  },
+  {
+    pergunta: 'É a IA que faz as contas?',
+    resposta:
+      'Não. A IA só lê a foto e o texto da receita. Toda conta (custo, margem, preço sugerido) é feita pelo sistema, com regras fixas e testadas.',
+  },
+  {
+    pergunta: 'Funciona com iFood, 99Food ou Rappi?',
+    resposta:
+      'O LucraFood não se conecta a nenhum app de delivery. Você informa a taxa que paga (por exemplo, 23%) e o imposto, e ele faz a conta com os seus números.',
+  },
+  {
+    pergunta: 'Preciso entender de planilha?',
+    resposta:
+      'Não. Você escreve a receita como falaria ("pão, 150 g de carne, 2 fatias de queijo"). Quando falta alguma coisa, o sistema pergunta, por exemplo quanto pesa uma fatia.',
+  },
+]
