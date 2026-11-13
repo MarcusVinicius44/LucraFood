@@ -13,6 +13,10 @@
   Django · DRF · React · TypeScript · Gemini (visão + JSON) · Pydantic
 </p>
 
+<p align="center">
+  <a href="https://lucrafood.vercel.app/"><strong>Ver o site e testar a demo → lucrafood.vercel.app</strong></a>
+</p>
+
 ---
 
 ## O problema
@@ -44,7 +48,7 @@ flowchart LR
 
 ## Landing e demo interativa
 
-<!-- Link do site: preencher depois do deploy na Vercel. -->
+**No ar: [lucrafood.vercel.app](https://lucrafood.vercel.app/)** (página de venda + demo; o app completo roda com o back-end, veja [`docs/DESENVOLVIMENTO.md`](docs/DESENVOLVIMENTO.md)).
 
 A página inicial do frontend (`/`) apresenta o projeto e tem uma **demo interativa** que roda sem back-end: o visitante lê o cardápio de uma lanchonete fictícia, corrige os pratos, monta a receita de um lanche e chega ao diagnóstico em menos de um minuto. O app completo fica em `/app`.
 
@@ -95,7 +99,7 @@ A avaliação também orientou decisões de produto. Ela mostrou que o plano gra
 | Backend | Python, Django 5.2, Django REST Framework, SQLite |
 | Frontend | React 19, TypeScript, Vite, React Router, mobile-first (câmera do celular) |
 | IA | Gemini 3.5 Flash-Lite (visão + JSON) pela biblioteca `openai`; Groq como alternativa; Pydantic para validar a saída |
-| Qualidade | 185 testes no backend (IA simulada, sem rede), 85 no frontend (Vitest e Testing Library, incluindo as contas da demo contra o Python e o fluxo da demo de ponta a ponta), conjuntos de avaliação com fotos e frases reais |
+| Qualidade | 185 testes no backend (IA simulada, sem rede), 90 no frontend (Vitest e Testing Library, incluindo as contas da demo contra o Python e o fluxo da demo de ponta a ponta), conjuntos de avaliação com fotos e frases reais |
 
 ## Arquitetura
 
