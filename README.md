@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <strong>Tire uma foto do cardápio e descubra quais pratos dão lucro e quais dão prejuízo no delivery.</strong>
+  <strong>Tire uma foto do cardápio e descubra quanto sobra de cada prato, no balcão e no delivery.</strong>
 </p>
 
 <p align="center">
@@ -23,7 +23,7 @@
 
 No Brasil, a maioria dos restaurantes pequenos (lanchonete, marmitaria, pizzaria de bairro) é tocada pelo próprio dono, sem contador nem planilha. O preço sai do "achismo" ou da comparação com o concorrente.
 
-O problema aparece quando o restaurante entra no delivery. O aplicativo cobra comissão, há imposto e embalagem, e um prato que dava lucro no balcão pode estar **dando prejuízo a cada pedido**, sem que o dono perceba. Descobrir isso exige montar a ficha técnica de cada prato (quanto vai de cada ingrediente e quanto custa), e quase ninguém tem tempo para isso.
+Mesmo no balcão, poucos donos sabem quanto sobra de cada prato depois de ingredientes, embalagem e imposto. No delivery a conta fica mais apertada: o aplicativo ainda cobra comissão, e um prato que dava lucro no balcão pode estar **dando prejuízo a cada pedido**, sem que o dono perceba. Descobrir isso exige montar a ficha técnica de cada prato (quanto vai de cada ingrediente e quanto custa), e quase ninguém tem tempo para isso.
 
 ## A solução
 
@@ -33,7 +33,7 @@ O LucraFood usa IA para fazer a parte chata e deixa as contas para um código qu
 2. **Ele confere o que a IA leu.** Nada é gravado sem confirmação humana.
 3. **Ele conta o que vai em cada prato, em texto livre:** *"pão, hambúrguer de 150 g, 2 fatias de queijo"*. A IA liga cada item a um ingrediente cadastrado e marca o que precisa de atenção ("fatia" não tem peso exato, "queijo" pode ser três produtos diferentes).
 4. **O sistema pergunta o que faltou.** *"Quanto dá mais ou menos 1 fatia de queijo prato, em gramas?"* → *"uns 18"* → anota 2 × 18 g = 36 g. A IA só entende a resposta; a conta é do sistema. Ao confirmar a ficha, o sistema lembra que 1 fatia de queijo prato dá 18 g: no próximo prato, "3 fatias" já vira 54 g, sem perguntar de novo (e o dono pode pedir para esquecer).
-5. **Ele recebe o diagnóstico de cada prato:** custo, margem no balcão, margem no delivery, a conta de um pedido no delivery linha por linha (preço − ingredientes − embalagem − impostos − taxa do app = o que sobra) e um semáforo 🟢 🟡 🔴, com o preço sugerido para voltar à margem desejada.
+5. **Ele recebe o diagnóstico de cada prato:** custo, margem no balcão (preço − ingredientes − embalagem − impostos), margem no delivery (o mesmo, menos a taxa do app), a conta de um pedido no delivery linha por linha e um semáforo 🟢 🟡 🔴 pela margem do delivery, a mais apertada, com o preço sugerido para voltar à margem desejada. Quem só vende no balcão deixa a taxa do app em 0%, e o semáforo passa a valer para o balcão.
 
 O painel guia o primeiro acesso passo a passo (cadastrar ingredientes, montar as fichas, ajustar taxas) até o restaurante ter o diagnóstico do cardápio inteiro.
 
