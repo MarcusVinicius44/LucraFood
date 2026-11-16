@@ -36,7 +36,12 @@ function CupomAnimado({ ativo, onRepetir }: { ativo: boolean; onRepetir: () => v
   const exibido = useValorSuave(RESTANTE[Math.min(fase, 3)], 700)
 
   return (
-    <div className={`cupom cupom-fase-${fase}`}>
+    <div className={`cupom cupom-fase-${fase}${ativo ? ' imprimindo' : ''}`}>
+      {/* o pedido sai de uma impressora de comanda, como na cozinha */}
+      <div className="cupom-impressora" aria-hidden="true">
+        <span className="cupom-led" />
+      </div>
+      <div className="cupom-saida">
       <div className="cupom-papel">
         <p className="cupom-cabeca">
           <strong>{RESTAURANTE_DEMO.nome}</strong>
@@ -71,6 +76,11 @@ function CupomAnimado({ ativo, onRepetir }: { ativo: boolean; onRepetir: () => v
         <p className="cupom-restante" aria-hidden="true">
           Ainda é seu: <strong>{formatarReais(exibido.toFixed(2))}</strong>
         </p>
+        <span className="cupom-carimbo" aria-hidden="true">
+          <small>Sobrou</small>
+          {formatarReais(C.sobra)}
+        </span>
+      </div>
       </div>
       <div className={`cupom-conclusao${fase >= 4 ? ' entrou' : ''}`}>
         <p>

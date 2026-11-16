@@ -148,3 +148,111 @@ export function useValorSuave(alvo: number, duracaoMs = 700) {
   }, [alvo, duracaoMs])
   return valor
 }
+
+/** Mouse de verdade (não toque) e sem pedido de menos movimento: só aí ligamos luz e inclinação. */
+const temMouse = () =>
+  typeof window !== 'undefined' && !semMovimento() && !!window.matchMedia?.('(hover: hover) and (pointer: fine)').matches
+
+/**
+ * Luz que segue o mouse: escreve --mx/--my (px dentro do elemento) e --px/--py (-1 a 1, do centro) no elemento.
+ * O CSS desenha a luz e o leve deslocamento da cena; sem mouse, nada muda.
+ */
+export function useLuzDoMouse<T extends HTMLElement>() {
+  const ref = useRef<T>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || !temMouse()) return
+    let quadro = 0
+    const mover = (e: PointerEvent) => {
+      cancelAnimationFrame(quadro)
+      quadro = requestAnimationFrame(() => {
+        const r = el.getBoundingClientRect()
+        const x = e.clientX - r.left
+        const y = e.clientY - r.top
+        el.style.setProperty('--mx', `${x}px`)
+        el.style.setProperty('--my', `${y}px`)
+        el.style.setProperty('--px', ((x / r.width) * 2 - 1).toFixed(3))
+        el.style.setProperty('--py', ((y / r.height) * 2 - 1).toFixed(3))
+        el.classList.add('com-luz')
+      })
+    }
+    const sair = () => {
+      cancelAnimationFrame(quadro)
+      el.classList.remove('com-luz')
+      el.style.setProperty('--px', '0')
+      el.style.setProperty('--py', '0')
+    }
+    el.addEventListener('pointermove', mover)
+    el.addEventListener('pointerleave', sair)
+    return () => {
+      cancelAnimationFrame(quadro)
+      el.removeEventListener('pointermove', mover)
+      el.removeEventListener('pointerleave', sair)
+    }
+  }, [])
+  return ref
+}
+
+/** Cartões com [data-inclinar] inclinam um pouco na direção do mouse e ganham um brilho onde ele está. */
+export function useInclinar() {
+  useEffect(() => {
+    if (!temMouse()) return
+    let atual: HTMLElement | null = null
+    const soltar = () => {
+      if (!atual) return
+      atual.style.setProperty('--rx', '0deg')
+      atual.style.setProperty('--ry', '0deg')
+      atual.classList.remove('inclinado')
+      atual = null
+    }
+    const mover = (e: PointerEvent) => {
+      const alvo = (e.target as Element | null)?.closest?.<HTMLElement>('[data-inclinar]') ?? null
+      if (alvo !== atual) soltar()
+      if (!alvo) return
+      atual = alvo
+      const r = alvo.getBoundingClientRect()
+      const x = (e.clientX - r.left) / r.width
+      const y = (e.clientY - r.top) / r.height
+      alvo.style.setProperty('--rx', `${((0.5 - y) * 7).toFixed(2)}deg`)
+      alvo.style.setProperty('--ry', `${((x - 0.5) * 9).toFixed(2)}deg`)
+      alvo.style.setProperty('--gx', `${(x * 100).toFixed(1)}%`)
+      alvo.style.setProperty('--gy', `${(y * 100).toFixed(1)}%`)
+      alvo.classList.add('inclinado')
+    }
+    document.addEventListener('pointermove', mover, { passive: true })
+    document.documentElement.addEventListener('pointerleave', soltar)
+    return () => {
+      document.removeEventListener('pointermove', mover)
+      document.documentElement.removeEventListener('pointerleave', soltar)
+    }
+  }, [])
+}
+
+/** Progresso da leitura (0 a 1) em --progresso e a classe .rolou depois do topo, no elemento do ref. */
+export function useProgressoDaLeitura<T extends HTMLElement>() {
+  const ref = useRef<T>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    let quadro = 0
+    const medir = () => {
+      quadro = 0
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0
+      el.style.setProperty('--progresso', p.toFixed(4))
+      el.classList.toggle('rolou', window.scrollY > 24)
+    }
+    const agendar = () => {
+      if (!quadro) quadro = requestAnimationFrame(medir)
+    }
+    medir()
+    window.addEventListener('scroll', agendar, { passive: true })
+    window.addEventListener('resize', agendar)
+    return () => {
+      cancelAnimationFrame(quadro)
+      window.removeEventListener('scroll', agendar)
+      window.removeEventListener('resize', agendar)
+    }
+  }, [])
+  return ref
+}

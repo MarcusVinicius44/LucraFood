@@ -99,7 +99,7 @@ section[id] { scroll-margin-top: 60px; }
 
 .lp-topo-grade { display: grid; gap: 3rem; align-items: center; }
 @media (min-width: 960px) { .lp-topo-grade { grid-template-columns: 1.02fr 1fr; gap: 3.5rem; } }
-.lp-topo-texto > * { animation: lp-subir 0.7s ease-out both; }
+.lp-topo-texto > :not(h1) { animation: lp-subir 0.7s ease-out both; }
 .lp-topo-texto > :nth-child(2) { animation-delay: 0.08s; }
 .lp-topo-texto > :nth-child(3) { animation-delay: 0.16s; }
 .lp-topo-texto > :nth-child(4) { animation-delay: 0.24s; }
@@ -178,7 +178,7 @@ section[id] { scroll-margin-top: 60px; }
   background: linear-gradient(180deg, transparent, rgba(62, 207, 142, 0.35) 85%, var(--menta) 100%);
   animation: lp-scan 2.2s ease-in-out infinite;
 }
-.cena:not(.cena-fase-0) .cena-celular .cena-scan { opacity: 0; transition: opacity 0.4s; }
+.cena:not(.cena-fase-0):not(.cena-fase-1) .cena-celular .cena-scan { opacity: 0; transition: opacity 0.4s; }
 .cena-celular-status {
   position: absolute; left: 8px; right: 8px; bottom: 10px; text-align: center; font-size: 0.68rem; font-weight: 600;
   background: rgba(6, 36, 25, 0.88); color: #fff; border-radius: 999px; padding: 0.3rem 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -333,7 +333,7 @@ section[id] { scroll-margin-top: 60px; }
 .cupom-seg-taxa.saiu { background: repeating-linear-gradient(45deg, #d0574f 0 6px, #e08a84 6px 12px); }
 .cupom-restante { margin: 0.6rem 0 0; font-size: 0.85rem; color: var(--texto-suave); text-align: right; }
 .cupom-restante strong { color: var(--verde); font-size: 1rem; }
-.cupom-conclusao { margin-top: 2rem; opacity: 0; transform: translateY(8px); transition: opacity 0.5s, transform 0.5s; }
+.cupom-conclusao { margin-top: 2.75rem; opacity: 0; transform: translateY(8px); transition: opacity 0.5s, transform 0.5s; }
 .cupom-conclusao.entrou { opacity: 1; transform: none; }
 .cupom-conclusao p:first-child { font-size: 1.05rem; }
 .cupom-conclusao .botao-texto { padding-left: 0; }
@@ -447,6 +447,124 @@ section[id] { scroll-margin-top: 60px; }
 .lp-lista-tecnica { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.5rem; }
 .lp-tecnico :focus-visible, .lp-topo :focus-visible, .lp-piloto :focus-visible, .lp-secao-demo :focus-visible, .lp-cabecalho :focus-visible { outline-color: var(--pessego); }
 
+/* ---------- Título: palavra por palavra ---------- */
+.lp-palavra { display: inline-block; animation: lp-palavra 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(0.12s + var(--i, 0) * 0.07s); }
+@keyframes lp-palavra { from { opacity: 0; transform: translateY(0.55em) rotate(4deg); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
+
+/* ---------- Luz que segue o mouse (topo e oferta) ---------- */
+.lp-luz {
+  position: absolute; inset: 0; z-index: 1; opacity: 0; transition: opacity 0.5s;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(62, 207, 142, 0.16), rgba(255, 180, 143, 0.06) 40%, transparent 70%);
+}
+.com-luz .lp-luz { opacity: 1; }
+/* a cena acompanha o mouse em camadas (profundidade): o painel pouco, o celular e os chips mais */
+.cena-janela { translate: calc(var(--px, 0) * -8px) calc(var(--py, 0) * -6px); transition: translate 0.6s ease-out; }
+.cena-celular { translate: calc(var(--px, 0) * 14px) calc(var(--py, 0) * 10px); transition: translate 0.6s ease-out; }
+.cena-chip { translate: calc(var(--px, 0) * 20px) calc(var(--py, 0) * 14px); }
+
+/* ---------- Caixas da leitura na foto e o prato voando até o painel ---------- */
+.cena-caixa {
+  position: absolute; left: 4%; right: 4%; border: 1.5px solid var(--menta); border-radius: 4px;
+  background: rgba(62, 207, 142, 0.12); box-shadow: 0 0 0 1px rgba(6, 36, 25, 0.15);
+  opacity: 0; transform: scaleX(0.3); transform-origin: left;
+  transition: opacity 0.25s ease var(--d, 0ms), transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) var(--d, 0ms), background 0.3s, border-color 0.3s;
+}
+.cena-caixa.entrou { opacity: 1; transform: none; }
+.cena-caixa.alvo { border-color: var(--laranja); background: rgba(239, 106, 46, 0.3); box-shadow: 0 0 0 3px rgba(239, 106, 46, 0.25); transition-delay: 0ms; }
+.cena-caixa.lido { opacity: 0.45; transition-delay: 0ms; }
+.cena:is(.cena-fase-6, .cena-fase-7) .cena-caixa { opacity: 0.3; }
+.cena-voo {
+  position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; white-space: nowrap;
+  font-size: 0.74rem; font-weight: 600; color: #fff; background: var(--laranja); border-radius: 999px; padding: 0.25rem 0.6rem;
+  box-shadow: 0 10px 24px rgba(239, 106, 46, 0.45);
+  animation: lp-voo 0.8s cubic-bezier(0.5, 0, 0.2, 1) both;
+}
+.cena-voo strong { font-weight: 700; opacity: 0.85; margin-left: 0.25rem; }
+@keyframes lp-voo {
+  0% { transform: translate(var(--de-x), var(--de-y)) translateY(-50%) scale(0.5); opacity: 0; }
+  20% { opacity: 1; transform: translate(var(--de-x), var(--de-y)) translateY(-50%) scale(1); }
+  /* sobe um pouco no meio do caminho: arco em vez de linha reta */
+  60% { transform: translate(calc((var(--de-x) + var(--para-x)) / 2), calc((var(--de-y) + var(--para-y)) / 2 - 36px)) translateY(-50%) scale(1.05); }
+  88% { opacity: 1; }
+  100% { transform: translate(var(--para-x), var(--para-y)) translateY(-50%) scale(0.85); opacity: 0; }
+}
+.cena-lista li.entrou { transition-delay: 0.55s; animation: lp-pousar 0.6s 0.6s ease-out; }
+@keyframes lp-pousar { 30% { background: rgba(239, 106, 46, 0.14); } }
+
+/* ---------- Cupom: sai da impressora e leva carimbo ---------- */
+.cupom-impressora {
+  position: relative; z-index: 2; height: 22px; margin: 0 -14px; border-radius: 10px 10px 6px 6px;
+  background: linear-gradient(180deg, #2c3a33, #16231d); box-shadow: 0 10px 22px rgba(19, 34, 27, 0.25);
+}
+.cupom-impressora::after { content: ''; position: absolute; left: 12px; right: 12px; bottom: 5px; height: 3px; border-radius: 2px; background: #050c09; }
+.cupom-led { position: absolute; right: 14px; top: 5px; width: 6px; height: 6px; border-radius: 50%; background: #4c5b54; }
+.cupom.imprimindo:not(.cupom-fase-4) .cupom-led { background: var(--menta); box-shadow: 0 0 8px var(--menta); animation: lp-piscar 0.5s steps(2) infinite; }
+@keyframes lp-piscar { 50% { opacity: 0.3; } }
+.cupom-saida { clip-path: inset(0 -80px -120px -80px); margin-top: -8px; }
+.cupom-papel { transform: translateY(-102%); }
+.cupom.imprimindo .cupom-papel { animation: lp-imprimir 1.1s cubic-bezier(0.3, 0.7, 0.4, 1) forwards; }
+@keyframes lp-imprimir {
+  from { transform: translateY(-102%) rotate(0deg); }
+  70% { transform: translateY(3%) rotate(0.6deg); }
+  to { transform: translateY(0) rotate(1.2deg); }
+}
+.cupom-fase-4 .cupom-saida { animation: lp-tranco 0.35s 0.3s ease-out; }
+@keyframes lp-tranco { 30% { transform: translate(2px, 3px); } 60% { transform: translate(-1px, -1px); } }
+.cupom-carimbo {
+  position: absolute; right: -1.1rem; bottom: -2.4rem; z-index: 1; display: flex; flex-direction: column; align-items: center; line-height: 1;
+  font: 800 1.35rem var(--fonte-titulo); letter-spacing: 0.02em; color: var(--verde);
+  border: 3px solid currentColor; border-radius: 10px; padding: 0.35rem 0.7rem 0.45rem; background: rgba(255, 253, 248, 0.92);
+  pointer-events: none; box-shadow: 0 6px 16px rgba(11, 93, 59, 0.18);
+  opacity: 0; transform: rotate(-12deg) scale(2.2);
+}
+.cupom-carimbo small { font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.2rem; }
+.cupom-fase-4 .cupom-carimbo { animation: lp-carimbar 0.45s 0.15s cubic-bezier(0.5, 0, 0.75, 0) both; }
+@keyframes lp-carimbar {
+  0% { opacity: 0; transform: rotate(-4deg) scale(2.2); }
+  75% { opacity: 0.95; transform: rotate(-12deg) scale(0.94); }
+  100% { opacity: 0.9; transform: rotate(-12deg) scale(1); }
+}
+.cupom-conclusao.entrou .semaforo { animation: lp-acender 1.2s 0.5s ease-out; }
+@keyframes lp-acender { 0% { box-shadow: 0 0 0 0 rgba(31, 138, 91, 0.5); } 100% { box-shadow: 0 0 0 14px rgba(31, 138, 91, 0); } }
+
+/* ---------- Cartões que inclinam na direção do mouse ---------- */
+[data-inclinar] { position: relative; }
+[data-inclinar].is-visible.inclinado {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-2px);
+  transition: transform 0.12s ease-out, box-shadow 0.2s, border-color 0.2s;
+  box-shadow: 0 22px 48px rgba(19, 34, 27, 0.12);
+}
+[data-inclinar]::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity 0.3s;
+  background: radial-gradient(260px circle at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, 0.22), transparent 65%);
+}
+.lp-coluna-sem::after, .lp-numero-mercado::after, .lp-grade-breve .cartao::after {
+  background: radial-gradient(260px circle at var(--gx, 50%) var(--gy, 50%), rgba(239, 106, 46, 0.09), transparent 65%);
+}
+[data-inclinar].inclinado::after { opacity: 1; }
+.lp-numero-mercado:hover { transform: none; }
+
+/* ---------- Barra de leitura no cabeçalho ---------- */
+.lp-cabecalho { transition: box-shadow 0.3s; }
+.lp-cabecalho.rolou { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); }
+.lp-cabecalho img { transform-origin: left center; transition: transform 0.3s; }
+.lp-cabecalho.rolou img { transform: scale(0.9); }
+.lp-progresso {
+  position: absolute; left: 0; bottom: -1px; height: 2px; width: 100%; pointer-events: none;
+  background: linear-gradient(90deg, var(--menta), var(--laranja));
+  transform: scaleX(var(--progresso, 0)); transform-origin: left;
+}
+
+/* CTA: um brilho atravessa ao passar o mouse e o ícone do WhatsApp acena */
+.lp-botao-cta { position: relative; overflow: hidden; }
+.lp-botao-cta::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.45) 50%, transparent 65%); transform: translateX(-120%);
+}
+.lp-botao-cta:hover::after { transition: transform 0.7s ease; transform: translateX(120%); }
+.lp-botao-cta:hover svg { animation: lp-acenar 0.6s ease-in-out; }
+@keyframes lp-acenar { 25% { transform: rotate(-14deg); } 60% { transform: rotate(10deg); } }
+
 /* ---------- Revelação em cascata ---------- */
 [data-reveal] { opacity: 0; transform: translateY(22px); transition: opacity 0.7s ease-out var(--d, 0ms), transform 0.7s ease-out var(--d, 0ms); }
 [data-reveal].is-visible { opacity: 1; transform: none; }
@@ -460,7 +578,10 @@ section[id] { scroll-margin-top: 60px; }
   .cena-janela::after { display: none; }
   .cena-scan { display: none; }
   .lp-giro > span { transition: none; }
-  .cf-camada, .cf-passo, .cupom-linha, .cupom-conclusao, .cena-lista li, .cena-chip { transition: none; }
+  .cf-camada, .cf-passo, .cupom-linha, .cupom-conclusao, .cena-lista li, .cena-chip, .cena-caixa { transition: none; }
+  .cupom-papel { transform: rotate(1.2deg); }
+  .cupom-fase-4 .cupom-carimbo { opacity: 0.9; transform: rotate(-12deg); }
+  .lp-luz, .cena-voo { display: none; }
   html { scroll-behavior: auto; }
 }
 @media (prefers-reduced-motion: no-preference) {

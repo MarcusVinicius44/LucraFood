@@ -1,4 +1,4 @@
-import { lazy, Suspense, type CSSProperties, type ReactNode } from 'react'
+import { Fragment, lazy, Suspense, type CSSProperties, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import logoBranco from '../assets/lucrafood-logo-branco.svg'
 import { Etiqueta } from '../componentes/Etiqueta'
@@ -21,13 +21,27 @@ import {
   type NumeroMercado,
 } from './conteudo'
 import { Cupom } from './Cupom'
-import { useContador, useGiro, useRevelar, useVisivel } from './hooks'
+import { useContador, useGiro, useInclinar, useLuzDoMouse, useProgressoDaLeitura, useRevelar, useVisivel } from './hooks'
 import './landing.css'
 
 // A demo é a parte mais pesada da página: só baixa quando o visitante chega perto dela.
 const Demo = lazy(() => import('../demo/Demo'))
 
 const atraso = (i: number) => ({ '--d': `${i * 90}ms` }) as CSSProperties
+
+/** Palavras do título entrando uma a uma (a ordem vem de --i no CSS). */
+function Palavras({ texto, de }: { texto: string; de: number }) {
+  return (
+    <>
+      {texto.split(' ').map((p, j, todas) => (
+        <Fragment key={j}>
+          <span className="lp-palavra" style={{ '--i': de + j } as CSSProperties}>{p}</span>
+          {j < todas.length - 1 && ' '}
+        </Fragment>
+      ))}
+    </>
+  )
+}
 
 function BotaoPiloto({ children = 'Quero o piloto gratuito', className = '' }: { children?: ReactNode; className?: string }) {
   return (
@@ -58,7 +72,7 @@ function NumeroQueConta({ n, i }: { n: NumeroMercado; i: number }) {
   const valor = useContador(c?.numero ?? 0, visivel, 1500)
   const exibido = c ? `${c.antes ?? ''}${valor.toLocaleString('pt-BR', { minimumFractionDigits: c.casas, maximumFractionDigits: c.casas })}${c.depois}` : n.valor
   return (
-    <li ref={ref} className="lp-numero-mercado" data-reveal style={atraso(i)}>
+    <li ref={ref} className="lp-numero-mercado" data-reveal data-inclinar style={atraso(i)}>
       <span className="lp-numero-valor">
         <span aria-hidden="true">{exibido}</span>
         <span className="lp-so-leitor">{n.valor}</span>
@@ -74,15 +88,16 @@ function Titulo() {
   return (
     <h1 className="lp-titulo" aria-label="Quanto sobra de cada prato depois da taxa do app?">
       <span aria-hidden="true">
-        Quanto sobra{' '}
-        <span className="lp-giro">
+        <Palavras texto="Quanto" de={0} />{' '}
+        <span className="lp-palavra" style={{ '--i': 1 } as CSSProperties}>sobra</span>{' '}
+        <span className="lp-palavra" style={{ '--i': 2 } as CSSProperties}><span className="lp-giro">
           {PRATOS_GIRO.map((p, j) => (
             <span key={p} className={j === i ? 'ativo' : ''}>
               {p}
             </span>
           ))}
-        </span>{' '}
-        depois da taxa do app?
+        </span></span>{' '}
+        <Palavras texto="depois da taxa do app?" de={3} />
       </span>
     </h1>
   )
@@ -120,10 +135,15 @@ function Fechamento() {
 
 export function Landing() {
   useRevelar()
+  useInclinar()
+  const cabecalho = useProgressoDaLeitura<HTMLElement>()
+  const topo = useLuzDoMouse<HTMLElement>()
+  const piloto = useLuzDoMouse<HTMLElement>()
   return (
     <div className="lp">
       <a className="lp-pular" href="#conteudo">Pular para o conteúdo</a>
-      <header className="lp-cabecalho">
+      <header ref={cabecalho} className="lp-cabecalho">
+        <span className="lp-progresso" aria-hidden="true" />
         <div className="lp-cabecalho-conteudo">
           <a href="#topo" aria-label="LucraFood, topo da página">
             <img src={logoBranco} alt="LucraFood" height={28} />
@@ -139,8 +159,9 @@ export function Landing() {
 
       <main id="conteudo">
         {/* 1. Topo */}
-        <section id="topo" className="lp-topo">
+        <section ref={topo} id="topo" className="lp-topo">
           <div className="lp-topo-fundo" aria-hidden="true">
+            <span className="lp-luz" />
             <span className="lp-mancha lp-mancha-1" />
             <span className="lp-mancha lp-mancha-2" />
             <span className="lp-mancha lp-mancha-3" />
@@ -237,11 +258,11 @@ export function Landing() {
             <p className="lp-sobretitulo" data-reveal>O que muda</p>
             <h2 id="semcom-titulo" data-reveal style={atraso(1)}>Sem o LucraFood × com o LucraFood</h2>
             <div className="lp-sem-com">
-              <div className="lp-coluna-sem" data-reveal style={atraso(1)}>
+              <div className="lp-coluna-sem" data-reveal data-inclinar style={atraso(1)}>
                 <h3>Sem</h3>
                 <ul>{SEM_COM.sem.map((t) => <li key={t}>{t}</li>)}</ul>
               </div>
-              <div className="lp-coluna-com" data-reveal style={atraso(2)}>
+              <div className="lp-coluna-com" data-reveal data-inclinar style={atraso(2)}>
                 <h3>Com o LucraFood</h3>
                 <ul>{SEM_COM.com.map((t) => <li key={t}>{t}</li>)}</ul>
               </div>
@@ -268,7 +289,7 @@ export function Landing() {
                 ['Ingrediente ficou mais caro', 'A carne subiu? Veja quais pratos foram afetados e quanto a sobra de cada um caiu.'],
                 ['Preço de ingrediente antigo', 'Aviso quando um preço está há mais de 30 dias sem atualizar: a conta pode estar desatualizada.'],
               ].map(([titulo, texto], i) => (
-                <li key={titulo} className="cartao" data-reveal style={atraso(i)}>
+                <li key={titulo} className="cartao" data-reveal data-inclinar style={atraso(i)}>
                   <Etiqueta origem="Funciona na demo; ainda não está no app real.">Em desenvolvimento</Etiqueta>
                   <h3>{titulo}</h3>
                   <p>{texto}</p>
@@ -311,8 +332,9 @@ export function Landing() {
         </section>
 
         {/* 9. Oferta */}
-        <section id="piloto" className="lp-piloto" aria-labelledby="piloto-titulo">
+        <section ref={piloto} id="piloto" className="lp-piloto" aria-labelledby="piloto-titulo">
           <div className="lp-topo-fundo" aria-hidden="true">
+            <span className="lp-luz" />
             <span className="lp-mancha lp-mancha-1" />
             <span className="lp-mancha lp-mancha-2" />
           </div>
