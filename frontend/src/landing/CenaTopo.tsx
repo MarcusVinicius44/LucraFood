@@ -76,7 +76,7 @@ export function CenaTopo() {
   const lidos = new Set(LINHAS.filter((_, i) => fase >= PRIMEIRO_VOO + i + 1).map((l) => l.prato.nome))
 
   return (
-    <div ref={ref} className={`cena cena-fase-${fase}`} role="img" aria-label={`Exemplo do LucraFood: o celular lê o cardápio e o painel mostra quanto sobra de cada prato no delivery. No X-Burger de ${formatarReais(PRINCIPAL.conta.preco)}, sobram ${formatarReais(PRINCIPAL.conta.sobra)}.`}>
+    <div ref={ref} className={`cena cena-fase-${fase}`} role="img" aria-label={`Exemplo do LucraFood: o celular lê o cardápio e o painel mostra quanto sobra de cada prato. No X-Burger de ${formatarReais(PRINCIPAL.conta.preco)}, sobram ${formatarReais(PRINCIPAL.conta.sobra)} no delivery.`}>
       <div className="cena-janela" aria-hidden="true">
         <div className="cena-janela-barra">
           <span /><span /><span />

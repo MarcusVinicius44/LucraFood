@@ -21,7 +21,7 @@ const GUIA = [
   'confira os preços e confirme',
   'abra o X-Burger para montar a receita',
   'organize a receita e confirme',
-  'veja quanto sobra no delivery',
+  'veja quanto sobra no balcão e no delivery',
 ]
 
 type Aparelho = 'computador' | 'celular'

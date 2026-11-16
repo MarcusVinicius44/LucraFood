@@ -17,7 +17,7 @@ describe('página de venda', () => {
     const fetchEspiao = vi.fn()
     vi.stubGlobal('fetch', fetchEspiao)
     render(<MemoryRouter><Landing /></MemoryRouter>)
-    expect(screen.getByRole('heading', { level: 1, name: 'Quanto sobra de cada prato depois da taxa do app?' })).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 1, name: 'Quanto sobra de cada prato no balcão e no delivery?' })).toBeTruthy()
     const ctas = screen.getAllByRole('link', { name: /piloto gratuito/i })
     expect(ctas.some((a) => a.getAttribute('href')!.startsWith('https://wa.me/'))).toBe(true)
     expect(screen.getByRole('link', { name: /Por dentro/ }).getAttribute('href')).toBe('/por-dentro')
@@ -38,6 +38,9 @@ describe('página de venda', () => {
     // casos-calculos.json: X-Burger R$ 24,90 → sobra R$ 7,57 (taxa 26%, imposto 6%)
     expect(screen.getAllByText('R$ 24,90').length).toBeGreaterThan(0)
     expect(screen.getAllByText('R$ 7,57').length).toBeGreaterThan(0)
+    // no balcão, a mesma venda sem a taxa do app: 24,90 − 9,37 − 1,49 = 14,04 (margem_balcao 56,4%)
+    expect(screen.getByText('R$ 14,04')).toBeTruthy()
+    expect(screen.getByText(/\(56,4%\)/)).toBeTruthy()
     expect(screen.getByRole('img', { name: /No X-Burger de R\$ 24,90, sobram R\$ 7,57/ })).toBeTruthy()
   })
 

@@ -86,7 +86,7 @@ function NumeroQueConta({ n, i }: { n: NumeroMercado; i: number }) {
 function Titulo() {
   const i = useGiro(PRATOS_GIRO.length, 2400)
   return (
-    <h1 className="lp-titulo" aria-label="Quanto sobra de cada prato depois da taxa do app?">
+    <h1 className="lp-titulo" aria-label="Quanto sobra de cada prato no balcão e no delivery?">
       <span aria-hidden="true">
         <Palavras texto="Quanto" de={0} />{' '}
         <span className="lp-palavra" style={{ '--i': 1 } as CSSProperties}>sobra</span>{' '}
@@ -97,7 +97,7 @@ function Titulo() {
             </span>
           ))}
         </span></span>{' '}
-        <Palavras texto="depois da taxa do app?" de={3} />
+        <Palavras texto="no balcão e no delivery?" de={3} />
       </span>
     </h1>
   )
@@ -169,12 +169,12 @@ export function Landing() {
           <div className="lp-conteudo lp-topo-grade">
             <div className="lp-topo-texto">
               <p className="lp-selo-topo">
-                <span className="lp-ponto-vivo" aria-hidden="true" /> Para restaurantes que vendem por app de delivery
+                <span className="lp-ponto-vivo" aria-hidden="true" /> Para restaurantes que vendem no balcão e por app de delivery
               </p>
               <Titulo />
               <p className="lp-subtitulo">
                 Tire uma foto do cardápio. O LucraFood lê os pratos com IA, você confere, e ele mostra prato a prato quanto fica
-                para você depois de ingredientes, imposto e taxa do app.
+                para você: no balcão, depois de ingredientes e imposto; no delivery, também depois da taxa do app.
               </p>
               <div className="lp-acoes">
                 <BotaoPiloto />
@@ -193,15 +193,15 @@ export function Landing() {
         <section id="problema" className="lp-secao" aria-labelledby="problema-titulo">
           <div className="lp-conteudo">
             <p className="lp-sobretitulo" data-reveal>O problema</p>
-            <h2 id="problema-titulo" data-reveal style={atraso(1)}>O delivery cresceu. A conta ficou mais difícil.</h2>
+            <h2 id="problema-titulo" data-reveal style={atraso(1)}>Vender comida ficou mais caro. A conta ficou mais difícil.</h2>
             <ul className="lp-grade-numeros">
               {NUMEROS_MERCADO.map((n, i) => (
                 <NumeroQueConta key={n.valor} n={n} i={i} />
               ))}
             </ul>
             <p className="lp-fechamento" data-reveal>
-              Muitos donos sabem o preço de venda. Poucos sabem quanto sobra depois de ingredientes, embalagem, imposto e taxa do
-              app.
+              Muitos donos sabem o preço de venda. Poucos sabem quanto sobra depois de ingredientes, embalagem e imposto, e menos
+              ainda depois da taxa do app.
             </p>
           </div>
         </section>
@@ -222,8 +222,8 @@ export function Landing() {
               <p className="lp-sobretitulo" data-reveal>A conta que ninguém te mostra</p>
               <h2 id="conta-titulo" data-reveal style={atraso(1)}>O cliente paga R$ 24,90. Quanto disso é seu?</h2>
               <p className="lp-texto-grande" data-reveal style={atraso(2)}>
-                O app mostra o que você vendeu. O LucraFood mostra o que sobrou: cada pedido descontado linha por linha, com o seu
-                custo, o seu imposto e a sua taxa.
+                A maquininha e o app mostram o que você vendeu. O LucraFood mostra o que sobrou: cada venda descontada linha por
+                linha, com o seu custo, o seu imposto e, no delivery, a taxa do app.
               </p>
               <p className="suave pequeno" data-reveal style={atraso(3)}>
                 Exemplo com o X-Burger da lanchonete fictícia da demo, taxa de 26% e imposto de 6%.
@@ -271,8 +271,8 @@ export function Landing() {
             <h3 className="lp-subsecao" data-reveal>O que o LucraFood já faz hoje</h3>
             <ul className="lp-lista-beneficios">
               {[
-                ['Ver quais pratos dão pouco lucro no delivery.', 'O painel separa os pratos em saudável, atenção e crítico pela margem depois da taxa do app.'],
-                ['Ver a conta inteira, linha por linha:', 'preço − ingredientes − embalagem − imposto − taxa do app = o que sobra.'],
+                ['Ver quais pratos dão pouco lucro, no balcão e no delivery.', 'O painel mostra a margem de cada prato nos dois e separa em saudável, atenção e crítico pela margem do delivery, a mais apertada.'],
+                ['Ver a conta inteira, linha por linha:', 'preço − ingredientes − embalagem − imposto (− taxa do app, no delivery) = o que sobra.'],
                 ['Saber o custo de cada ingrediente da receita,', 'inclusive de receitas que rendem várias porções.'],
                 ['Um preço sugerido', 'para chegar na margem que você escolheu, sempre marcado como sugestão.'],
               ].map(([forte, resto], i) => (
@@ -285,7 +285,7 @@ export function Landing() {
             <h3 className="lp-subsecao" data-reveal>O que vem por aí</h3>
             <ul className="lp-grade-breve">
               {[
-                ['Testar um preço novo', 'Mude o preço e veja a sobra e o farol mudarem antes de mexer no app de delivery.'],
+                ['Testar um preço novo', 'Mude o preço e veja a sobra e o farol mudarem antes de trocar o cardápio ou o preço no app.'],
                 ['Ingrediente ficou mais caro', 'A carne subiu? Veja quais pratos foram afetados e quanto a sobra de cada um caiu.'],
                 ['Preço de ingrediente antigo', 'Aviso quando um preço está há mais de 30 dias sem atualizar: a conta pode estar desatualizada.'],
               ].map(([titulo, texto], i) => (
@@ -359,7 +359,7 @@ export function Landing() {
           <div className="lp-rodape-topo">
             <div>
               <img src={logoBranco} alt="LucraFood" height={28} />
-              <p>Quanto sobra de cada prato no delivery.</p>
+              <p>Quanto sobra de cada prato, no balcão e no delivery.</p>
             </div>
             <nav aria-label="Rodapé" className="lp-rodape-links">
               <a href="#como-funciona">Como funciona</a>

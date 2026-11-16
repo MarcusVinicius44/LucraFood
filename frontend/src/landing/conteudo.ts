@@ -86,7 +86,7 @@ export const NUMEROS_PROJETO = [
 
 export const CONTATO_PILOTO = `https://wa.me/5579999757907?text=${encodeURIComponent('Olá, vi o LucraFood e quero participar do piloto gratuito')}`
 
-/** Palavras que giram no título: "Quanto sobra [do seu X-Burger] depois da taxa do app?" */
+/** Palavras que giram no título: "Quanto sobra [do seu X-Burger] no balcão e no delivery?" */
 export const PRATOS_GIRO = ['do seu X-Burger', 'da sua marmita', 'da sua pizza', 'do seu açaí', 'do seu prato feito']
 
 /** Faixa rolando. `breve` = ainda não está no app real (só na demo). */
@@ -94,6 +94,7 @@ export const RECURSOS_FAIXA: { texto: string; breve?: boolean }[] = [
   { texto: 'Cardápio lido por foto' },
   { texto: 'Nada salva sem você conferir' },
   { texto: 'Receita escrita do seu jeito' },
+  { texto: 'Margem no balcão e no delivery' },
   { texto: 'Conta do pedido linha por linha' },
   { texto: 'Farol por prato' },
   { texto: 'Receita que rende várias porções' },
@@ -116,13 +117,13 @@ export const SEM_COM = {
     'Preço no chute, ou copiado do concorrente',
     'A taxa do app aparece só no extrato do fim do mês',
     'Planilha de custo que ninguém atualiza',
-    'Não dá para saber qual prato vende muito e sobra pouco',
+    'Não dá para saber qual prato vende muito e sobra pouco, no balcão ou no app',
   ],
   com: [
     'Cardápio lido pela foto, em segundos, e você confere',
-    'A conta de cada pedido: preço, ingredientes, imposto, taxa e o que sobra',
+    'A margem de cada prato no balcão e no delivery, com a conta linha por linha',
     'Receita escrita do seu jeito ("2 fatias de queijo"); a IA organiza',
-    'Farol por prato: saudável, atenção ou crítico no delivery',
+    'Farol por prato: saudável, atenção ou crítico, pela margem do delivery',
   ],
 }
 
@@ -151,6 +152,11 @@ export const PERGUNTAS: { pergunta: string; resposta: string }[] = [
     pergunta: 'Funciona com iFood, 99Food ou Rappi?',
     resposta:
       'O LucraFood não se conecta a nenhum app de delivery. Você informa a taxa que paga (por exemplo, 23%) e o imposto, e ele faz a conta com os seus números.',
+  },
+  {
+    pergunta: 'E se eu vendo só no balcão?',
+    resposta:
+      'Também serve. A margem do balcão (preço menos ingredientes, embalagem e imposto) aparece em todo prato. O farol olha a margem do delivery, que é a mais apertada; se você não vende por app, deixe a taxa do app em 0% e o farol passa a valer para o balcão.',
   },
   {
     pergunta: 'Preciso entender de planilha?',

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { SemaforoSelo } from '../componentes/SemaforoSelo'
-import { diagnosticoDemo, fichaExemplo, PRATOS_LIDOS, RESTAURANTE_DEMO } from '../demo/dadosDemo'
+import { decompor } from '../demo/calculosDemo'
+import { diagnosticoDemo, fichaExemplo, itensCusto, PRATOS_LIDOS, RESTAURANTE_DEMO } from '../demo/dadosDemo'
 import { formatarPct, formatarReais } from '../formato'
 import { useLinhaDoTempo, useValorSuave, useVisivel } from './hooks'
 
@@ -10,6 +11,8 @@ const PRATO = PRATOS_LIDOS.find((p) => p.nome === 'X-Burger')!
 const R = diagnosticoDemo(PRATO.preco!, fichaExemplo('X-Burger')!)
 const C = R.conta
 const P = Number(C.preco)
+/** A mesma venda no balcão: a mesma conta, sem a taxa do app. */
+const BALCAO = decompor(PRATO.preco!, itensCusto(fichaExemplo('X-Burger')!), 0, 1, 0, RESTAURANTE_DEMO.impostos_pct)
 
 const DESCONTOS = [
   { chave: 'ingredientes', rotulo: 'Ingredientes e embalagem', valor: C.ingredientes },
@@ -85,7 +88,8 @@ function CupomAnimado({ ativo, onRepetir }: { ativo: boolean; onRepetir: () => v
       <div className={`cupom-conclusao${fase >= 4 ? ' entrou' : ''}`}>
         <p>
           De cada {formatarReais(C.preco)} que o cliente paga, ficam <strong>{formatarReais(C.sobra)}</strong> para você
-          ({formatarPct(R.diagnostico.margem_delivery)}).
+          ({formatarPct(R.diagnostico.margem_delivery)}). No balcão, sem a taxa do app, ficariam{' '}
+          <strong>{formatarReais(BALCAO.sobra)}</strong> ({formatarPct(R.diagnostico.margem_balcao)}).
         </p>
         <p className="linha">
           <SemaforoSelo semaforo={R.diagnostico.semaforo} />
